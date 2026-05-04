@@ -568,13 +568,8 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
             // - When typing Vietnamese on new line, Forward Delete must be blocked
             if character == "\n" || character == "\r" {
                 injector.markNewSession(cursorMoved: true)  // Treat Enter as cursor movement
-
-                // For terminal apps, clear history to prevent backspace from restoring
-                // words from previous command lines. Each command line in terminal is
-                // independent, so restoring text from previous lines causes confusion.
-                if AppBehaviorDetector.shared.isTerminal {
-                    engine.clearHistory()
-                }
+                // History is now cleared in processWordBreak() for ALL apps after Enter,
+                // so terminal-specific clearHistory() is no longer needed here.
             }
             
             return event

@@ -3516,22 +3516,20 @@ extension VNEngine {
             // macroKey is cleared by startNewSession()
             // This allows macros like "hello" -> "hello world" to work correctly
         } else if isEnterOrReturn {
-            // Enter/Return = definitive sentence boundary
-            // Must use startNewSession() to clear ALL state including macroKey.
+            // Enter/Return = definitive sentence boundary.
+            // Use reset() to clear ALL state including history, buffer, specialChar, etc.
             //
-            // Without this, macroKey from the previous word survives across Enter.
-            // When user types a new word on the next line/message, processKey()
-            // appends new keystrokes to stale macroKey, creating corrupted macro
-            // data like ['o','l','d','n','e','w'] that can trigger false macro matches
-            // → unexpected text replacement → "text overflow" bug.
+            // Why reset() instead of startNewSession():
+            //   startNewSession() preserves history, but after Enter the previous text
+            //   is no longer on screen (chat: message sent, terminal: command executed,
+            //   editor: new paragraph). Restoring old words via backspace would cause
+            //   buffer-screen desync → garbled output like "ddthuwr" instead of "thử".
             //
-            // Also reset focusChangedDuringTyping which may have been set by
-            // autocomplete popup focus changes. Without this reset, the flag
-            // persists across Enter boundary, causing backspace restore to be
-            // incorrectly skipped (clearWithoutRestore) for the entire next word.
-            startNewSession()
-            spaceCount = 0  // Enter is not a space — no phantom separator in history
-            focusChangedDuringTyping = false  // Clean slate for next typing session
+            // reset() = startNewSession() + history.clear() + specialChar.removeAll()
+            //         + spaceCount=0 + all flags reset
+            // This is exactly what we need for a clean slate after Enter.
+            reset()
+            logCallback?("processWordBreak: Enter → reset() (prevent cross-boundary restore)")
         } else {
             // For non-space word breaks (!, @, #, etc.), we still need to reset the buffer
             // but preserve macroKey to build macros like "!bb"
