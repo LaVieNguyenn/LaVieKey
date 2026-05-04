@@ -6,30 +6,29 @@
     <description>XKey - Vietnamese Input Method for macOS</description>
     <language>vi</language>
     <item>
-      <title>Version 1.2.21 (Build 20260504)</title>
-      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.21-20260504</link>
-      <sparkle:version>20260504</sparkle:version>
+      <title>Version 1.2.21 (Build 20260504.1)</title>
+      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.21-20260504.1</link>
+      <sparkle:version>20260504.1</sparkle:version>
       <sparkle:shortVersionString>1.2.21</sparkle:shortVersionString>
       <description><![CDATA[
         <p><h2>What's New</h2></p>
-<p>fix: clear history after Enter to prevent cross-boundary restore desync</p>
-<p>After Enter in chat apps (Facebook, Telegram), the message is sent and input</p>
-<p>cleared, but engine history still contained words from the sent message.</p>
-<p>When user backspaced through new text, engine restored old words that no</p>
-<p>longer exist on screen, causing buffer-screen desync and garbled output</p>
-<p>like 'ddthuwr' instead of 'thử'.</p>
-<p>Fix: Use reset() instead of startNewSession() in the Enter branch of</p>
-<p>processWordBreak(). reset() clears ALL state including history, buffer,</p>
-<p>specialChar, and flags — providing a clean slate after Enter.</p>
-<p>Enter is a definitive boundary in all contexts (chat, terminal, editor),</p>
-<p>so restoring words across Enter is unreliable and causes desync.</p>
-<p>Also removed redundant terminal-specific clearHistory() from</p>
-<p>KeyboardEventHandler since processWordBreak now handles all apps.</p>
-<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.21-20260504">Xem chi tiết trên GitHub</a></p>
+<p>feat: Smart Switch for overlay apps (Spotlight/Raycast/Alfred)</p>
+<p>Overlay apps now remember their own language state instead of</p>
+<p>inheriting from the underlying app.</p>
+<p>Changes:</p>
+<ul>
+<li>enableVietnameseForOverlay(): Apply Smart Switch when overlay opens</li>
+<li>saveLanguageForOverlay(): Save overlay state when overlay closes</li>
+<li>saveLanguageForCurrentApp(): Save for overlay bundleId when toggling in overlay</li>
+<li>Callback signature (Bool) -> (Bool, String?) to pass overlay name</li>
+<li>Centralized bundleId mapping at OverlayAppDetector.bundleId(forOverlayName:)</li>
+<li>Overlay guard in handleSmartSwitch to prevent double-fire for Raycast/Alfred</li>
+</ul>
+<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.21-20260504.1">Xem chi tiết trên GitHub</a></p>
       ]]></description>
-      <pubDate>Mon, 04 May 2026 08:56:57 +0000</pubDate>
+      <pubDate>Mon, 04 May 2026 14:56:05 +0000</pubDate>
       <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.21-20260504/XKey.dmg" sparkle:version="20260504" sparkle:shortVersionString="1.2.21" length="10687281" type="application/octet-stream" sparkle:edSignature="TugCDUXqgvxBktNHI/U/tzAp2t6Zl8wNwdfTqaFtbtw5cZbhHkQ3tkmUJN0/KTiR+bksvBgfgR6ScAJ1qhnPCg==" />
+      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.21-20260504.1/XKey.dmg" sparkle:version="20260504.1" sparkle:shortVersionString="1.2.21" length="11566374" type="application/octet-stream" sparkle:edSignature="OxN6YcEZgUzclrv2mQHSL3bNrf21VLDqeIyEGvYSew8Ctbad0JR2eqNJ3t0km6IZxl8CuCiidLeFem2Bb8PzCQ==" />
     </item>
   </channel>
 </rss>
