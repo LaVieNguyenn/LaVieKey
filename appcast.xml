@@ -6,33 +6,35 @@
     <description>XKey - Vietnamese Input Method for macOS</description>
     <language>vi</language>
     <item>
-      <title>Version 1.2.21 (Build 20260520)</title>
-      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.21-20260520</link>
-      <sparkle:version>20260520</sparkle:version>
+      <title>Version 1.2.21 (Build 20260522)</title>
+      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.21-20260522</link>
+      <sparkle:version>20260522</sparkle:version>
       <sparkle:shortVersionString>1.2.21</sparkle:shortVersionString>
       <description><![CDATA[
         <p><h2>What's New</h2></p>
-<p>feat: add clipboard paste injection method for TUI apps (Kiro CLI)</p>
+<p>fix: Smart Switch per-app engine state not restored on app switch</p>
+<p>Fix two combined defects causing engine state ('V'/'E') to not be</p>
+<p>remembered per-app when switching between rule-controlled apps (iTerm</p>
+<p>with title rule) and non-rule apps (Ghostty).</p>
+<p>Defect 1: handleSmartSwitch's IS-disabled guard was at the top, blocking</p>
+<p>rule restore (preRuleInputSourceId cleanup) and Smart Switch per-app</p>
+<p>lookup. Moved guard AFTER rule restore so:</p>
 <ul>
-<li>Add TextSendingMethod.paste for apps that drop CGEvent Unicode chars</li>
-<li>Add PasteConfig struct with configurable parameters (delays, key combo,</li>
+<li>preRuleInputSourceId doesn't leak across app switches</li>
+<li>Smart Switch can query per-app data after IS is restored</li>
 </ul>
-<p>  posting method, settle time) and presets (.tuiApp, .remoteDesktop)</p>
-<ul>
-<li>Integrate PasteConfig into InjectionMethodInfo, WindowTitleRule,</li>
-</ul>
-<p>  MergedRuleResult with full Codable support</p>
-<ul>
-<li>Add Kiro CLI window title rule using .paste + .tuiApp config</li>
-<li>sendTextViaPaste: clipboard set → Cmd+V via CGEvent.post → wait</li>
-<li>Skip settle time when pasteConfig.skipSettleTime = true</li>
-<li>No clipboard restore (avoids race condition on fast typing)</li>
-</ul>
-<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.21-20260520">Xem chi tiết trên GitHub</a></p>
+<p>Defect 2: handleInputSourceChange blindly set engine state based on</p>
+<p>global IS config (shouldEnable), ignoring Smart Switch per-app data.</p>
+<p>Now consults SmartSwitchManager.getAppLanguage() to override shouldEnable</p>
+<p>when app has saved English preference.</p>
+<p>Coordination: Added smartSwitchHandledBundleId flag to prevent</p>
+<p>handleInputSourceChange (~150ms async) from overriding engine state</p>
+<p>that handleSmartSwitch (~50ms) already set correctly.</p>
+<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.21-20260522">Xem chi tiết trên GitHub</a></p>
       ]]></description>
-      <pubDate>Wed, 20 May 2026 06:13:45 +0000</pubDate>
+      <pubDate>Fri, 22 May 2026 05:25:09 +0000</pubDate>
       <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.21-20260520/XKey.dmg" sparkle:version="20260520" sparkle:shortVersionString="1.2.21" length="10753887" type="application/octet-stream" sparkle:edSignature="NPa+Gga6yiluiHKysNJUGtRqlUpzpHPUv+95t4FgKVjDJtBJprnPyNuxkdyHfD5o3vEl00eksSEI+o9rzHsMCw==" />
+      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.21-20260522/XKey.dmg" sparkle:version="20260522" sparkle:shortVersionString="1.2.21" length="10755653" type="application/octet-stream" sparkle:edSignature="nDNanKwopTwznlxWaQe7mQaABccctuVT+FNLvSkFPB4RyOSVK878akgd0qMp10p+0ZMID1lYTP8nZI7qp0G2Cw==" />
     </item>
   </channel>
 </rss>
