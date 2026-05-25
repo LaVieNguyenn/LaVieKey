@@ -66,12 +66,11 @@
 </ul>
 <p>Tests: 416 passed, 1 network-dependent translation test flaked</p>
 <p>(unrelated to this change).</p>
-<p>Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com></p>
 <p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.22-20260525">Xem chi tiết trên GitHub</a></p>
       ]]></description>
-      <pubDate>Mon, 25 May 2026 02:06:02 +0000</pubDate>
+      <pubDate>Mon, 25 May 2026 02:09:48 +0000</pubDate>
       <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.22-20260525/XKey.dmg" sparkle:version="20260525" sparkle:shortVersionString="1.2.22" length="10879244" type="application/octet-stream" sparkle:edSignature="elm5v18crR1rnBvPm9RXHXSKlEF6vht9m/x8I82beP6VkbkJoJ9OWQICVQOcOFxj4q3SZhgV/vqAvo02G+pOCw==" />
+      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.22-20260525/XKey.dmg" sparkle:version="20260525" sparkle:shortVersionString="1.2.22" length="10879249" type="application/octet-stream" sparkle:edSignature="5JSBZpsm5i7WaAdnPqly/uDI2N+Ru/+GoMn2JxJKV4RiMMFD7XEqRmBNSdC2BXw47FNxLSBzDLXIctf8h718Dw==" />
     </item>
   </channel>
 </rss>
