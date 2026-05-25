@@ -6,57 +6,72 @@
     <description>XKey - Vietnamese Input Method for macOS</description>
     <language>vi</language>
     <item>
-      <title>Version 1.2.21 (Build 20260524)</title>
-      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.21-20260524</link>
-      <sparkle:version>20260524</sparkle:version>
-      <sparkle:shortVersionString>1.2.21</sparkle:shortVersionString>
+      <title>Version 1.2.22 (Build 20260525)</title>
+      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.22-20260525</link>
+      <sparkle:version>20260525</sparkle:version>
+      <sparkle:shortVersionString>1.2.22</sparkle:shortVersionString>
       <description><![CDATA[
         <p><h2>What's New</h2></p>
-<p>fix: Notion code block + Kiro CLI + dynamic dual tap + remote desktop inject</p>
-<p>Several related fixes for Vietnamese input injection across Chromium-based</p>
-<p>and remote desktop apps:</p>
-<ol>
-<li>Notion code block fix</li>
-</ol>
-<p>   - Switch to .slow + chunked text + low delays (12/25/12 ms). Chunked</p>
-<p>     text sends all chars in one CGEvent, avoiding per-char IME composition</p>
-<p>     state that broke subsequent BS.</p>
-<p>   - Telex sequences like "thuwr" → "thử" now work correctly inside Notion</p>
-<p>     code blocks.</p>
-<ol>
-<li>Dynamic dual event tap</li>
-</ol>
-<p>   - Always-active session-level secondary tap was interfering with synthetic</p>
-<p>     event delivery in Chromium-based apps (Notion code block, Kiro CLI).</p>
-<p>     The tap's mere presence at .headInsertEventTap altered timing/ordering.</p>
-<p>   - Make session tap creation lazy: install only while a remote desktop</p>
-<p>     client is frontmost (RustDesk/Jump/TeamViewer/etc), destroy when leaving.</p>
-<p>     Hooked via NSWorkspace.didActivateApplicationNotification on main queue.</p>
-<p>   - Single tap for 99% of users → no interference. Remote desktop typing</p>
-<p>     support preserved when actually needed.</p>
-<ol>
-<li>Remote desktop inject mode (experimental, opt-in)</li>
-</ol>
-<p>   - New Settings → Advanced → Remote Desktop toggle. Default OFF.</p>
-<p>   - When OFF: remote desktop apps stay in passthrough (existing behavior).</p>
-<p>   - When ON: XKey injects Vietnamese into the remote desktop client via</p>
-<p>     clipboard paste (Cmd+V default, Ctrl+V for RustDesk).</p>
-<p>   - Uses .combinedSessionState event source + explicit Cmd-down → V → Cmd-up</p>
-<p>     sequence for the paste path only (other paths keep .privateState).</p>
-<p>   - Works with Jump Desktop and similar clients (slow typing required).</p>
-<p>     RustDesk strict-checks HID modifier state — synthetic modifier stripped,</p>
-<p>     unsupported and documented in UI.</p>
-<ol>
-<li>Single source of truth for remote desktop bundle IDs</li>
-</ol>
-<p>   - New <code>RemoteDesktopBundleIds.all</code> in Shared/AppBehaviorDetector.swift.</p>
-<p>   - Consumed by both KeyboardEventHandler.passthroughApps and</p>
-<p>     EventTapManager dynamic tap logic. Old duplicated list removed.</p>
-<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.21-20260524">Xem chi tiết trên GitHub</a></p>
+<p>feat(i18n): full vi/en/zh-Hans coverage + macro case-handling fixes</p>
+<p>i18n follow-up to PR #275:</p>
+<ul>
+<li>Wire appLanguage into SharedSettings load/save so it persists in the</li>
+</ul>
+<p>  App Group plist and survives export/import (previously stored only in</p>
+<p>  the standalone UserDefaults cache).</p>
+<ul>
+<li>Default first-launch language to Vietnamese (.vi) instead of .system</li>
+</ul>
+<p>  so new users see the Vietnamese UI regardless of macOS locale.</p>
+<ul>
+<li>Fix MenuBarIconStyle.displayName double-lookup: return raw vi key and</li>
+</ul>
+<p>  let the UI wrap with LocalizedStringKey for a single catalog lookup.</p>
+<ul>
+<li>Harden AppearanceSection.restartApp(): use executableURL, pass the</li>
+</ul>
+<p>  bundle path via argv $1 (safe for paths with quotes/$), surface launch</p>
+<p>  failures via NSLog and skip exit(0) on failure.</p>
+<ul>
+<li>Localize previously-hardcoded strings in HotkeyRecorderView and</li>
+</ul>
+<p>  AdvancedSection (Text(ternary), .help, .alert title, downloadError,</p>
+<p>  user-dictionary alert messages).</p>
+<ul>
+<li>Strengthen AppLanguageTests: use a sentinel AppleLanguages override</li>
+</ul>
+<p>  so removal can be verified without relying on NSGlobalDomain fallback;</p>
+<p>  add invalid-value and missing-key coverage.</p>
+<ul>
+<li>Localizable.xcstrings: complete en and zh-Hans translations for every</li>
+</ul>
+<p>  catalog key (535/535 = 100% both languages); replace stale RDP</p>
+<p>  description key whose Vietnamese source had drifted from the catalog.</p>
+<p>Macro engine:</p>
+<ul>
+<li>All-caps detection now ignores non-letter characters so triggers like</li>
+</ul>
+<p>  "XR-EV" or "XREV1" remain all-caps (digits/punct are neutral).</p>
+<ul>
+<li>First-letter-uppercase triggers produce Title Case output: capitalize</li>
+</ul>
+<p>  the first letter of each whitespace-separated word in the result.</p>
+<ul>
+<li>Add MacroManagerTests covering trigger case-sensitivity and auto-caps</li>
+</ul>
+<p>  output behavior.</p>
+<p>Release:</p>
+<ul>
+<li>Bump MARKETING<em>VERSION to 1.2.22 (CURRENT</em>PROJECT_VERSION 20260525).</li>
+</ul>
+<p>Tests: 416 passed, 1 network-dependent translation test flaked</p>
+<p>(unrelated to this change).</p>
+<p>Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com></p>
+<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.22-20260525">Xem chi tiết trên GitHub</a></p>
       ]]></description>
-      <pubDate>Sun, 24 May 2026 10:27:18 +0000</pubDate>
+      <pubDate>Mon, 25 May 2026 02:06:02 +0000</pubDate>
       <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.21-20260524/XKey.dmg" sparkle:version="20260524" sparkle:shortVersionString="1.2.21" length="10754678" type="application/octet-stream" sparkle:edSignature="JzcgDA4MdtzzHz8w4UivwRdgmmhgbhlkws3t6CjJn2hwwckd9MbAvM4x3ZFB4Ela2kLH4WoNVRM2GUPdOBRRBw==" />
+      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.22-20260525/XKey.dmg" sparkle:version="20260525" sparkle:shortVersionString="1.2.22" length="10879244" type="application/octet-stream" sparkle:edSignature="elm5v18crR1rnBvPm9RXHXSKlEF6vht9m/x8I82beP6VkbkJoJ9OWQICVQOcOFxj4q3SZhgV/vqAvo02G+pOCw==" />
     </item>
   </channel>
 </rss>
