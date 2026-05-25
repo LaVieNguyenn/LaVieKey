@@ -93,7 +93,10 @@ struct AdvancedSection: View {
                                 HStack(spacing: 4) {
                                     Image(systemName: "info.circle")
                                         .foregroundColor(.blue)
-                                    Text("Bộ từ điển: \(viewModel.preferences.modernStyle ? "Dấu mới (xoà)" : "Dấu cũ (xóa)")")
+                                    let dictName = viewModel.preferences.modernStyle
+                                        ? String(localized: "Dấu mới (xoà)")
+                                        : String(localized: "Dấu cũ (xóa)")
+                                    Text("Bộ từ điển: \(dictName)")
                                         .font(.caption)
                                     Text("- tự động theo kiểu gõ")
                                         .font(.caption)
@@ -110,6 +113,7 @@ struct AdvancedSection: View {
                                     HStack {
                                         Image(systemName: "exclamationmark.triangle.fill")
                                             .foregroundColor(.orange)
+                                        // `error` is already a localized message produced where it was set.
                                         Text(error)
                                             .font(.caption)
                                             .foregroundColor(.orange)
@@ -322,10 +326,11 @@ struct AdvancedSection: View {
                             ProgressView()
                                 .controlSize(.small)
                                 .scaleEffect(0.6)
+                            Text("Đang tải...")
                         } else {
                             Image(systemName: "arrow.clockwise")
+                            Text("Tải lại")
                         }
-                        Text(isDownloading ? "Đang tải..." : "Tải lại")
                     }
                 }
                 .buttonStyle(.bordered)
@@ -368,10 +373,11 @@ struct AdvancedSection: View {
                             ProgressView()
                                 .controlSize(.small)
                                 .scaleEffect(0.7)
+                            Text("Đang tải...")
                         } else {
                             Image(systemName: "arrow.down.circle")
+                            Text("Tải từ điển (~200KB)")
                         }
-                        Text(isDownloading ? "Đang tải..." : "Tải từ điển (~200KB)")
                     }
                 }
                 .disabled(isDownloading)
@@ -540,9 +546,13 @@ struct AdvancedSection: View {
         ) { result in
             handleUserDictExportResult(result)
         }
-        .alert(userDictAlertIsError ? "Lỗi" : "Thành công", isPresented: $showUserDictAlert) {
+        .alert(userDictAlertIsError
+               ? String(localized: "Lỗi")
+               : String(localized: "Thành công"),
+               isPresented: $showUserDictAlert) {
             Button("OK", role: .cancel) { }
         } message: {
+            // `userDictAlertMessage` is set with String(localized:) at each assignment site.
             Text(userDictAlertMessage)
         }
     }
@@ -613,7 +623,7 @@ struct AdvancedSection: View {
                         showDownloadSuccess = false
                     }
                 case .failure(let error):
-                    downloadError = "Lỗi khi tải lại: \(error.localizedDescription)"
+                    downloadError = String(localized: "Lỗi khi tải lại: \(error.localizedDescription)")
                 }
             }
         }
@@ -654,7 +664,7 @@ struct AdvancedSection: View {
     private func handleUserDictExportResult(_ result: Result<URL, Error>) {
         switch result {
         case .success(_):
-            userDictAlertMessage = "Đã xuất \(userDictionaryWords.count) từ thành công"
+            userDictAlertMessage = String(localized: "Đã xuất \(userDictionaryWords.count) từ thành công")
             userDictAlertIsError = false
             showUserDictAlert = true
         case .failure(let error):
@@ -662,50 +672,50 @@ struct AdvancedSection: View {
             if (error as NSError).code == NSUserCancelledError {
                 return
             }
-            userDictAlertMessage = "Lỗi khi lưu file: \(error.localizedDescription)"
+            userDictAlertMessage = String(localized: "Lỗi khi lưu file: \(error.localizedDescription)")
             userDictAlertIsError = true
             showUserDictAlert = true
         }
     }
-    
+
     private func handleUserDictImportResult(_ result: Result<[URL], Error>) {
         switch result {
         case .success(let urls):
             guard let url = urls.first else { return }
             importUserDictionary(from: url)
         case .failure(let error):
-            userDictAlertMessage = "Lỗi khi chọn file: \(error.localizedDescription)"
+            userDictAlertMessage = String(localized: "Lỗi khi chọn file: \(error.localizedDescription)")
             userDictAlertIsError = true
             showUserDictAlert = true
         }
     }
-    
+
     private func importUserDictionary(from url: URL) {
         do {
             // Start accessing security-scoped resource
             guard url.startAccessingSecurityScopedResource() else {
-                userDictAlertMessage = "Không có quyền truy cập file"
+                userDictAlertMessage = String(localized: "Không có quyền truy cập file")
                 userDictAlertIsError = true
                 showUserDictAlert = true
                 return
             }
             defer { url.stopAccessingSecurityScopedResource() }
-            
+
             let content = try String(contentsOf: url, encoding: .utf8)
-            
+
             // Split by newlines and filter out empty lines
             let lines = content.components(separatedBy: .newlines)
             let importedWords = lines
                 .map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
                 .filter { !$0.isEmpty }
-            
+
             guard !importedWords.isEmpty else {
-                userDictAlertMessage = "File không chứa từ nào"
+                userDictAlertMessage = String(localized: "File không chứa từ nào")
                 userDictAlertIsError = true
                 showUserDictAlert = true
                 return
             }
-            
+
             // Add imported words
             var importedCount = 0
             for word in importedWords {
@@ -715,15 +725,15 @@ struct AdvancedSection: View {
                     importedCount += 1
                 }
             }
-            
+
             loadUserDictionaryWords()
-            
-            userDictAlertMessage = "Đã import \(importedCount) từ thành công"
+
+            userDictAlertMessage = String(localized: "Đã import \(importedCount) từ thành công")
             userDictAlertIsError = false
             showUserDictAlert = true
-            
+
         } catch {
-            userDictAlertMessage = "Lỗi: \(error.localizedDescription)"
+            userDictAlertMessage = String(localized: "Lỗi: \(error.localizedDescription)")
             userDictAlertIsError = true
             showUserDictAlert = true
         }

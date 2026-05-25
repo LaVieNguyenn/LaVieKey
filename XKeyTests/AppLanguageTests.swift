@@ -8,10 +8,18 @@ import XCTest
 
 class AppLanguageTests: XCTestCase {
 
-    override func tearDown() {
-        super.tearDown()
+    override func setUp() {
+        super.setUp()
+        // Ensure a clean slate — earlier test runs or unrelated code may have left
+        // values in the standard domain that would skew assertions.
         UserDefaults.standard.removeObject(forKey: "appLanguage")
         UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+    }
+
+    override func tearDown() {
+        UserDefaults.standard.removeObject(forKey: "appLanguage")
+        UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        super.tearDown()
     }
 
     // MARK: - applyLanguage
@@ -37,23 +45,45 @@ class AppLanguageTests: XCTestCase {
         XCTAssertEqual(languages, ["zh-Hans"])
     }
 
+    // Sentinel locale never present in NSGlobalDomain — lets us detect whether
+    // applyLanguage() removed our app-level override even though UserDefaults.standard
+    // falls back to NSGlobalDomain for AppleLanguages (so reading nil after removal is
+    // not reliable on a real system).
+    private static let sentinelOverride = ["xx-XKey-test"]
+
     func testApplyLanguageSystemClearsAppOverride() {
+        UserDefaults.standard.set(Self.sentinelOverride, forKey: "AppleLanguages")
         UserDefaults.standard.set("system", forKey: "appLanguage")
+
         AppLanguage.applyLanguage()
-        // After applying "system", the app-level override is removed;
-        // AppleLanguages falls back to the OS-level value (always present)
-        let lang = AppLanguage(rawValue: UserDefaults.standard.string(forKey: "appLanguage") ?? "system")
-        XCTAssertEqual(lang, .system)
+
+        // App-level override must be cleared so OS locale takes effect next launch.
+        let result = UserDefaults.standard.array(forKey: "AppleLanguages") as? [String]
+        XCTAssertNotEqual(result, Self.sentinelOverride)
     }
 
-    func testMissingKeyDefaultsToSystem() {
-        UserDefaults.standard.removeObject(forKey: "appLanguage")
-        let saved = UserDefaults.standard.string(forKey: "appLanguage") ?? "system"
-        XCTAssertEqual(AppLanguage(rawValue: saved) ?? .system, .system)
+    func testMissingKeyDefaultsToVietnamese() {
+        // No "appLanguage" stored — first-launch user. Should default to Vietnamese,
+        // not .system, since XKey is a Vietnamese input method.
+        AppLanguage.applyLanguage()
+
+        let result = UserDefaults.standard.array(forKey: "AppleLanguages") as? [String]
+        XCTAssertEqual(result, ["vi"])
     }
 
-    func testInvalidValueDefaultsToSystem() {
+    func testInvalidRawValueReturnsNil() {
         XCTAssertNil(AppLanguage(rawValue: "invalid"))
+    }
+
+    func testApplyLanguageInvalidValueDefaultsToVietnamese() {
+        // Invalid stored value (e.g., corrupted preferences) must fall back to .vi
+        // (the default) rather than leaving stale state.
+        UserDefaults.standard.set("garbage", forKey: "appLanguage")
+
+        AppLanguage.applyLanguage()
+
+        let result = UserDefaults.standard.array(forKey: "AppleLanguages") as? [String]
+        XCTAssertEqual(result, ["vi"])
     }
 
     // MARK: - localeIdentifier
@@ -67,9 +97,9 @@ class AppLanguageTests: XCTestCase {
 
     // MARK: - Codable backward compatibility
 
-    func testPreferencesDefaultLanguageIsSystem() {
+    func testPreferencesDefaultLanguageIsVietnamese() {
         let prefs = Preferences()
-        XCTAssertEqual(prefs.appLanguage, .system)
+        XCTAssertEqual(prefs.appLanguage, .vi)
     }
 
     func testPreferencesRoundTripWithAppLanguage() throws {

@@ -32,9 +32,20 @@ enum AppLanguage: String, Codable, CaseIterable {
         }
     }
 
+    /// Apply the user-selected language by writing to `UserDefaults.standard["AppleLanguages"]`.
+    ///
+    /// Reads the raw value from `UserDefaults.standard["appLanguage"]`, populated by
+    /// `PreferencesViewModel.save()` and kept in sync by `SharedSettings.importSettings()`.
+    /// Defaults to Vietnamese when no value has been stored yet — XKey is a Vietnamese input
+    /// method, so first-launch users see the Vietnamese UI regardless of macOS locale.
+    ///
+    /// Timing caveat: macOS resolves `AppleLanguages` when `Bundle.main` initializes, which
+    /// happens before the app's `init()` runs. Calling this method during launch therefore
+    /// affects the *next* launch, not the current one — that is why the Language picker shows
+    /// a restart confirmation.
     static func applyLanguage() {
-        let saved = UserDefaults.standard.string(forKey: "appLanguage") ?? "system"
-        let lang = AppLanguage(rawValue: saved) ?? .system
+        let saved = UserDefaults.standard.string(forKey: "appLanguage") ?? AppLanguage.vi.rawValue
+        let lang = AppLanguage(rawValue: saved) ?? .vi
         if let locale = lang.localeIdentifier {
             UserDefaults.standard.set([locale], forKey: "AppleLanguages")
         } else {
@@ -48,10 +59,11 @@ enum MenuBarIconStyle: String, Codable, CaseIterable {
     case v = "V"
     case emoji = "emoji"
     
+    // Returns raw Vietnamese key (source language). UI wraps with LocalizedStringKey for catalog lookup.
     var displayName: String {
         switch self {
-        case .x: return String(localized: "Chữ X")
-        case .v: return String(localized: "Chữ V")
+        case .x: return "Chữ X"
+        case .v: return "Chữ V"
         case .emoji: return "Emoji 🇻🇳 / 🇬🇧"
         }
     }
@@ -118,7 +130,7 @@ struct Preferences: Codable {
     var showDockIcon: Bool = false               // Show icon in Dock (menu bar always visible)
     var startAtLogin: Bool = false
     var menuBarIconStyle: MenuBarIconStyle = .x  // Icon style for menubar
-    var appLanguage: AppLanguage = .system
+    var appLanguage: AppLanguage = .vi
     var autoCheckForUpdates: Bool = true
     
     // Excluded apps - apps where Vietnamese input is disabled

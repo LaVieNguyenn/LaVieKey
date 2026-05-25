@@ -320,15 +320,23 @@ class MacroManager {
         if vAutoCapsMacro && !searchKey.isEmpty {
             // Check if first character is uppercase
             let firstCharWasUppercase = isUppercaseChar(searchKey[0])
-            
-            // Check if ALL characters are uppercase (for ALL CAPS case like "BTW")
-            var allCapsFlag = true
-            for i in 0..<searchKey.count {
-                if !isUppercaseChar(searchKey[i]) {
-                    allCapsFlag = false
-                    break
+
+            // Check if ALL LETTER characters are uppercase (digits/punct are neutral)
+            // e.g. "XREV1" or "XR-EV" → still all-caps. "Xrev" → not all-caps.
+            var hasUpperLetter = false
+            var hasLowerLetter = false
+            for code in searchKey {
+                let charValue = code & 0xFFFF
+                guard let scalar = UnicodeScalar(charValue) else { continue }
+                let char = Character(scalar)
+                guard char.isLetter else { continue }
+                if char.isUppercase {
+                    hasUpperLetter = true
+                } else if char.isLowercase {
+                    hasLowerLetter = true
                 }
             }
+            let allCapsFlag = hasUpperLetter && !hasLowerLetter
             
             // Convert all characters to lowercase for search
             var lowercaseKey = searchKey
@@ -347,9 +355,25 @@ class MacroManager {
                         _ = modifyCaseUnicode(&result[i], isUpperCase: true)
                     }
                 } else if firstCharWasUppercase {
-                    // First char uppercase -> capitalize first char of result
-                    if !result.isEmpty {
-                        _ = modifyCaseUnicode(&result[0], isUpperCase: true)
+                    // First char uppercase -> Title Case: capitalize first char of each word
+                    var atWordStart = true
+                    for i in 0..<result.count {
+                        let charValue = result[i] & 0xFFFF
+                        let isWhitespace: Bool
+                        if let scalar = UnicodeScalar(charValue) {
+                            isWhitespace = Character(scalar).isWhitespace
+                        } else {
+                            isWhitespace = false
+                        }
+
+                        if isWhitespace {
+                            atWordStart = true
+                        } else {
+                            if atWordStart {
+                                _ = modifyCaseUnicode(&result[i], isUpperCase: true)
+                            }
+                            atWordStart = false
+                        }
                     }
                 }
                 

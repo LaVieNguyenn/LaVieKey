@@ -73,6 +73,7 @@ enum SharedSettingsKey: String {
     case showDockIcon = "XKey.showDockIcon"
     case startAtLogin = "XKey.startAtLogin"
     case menuBarIconStyle = "XKey.menuBarIconStyle"
+    case appLanguage = "XKey.appLanguage"
     case autoCheckForUpdates = "XKey.autoCheckForUpdates"
 
     // Excluded apps
@@ -601,6 +602,14 @@ class SharedSettings {
         set { writeString(newValue, forKey: SharedSettingsKey.menuBarIconStyle.rawValue) }
     }
 
+    var appLanguage: String {
+        // Default to Vietnamese on first launch — matches Preferences.appLanguage default
+        // so loadPreferences() from an empty plist yields the same value as a fresh
+        // Preferences() struct.
+        get { readString(forKey: SharedSettingsKey.appLanguage.rawValue) ?? AppLanguage.vi.rawValue }
+        set { writeString(newValue, forKey: SharedSettingsKey.appLanguage.rawValue) }
+    }
+
     var autoCheckForUpdates: Bool {
         get {
             let dict = readPlistDict()
@@ -997,7 +1006,15 @@ class SharedSettings {
             // Write all settings
             writePlistDict(importDict)
             sharedLogSuccess("Imported settings successfully")
-            
+
+            // Sync app language to UserDefaults.standard so AppLanguage.applyLanguage()
+            // picks up the imported value on next launch (it reads from standard defaults,
+            // not from the shared plist, for early-launch access).
+            if let langRaw = importDict[SharedSettingsKey.appLanguage.rawValue] as? String,
+               AppLanguage(rawValue: langRaw) != nil {
+                UserDefaults.standard.set(langRaw, forKey: "appLanguage")
+            }
+
             // Notify observers
             notifySettingsChanged()
             // Post macros notification if available (XKey only, not XKeyIM)
@@ -1155,6 +1172,9 @@ class SharedSettings {
         if let style = MenuBarIconStyle(rawValue: menuBarIconStyle) {
             prefs.menuBarIconStyle = style
         }
+        if let lang = AppLanguage(rawValue: appLanguage) {
+            prefs.appLanguage = lang
+        }
         prefs.autoCheckForUpdates = autoCheckForUpdates
 
         // Excluded apps
@@ -1311,6 +1331,7 @@ class SharedSettings {
         showDockIcon = prefs.showDockIcon
         startAtLogin = prefs.startAtLogin
         menuBarIconStyle = prefs.menuBarIconStyle.rawValue
+        appLanguage = prefs.appLanguage.rawValue
         autoCheckForUpdates = prefs.autoCheckForUpdates
 
         // Excluded apps

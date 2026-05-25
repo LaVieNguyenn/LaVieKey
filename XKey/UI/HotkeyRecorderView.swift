@@ -65,8 +65,15 @@ struct HotkeyRecorderView: View {
                 }) {
                     HStack {
                         Spacer()
-                        Text(displayText.isEmpty ? "Nhấn để ghi phím tắt..." : displayText)
-                            .foregroundColor(isRecording ? .red : .primary)
+                        // Prompt text needs localization; recorded hotkey values are
+                        // symbol-only ("⌘⇧V") so they bypass the catalog as verbatim.
+                        if displayText.isEmpty {
+                            Text("Nhấn để ghi phím tắt...")
+                                .foregroundColor(isRecording ? .red : .primary)
+                        } else {
+                            Text(displayText)
+                                .foregroundColor(isRecording ? .red : .primary)
+                        }
                         Spacer()
                     }
                     .frame(height: 30)
@@ -78,7 +85,9 @@ struct HotkeyRecorderView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .help(isRecording ? "Nhấn phím tắt hoặc giữ modifier keys 0.5s..." : "Nhấn để ghi phím tắt")
+                .help(isRecording
+                      ? String(localized: "Nhấn phím tắt hoặc giữ modifier keys 0.5s...")
+                      : String(localized: "Nhấn để ghi phím tắt"))
                 
                 // Preset menu - allows selecting common hotkeys that may be hard to record
                 Menu {
@@ -144,7 +153,7 @@ struct HotkeyRecorderView: View {
     
     private func startRecording() {
         isRecording = true
-        displayText = "Nhấn phím tắt..."
+        displayText = String(localized: "Nhấn phím tắt...")
         currentModifiers = []
         modifierPressTime = nil
         showMinimumWarning = false
@@ -229,7 +238,7 @@ struct HotkeyRecorderView: View {
                     
                     // Update display to show current modifiers
                     let tempHotkey = Hotkey(keyCode: 0, modifiers: ModifierFlags(from: modifiers), isModifierOnly: true)
-                    displayText = tempHotkey.displayString + " (giữ 0.5s...)"
+                    displayText = String(localized: "\(tempHotkey.displayString) (giữ 0.5s...)")
                     
                     // Schedule check after 0.5 seconds
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -256,7 +265,7 @@ struct HotkeyRecorderView: View {
                 currentModifiers = []
                 modifierPressTime = nil
                 if isRecording {
-                    displayText = "Nhấn phím tắt..."
+                    displayText = String(localized: "Nhấn phím tắt...")
                 }
             }
             

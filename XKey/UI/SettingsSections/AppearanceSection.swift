@@ -85,16 +85,22 @@ struct AppearanceSection: View {
     private func restartApp() {
         let bundlePath = Bundle.main.bundleURL.path
         let pid = ProcessInfo.processInfo.processIdentifier
+        // Pass bundle path as argv $1 (not string interpolated) so paths with quotes/$ are safe.
         let script = """
         while kill -0 \(pid) 2>/dev/null; do
             sleep 0.1
         done
-        open "\(bundlePath)"
+        open "$1"
         """
         let task = Process()
-        task.launchPath = "/bin/bash"
-        task.arguments = ["-c", script]
-        try? task.run()
+        task.executableURL = URL(fileURLWithPath: "/bin/bash")
+        task.arguments = ["-c", script, "--", bundlePath]
+        do {
+            try task.run()
+        } catch {
+            NSLog("XKey restartApp: failed to launch relaunch helper: \(error)")
+            return
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             exit(0)
         }

@@ -15,10 +15,6 @@ class PreferencesViewModel: ObservableObject {
 
     init() {
         self.preferences = SharedSettings.shared.loadPreferences()
-        if let savedLang = UserDefaults.standard.string(forKey: "appLanguage"),
-           let lang = AppLanguage(rawValue: savedLang) {
-            self.preferences.appLanguage = lang
-        }
     }
 
     func save() {

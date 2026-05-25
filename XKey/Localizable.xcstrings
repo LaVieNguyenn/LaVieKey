@@ -1,15 +1,72 @@
 {
   "sourceLanguage": "vi",
   "strings": {
-    "": {},
-    "\"%@\"": {},
-    "%@": {},
+    "": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ""
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ""
+          }
+        }
+      }
+    },
+    "\"%@\"": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%@\""
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%@\""
+          }
+        }
+      }
+    },
+    "%@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@"
+          }
+        }
+      }
+    },
     "%@ %@": {
       "localizations": {
         "vi": {
           "stringUnit": {
             "state": "new",
             "value": "%1$@ %2$@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ %@"
           }
         }
       }
@@ -37,11 +94,53 @@
             "state": "new",
             "value": "%1$@ → %2$@"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ → %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ → %@"
+          }
         }
       }
     },
-    "%lld": {},
-    "%lld entries": {},
+    "%lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld"
+          }
+        }
+      }
+    },
+    "%lld entries": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld entries"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 条"
+          }
+        }
+      }
+    },
     "%lld từ": {
       "localizations": {
         "en": {
@@ -58,7 +157,22 @@
         }
       }
     },
-    "(%@)": {},
+    "(%@)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(%@)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(%@)"
+          }
+        }
+      }
+    },
     "(Tất cả windows)": {
       "localizations": {
         "en": {
@@ -140,14 +254,134 @@
         }
       }
     },
-    "- tự động theo kiểu gõ": {},
-    "1000": {},
-    "1000µs = 1ms. Increase delay if characters are lost.": {},
-    "1500": {},
-    "3000": {},
-    "A product of Codetay.com": {},
-    "AX Description:": {},
-    "AX Identifier:": {},
+    "- tự động theo kiểu gõ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "- automatic based on typing style"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "- 根据输入风格自动选择"
+          }
+        }
+      }
+    },
+    "1000": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1000"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1000"
+          }
+        }
+      }
+    },
+    "1000µs = 1ms. Increase delay if characters are lost.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1000µs = 1ms. Increase delay if characters are lost."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1000µs = 1ms。如果丢字符,请增加延迟。"
+          }
+        }
+      }
+    },
+    "1500": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1500"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1500"
+          }
+        }
+      }
+    },
+    "3000": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3000"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3000"
+          }
+        }
+      }
+    },
+    "A product of Codetay.com": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A product of Codetay.com"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codetay.com 出品"
+          }
+        }
+      }
+    },
+    "AX Description:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AX Description:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AX 描述:"
+          }
+        }
+      }
+    },
+    "AX Identifier:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AX Identifier:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AX 标识符:"
+          }
+        }
+      }
+    },
     "AX Matching": {
       "extractionState": "stale",
       "localizations": {
@@ -165,17 +399,182 @@
         }
       }
     },
-    "AX Matching (Nâng cao)": {},
-    "AX Role:": {},
-    "Actions": {},
-    "Advanced Options": {},
-    "App:": {},
-    "Auto Advance": {},
-    "Auto Clear Text": {},
-    "Auto-Scroll": {},
-    "Auto-cycle through all methods + text sending combinations": {},
-    "Backspace (µs):": {},
-    "Backspace delay:": {},
+    "AX Matching (Nâng cao)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AX Matching (Advanced)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AX 匹配 (高级)"
+          }
+        }
+      }
+    },
+    "AX Role:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AX Role:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AX 角色:"
+          }
+        }
+      }
+    },
+    "Actions": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actions"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作"
+          }
+        }
+      }
+    },
+    "Advanced Options": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Advanced Options"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高级选项"
+          }
+        }
+      }
+    },
+    "App:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用程序:"
+          }
+        }
+      }
+    },
+    "Auto Advance": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto Advance"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动前进"
+          }
+        }
+      }
+    },
+    "Auto Clear Text": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto Clear Text"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动清除文本"
+          }
+        }
+      }
+    },
+    "Auto-Scroll": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto-Scroll"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动滚动"
+          }
+        }
+      }
+    },
+    "Auto-cycle through all methods + text sending combinations": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto-cycle through all methods + text sending combinations"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动循环所有注入方法 + 文本发送组合"
+          }
+        }
+      }
+    },
+    "Backspace (µs):": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Backspace (µs):"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退格 (µs):"
+          }
+        }
+      }
+    },
+    "Backspace delay:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Backspace delay:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退格延迟:"
+          }
+        }
+      }
+    },
     "Biểu tượng menubar:": {
       "localizations": {
         "en": {
@@ -192,8 +591,38 @@
         }
       }
     },
-    "Bundle ID:": {},
-    "Buy me a coffee": {},
+    "Bundle ID:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bundle ID:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bundle ID:"
+          }
+        }
+      }
+    },
+    "Buy me a coffee": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buy me a coffee"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请我喝杯咖啡"
+          }
+        }
+      }
+    },
     "Báo lỗi": {
       "localizations": {
         "en": {
@@ -210,7 +639,22 @@
         }
       }
     },
-    "Bản dịch": {},
+    "Bản dịch": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Translation"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻译"
+          }
+        }
+      }
+    },
     "Bản dịch sẽ được copy vào clipboard để bạn có thể dán (paste) ở nơi khác.": {
       "localizations": {
         "en": {
@@ -597,7 +1041,22 @@
         }
       }
     },
-    "Bộ từ điển: %@": {},
+    "Bộ từ điển: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dictionary: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "词典:%@"
+          }
+        }
+      }
+    },
     "Bộ từ điển: %@ - tự động theo kiểu gõ": {
       "extractionState": "stale",
       "localizations": {
@@ -615,9 +1074,54 @@
         }
       }
     },
-    "Caret Context": {},
-    "Check": {},
-    "Check accessibility status of target app (see Log tab)": {},
+    "Caret Context": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caret Context"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "光标上下文"
+          }
+        }
+      }
+    },
+    "Check": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "检查"
+          }
+        }
+      }
+    },
+    "Check accessibility status of target app (see Log tab)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check accessibility status of target app (see Log tab)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "检查目标应用的辅助功能状态 (查看日志标签)"
+          }
+        }
+      }
+    },
     "Cho phép hiệu chỉnh XKey Engine xử lý Tiếng Việt theo từng ứng dụng cụ thể (ví dụ: Google Docs trong Safari)": {
       "localizations": {
         "en": {
@@ -987,9 +1491,54 @@
         }
       }
     },
-    "Clear": {},
-    "Clear & Reset": {},
-    "Clear text after fail to test next method": {},
+    "Clear": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除"
+          }
+        }
+      }
+    },
+    "Clear & Reset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear & Reset"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除并重置"
+          }
+        }
+      }
+    },
+    "Clear text after fail to test next method": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear text after fail to test next method"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "失败后清除文本以测试下一个方法"
+          }
+        }
+      }
+    },
     "Click để copy Bundle ID": {
       "localizations": {
         "en": {
@@ -1006,9 +1555,54 @@
         }
       }
     },
-    "Commit Delay": {},
-    "Commit Delay (µs):": {},
-    "Copy": {},
+    "Commit Delay": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commit Delay"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提交延迟"
+          }
+        }
+      }
+    },
+    "Commit Delay (µs):": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commit Delay (µs):"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提交延迟 (µs):"
+          }
+        }
+      }
+    },
+    "Copy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制"
+          }
+        }
+      }
+    },
     "Copy JSON của quy tắc": {
       "localizations": {
         "en": {
@@ -1266,7 +1860,22 @@
         }
       }
     },
-    "DOM Classes:": {},
+    "DOM Classes:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DOM Classes:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DOM 类:"
+          }
+        }
+      }
+    },
     "Danh sách macro (%lld)": {
       "localizations": {
         "en": {
@@ -1315,7 +1924,22 @@
         }
       }
     },
-    "Do giới hạn bảo mật, XKey không thể tự động cài đặt XKeyIM.\n\nVui lòng làm theo các bước sau:\n1. Nhấn \"Mở XKeyIM\" để hiển thị XKeyIM.app\n2. Nhấn \"Mở Input Methods\" để mở thư mục đích\n3. Kéo thả XKeyIM.app vào thư mục Input Methods\n4. Nhấn \"Mở Input Sources\" để thêm XKey Vietnamese": {},
+    "Do giới hạn bảo mật, XKey không thể tự động cài đặt XKeyIM.\n\nVui lòng làm theo các bước sau:\n1. Nhấn \"Mở XKeyIM\" để hiển thị XKeyIM.app\n2. Nhấn \"Mở Input Methods\" để mở thư mục đích\n3. Kéo thả XKeyIM.app vào thư mục Input Methods\n4. Nhấn \"Mở Input Sources\" để thêm XKey Vietnamese": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Due to security restrictions, XKey cannot automatically install XKeyIM.\n\nPlease follow these steps:\n1. Click \"Open XKeyIM\" to reveal XKeyIM.app\n2. Click \"Open Input Methods\" to open the destination folder\n3. Drag XKeyIM.app into the Input Methods folder\n4. Restart XKey\n\nOr you can copy it manually:\n- From: ~/Library/Caches/XKey/.../XKeyIM.app\n- To: ~/Library/Input Methods/"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由于安全限制,XKey 无法自动安装 XKeyIM。\n\n请按以下步骤操作:\n1. 点击\"打开 XKeyIM\"以显示 XKeyIM.app\n2. 点击\"打开 Input Methods\"以打开目标文件夹\n3. 将 XKeyIM.app 拖入 Input Methods 文件夹\n4. 重新启动 XKey\n\n或者您可以手动复制:\n- 从:~/Library/Caches/XKey/.../XKeyIM.app\n- 到:~/Library/Input Methods/"
+          }
+        }
+      }
+    },
     "Do giới hạn bảo mật, XKey không thể tự động cài đặt XKeyIM.\n\nVui lòng thực hiện các bước sau:\n1. Bấm \"Mở XKeyIM\" để hiện XKeyIM.app\n2. Bấm \"Mở Input Methods\" để mở thư mục đích\n3. Kéo XKeyIM.app vào thư mục Input Methods\n4. Bấm \"Mở Input Sources\" để thêm XKey Vietnamese": {
       "extractionState": "stale",
       "localizations": {
@@ -1398,29 +2022,27 @@
       }
     },
     "Dấu cũ (xóa)": {
-      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Old style (xóa)"
+            "value": "Old diacritics (xóa)"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "旧式声调 (xóa)"
+            "value": "传统声调 (xóa)"
           }
         }
       }
     },
     "Dấu mới (xoà)": {
-      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Modern style (xoà)"
+            "value": "New diacritics (xoà)"
           }
         },
         "zh-Hans": {
@@ -1592,7 +2214,22 @@
         }
       }
     },
-    "EN": {},
+    "EN": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EN"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EN"
+          }
+        }
+      }
+    },
     "Emoji sẽ hiển thị 🇻🇳 khi ở tiếng Việt và 🇬🇧 khi ở tiếng Anh.": {
       "localizations": {
         "en": {
@@ -1626,12 +2263,102 @@
         }
       }
     },
-    "Enable": {},
-    "Enable AXManualAccessibility for Electron/Chromium apps": {},
-    "Enabled": {},
-    "English": {},
-    "Expected Result": {},
-    "Export": {},
+    "Enable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "启用"
+          }
+        }
+      }
+    },
+    "Enable AXManualAccessibility for Electron/Chromium apps": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable AXManualAccessibility for Electron/Chromium apps"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为 Electron/Chromium 应用启用 AXManualAccessibility"
+          }
+        }
+      }
+    },
+    "Enabled": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enabled"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已启用"
+          }
+        }
+      }
+    },
+    "English": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "英语"
+          }
+        }
+      }
+    },
+    "Expected Result": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expected Result"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "预期结果"
+          }
+        }
+      }
+    },
+    "Export": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出"
+          }
+        }
+      }
+    },
     "Export toàn bộ cấu hình ra file .plist": {
       "localizations": {
         "en": {
@@ -1666,7 +2393,6 @@
       }
     },
     "File không chứa từ nào": {
-      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -1698,7 +2424,22 @@
         }
       }
     },
-    "Force Accessibility": {},
+    "Force Accessibility": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Force Accessibility"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "强制辅助功能"
+          }
+        }
+      }
+    },
     "Ghi chú": {
       "localizations": {
         "en": {
@@ -1764,8 +2505,38 @@
         }
       }
     },
-    "GitHub": {},
-    "Giảm cỡ chữ": {},
+    "GitHub": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub"
+          }
+        }
+      }
+    },
+    "Giảm cỡ chữ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decrease font size"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "减小字号"
+          }
+        }
+      }
+    },
     "Giới thiệu": {
       "extractionState": "stale",
       "localizations": {
@@ -2089,7 +2860,22 @@
         }
       }
     },
-    "Import": {},
+    "Import": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入"
+          }
+        }
+      }
+    },
     "Import cấu hình từ file đã lưu": {
       "localizations": {
         "en": {
@@ -2138,10 +2924,70 @@
         }
       }
     },
-    "Injection Method": {},
-    "Injection Method Test": {},
-    "Input Element": {},
-    "Input Keys": {},
+    "Injection Method": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Injection Method"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注入方法"
+          }
+        }
+      }
+    },
+    "Injection Method Test": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Injection Method Test"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注入方法测试"
+          }
+        }
+      }
+    },
+    "Input Element": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Input Element"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入元素"
+          }
+        }
+      }
+    },
+    "Input Keys": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Input Keys"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入按键"
+          }
+        }
+      }
+    },
     "Input Method Kit (Thử nghiệm)": {
       "localizations": {
         "en": {
@@ -2174,7 +3020,22 @@
         }
       }
     },
-    "Input Source:": {},
+    "Input Source:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Input Source:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入源:"
+          }
+        }
+      }
+    },
     "Input Sources": {
       "extractionState": "stale",
       "localizations": {
@@ -2208,7 +3069,22 @@
         }
       }
     },
-    "Inspired by Openkey & Unikey.": {},
+    "Inspired by Openkey & Unikey.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inspired by Openkey & Unikey."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inspired by Openkey & Unikey."
+          }
+        }
+      }
+    },
     "Khi bật, XKey sẽ hiển thị icon trên Dock như các ứng dụng thông thường": {
       "localizations": {
         "en": {
@@ -2434,18 +3310,17 @@
       }
     },
     "Không có quyền truy cập file": {
-      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No file access permission"
+            "value": "No permission to access file"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "无文件访问权限"
+            "value": "无权访问文件"
           }
         }
       }
@@ -2530,7 +3405,22 @@
         }
       }
     },
-    "Không thể lưu file: %@": {},
+    "Không thể lưu file: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot save file: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法保存文件:%@"
+          }
+        }
+      }
+    },
     "Không thể thay thế text trong ứng dụng này": {
       "localizations": {
         "en": {
@@ -3045,7 +3935,6 @@
       }
     },
     "Lỗi khi chọn file: %@": {
-      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3056,13 +3945,12 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "选择文件错误：%@"
+            "value": "选择文件出错:%@"
           }
         }
       }
     },
     "Lỗi khi lưu file: %@": {
-      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3073,24 +3961,23 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "保存文件错误：%@"
+            "value": "保存文件出错:%@"
           }
         }
       }
     },
     "Lỗi khi tải lại: %@": {
-      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Error reloading: %@"
+            "value": "Failed to reload: %@"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "重新加载错误：%@"
+            "value": "重新加载失败:%@"
           }
         }
       }
@@ -3129,7 +4016,6 @@
       }
     },
     "Lỗi: %@": {
-      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3140,7 +4026,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "错误：%@"
+            "value": "错误:%@"
           }
         }
       }
@@ -3179,10 +4065,70 @@
         }
       }
     },
-    "Made with ❤️ & ☕": {},
-    "Marked Text": {},
-    "Match mode:": {},
-    "Method:": {},
+    "Made with ❤️ & ☕": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Made with ❤️ & ☕"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Made with ❤️ & ☕"
+          }
+        }
+      }
+    },
+    "Marked Text": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marked Text"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "标记文本"
+          }
+        }
+      }
+    },
+    "Match mode:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Match mode:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匹配模式:"
+          }
+        }
+      }
+    },
+    "Method:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Method:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "方法:"
+          }
+        }
+      }
+    },
     "Mô tả (tùy chọn)": {
       "localizations": {
         "en": {
@@ -3215,24 +4161,22 @@
         }
       }
     },
-    "Mặc định TẮT: các ứng dụng remote desktop sẽ dùng chế độ passthrough — máy remote xử lý tiếng Việt.\n\nKhi BẬT: XKey sẽ inject tiếng Việt qua clipboard paste (Cmd+V / Ctrl+V). Hữu ích khi máy remote không có bộ gõ tiếng Việt.\n\nTương thích (thử nghiệm):\n• ✓ Jump Desktop — gõ chậm (~1 giây/từ) hoạt động ổn định\n• ✓ AnyDesk, Parallels, VMware Fusion, Apple Remote Desktop — tương tự Jump Desktop\n• ✗ RustDesk — KHÔNG hỗ trợ (strict-check HID modifier state, loại bỏ synthetic Cmd/Ctrl). Dùng Cmd+C/Ctrl+V thủ công.\n• ⚠ TeamViewer, Microsoft RDC — chưa test kỹ\n\nYêu cầu:\n• Bật clipboard sync trong app remote desktop.\n• Clipboard local sẽ bị ghi đè mỗi lần gõ — copy text quan trọng trước khi gõ.\n• Tốc độ gõ chậm hơn bình thường (~500ms-1s mỗi từ) để đồng bộ mạng.": {
-      "extractionState": "stale",
+    "Mặc định TẮT: các ứng dụng remote desktop ở chế độ passthrough — máy từ xa tự xử lý gõ tiếng Việt.\n\nKhi BẬT: XKey inject tiếng Việt qua clipboard paste (Cmd+V / Ctrl+V). Hữu ích khi máy từ xa không có bộ gõ tiếng Việt.\n\nTương thích (thử nghiệm):\n• ✓ Jump Desktop — gõ chậm (~1 giây / từ) hoạt động ổn định\n• ✓ AnyDesk, Parallels, VMware Fusion, Apple Remote Desktop — tương tự Jump Desktop\n• ✗ RustDesk — KHÔNG hỗ trợ (strict-check HID modifier state, strip synthetic Cmd/Ctrl). Dùng manual Cmd+C/Ctrl+V.\n• ⚠ TeamViewer, Microsoft RDC — chưa kiểm thử kỹ\n\nYêu cầu:\n• Bật đồng bộ clipboard trong ứng dụng remote desktop.\n• Clipboard local sẽ bị ghi đè mỗi lần gõ — copy text quan trọng trước khi gõ.\n• Gõ chậm hơn bình thường (mỗi từ ~500ms-1s) để network kịp đồng bộ.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Default OFF: remote desktop apps use passthrough mode — the remote machine handles Vietnamese input.\n\nWhen ON: XKey injects Vietnamese via clipboard paste (Cmd+V / Ctrl+V). Useful when the remote machine has no Vietnamese input method.\n\nCompatibility (experimental):\n• ✓ Jump Desktop — slow typing (~1 sec/word) works reliably\n• ✓ AnyDesk, Parallels, VMware Fusion, Apple Remote Desktop — similar to Jump Desktop\n• ✗ RustDesk — NOT supported (strict-check HID modifier state, strips synthetic Cmd/Ctrl). Use manual Cmd+C/Ctrl+V.\n• ⚠ TeamViewer, Microsoft RDC — not thoroughly tested\n\nRequirements:\n• Enable clipboard sync in your remote desktop app.\n• Local clipboard will be overwritten each time you type — copy important text before typing.\n• Typing is slower than normal (~500ms-1s per word) for network sync."
+            "value": "Default OFF: remote desktop apps run in passthrough mode — the remote machine handles Vietnamese typing itself.\n\nWhen ON: XKey injects Vietnamese via clipboard paste (Cmd+V / Ctrl+V). Useful when the remote machine has no Vietnamese input method.\n\nCompatibility (experimental):\n• ✓ Jump Desktop — slow typing (~1 sec / word) is stable\n• ✓ AnyDesk, Parallels, VMware Fusion, Apple Remote Desktop — similar to Jump Desktop\n• ✗ RustDesk — NOT supported (strict-check HID modifier state, strips synthetic Cmd/Ctrl). Use manual Cmd+C/Ctrl+V.\n• ⚠ TeamViewer, Microsoft RDC — not thoroughly tested\n\nRequirements:\n• Enable clipboard sync in the remote desktop app.\n• The local clipboard is overwritten on every keystroke — copy important text before typing.\n• Type slower than usual (~500ms-1s per word) so the network can keep up."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "默认关闭：远程桌面应用使用透传模式——由远程机器处理越南语输入。\n\n开启时：XKey通过剪贴板粘贴（Cmd+V / Ctrl+V）注入越南语。当远程机器没有越南语输入法时很有用。\n\n兼容性（实验性）：\n• ✓ Jump Desktop — 慢速输入（约1秒/词）运行稳定\n• ✓ AnyDesk、Parallels、VMware Fusion、Apple Remote Desktop — 类似Jump Desktop\n• ✗ RustDesk — 不支持（严格检查HID修饰键状态，去除合成Cmd/Ctrl）。请使用手动Cmd+C/Ctrl+V。\n• ⚠ TeamViewer、Microsoft RDC — 尚未充分测试\n\n要求：\n• 在远程桌面应用中启用剪贴板同步。\n• 每次输入时本地剪贴板将被覆盖——输入前请先复制重要文本。\n• 输入速度比正常慢（约500ms-1s/词），以便网络同步。"
+            "value": "默认关闭:远程桌面应用处于直通模式 — 由远程机器自行处理越南语输入。\n\n开启时:XKey 通过剪贴板粘贴 (Cmd+V / Ctrl+V) 注入越南语。当远程机器没有越南语输入法时很有用。\n\n兼容性 (实验性):\n• ✓ Jump Desktop — 慢速输入 (~1 秒 / 词) 稳定可用\n• ✓ AnyDesk、Parallels、VMware Fusion、Apple Remote Desktop — 类似 Jump Desktop\n• ✗ RustDesk — 不支持 (strict-check HID modifier state, strip synthetic Cmd/Ctrl)。请使用手动 Cmd+C/Ctrl+V。\n• ⚠ TeamViewer、Microsoft RDC — 未充分测试\n\n要求:\n• 在远程桌面应用中启用剪贴板同步。\n• 每次输入都会覆盖本地剪贴板 — 输入前请先复制重要文本。\n• 输入速度比平常慢 (每个词 ~500ms-1s) 以便网络同步。"
           }
         }
       }
     },
-    "Mặc định TẮT: các ứng dụng remote desktop ở chế độ passthrough — máy từ xa tự xử lý gõ tiếng Việt.\n\nKhi BẬT: XKey inject tiếng Việt qua clipboard paste (Cmd+V / Ctrl+V). Hữu ích khi máy từ xa không có bộ gõ tiếng Việt.\n\nTương thích (thử nghiệm):\n• ✓ Jump Desktop — gõ chậm (~1 giây / từ) hoạt động ổn định\n• ✓ AnyDesk, Parallels, VMware Fusion, Apple Remote Desktop — tương tự Jump Desktop\n• ✗ RustDesk — KHÔNG hỗ trợ (strict-check HID modifier state, strip synthetic Cmd/Ctrl). Dùng manual Cmd+C/Ctrl+V.\n• ⚠ TeamViewer, Microsoft RDC — chưa kiểm thử kỹ\n\nYêu cầu:\n• Bật đồng bộ clipboard trong ứng dụng remote desktop.\n• Clipboard local sẽ bị ghi đè mỗi lần gõ — copy text quan trọng trước khi gõ.\n• Gõ chậm hơn bình thường (mỗi từ ~500ms-1s) để network kịp đồng bộ.": {},
     "Mặc định: Esc. Hỗ trợ tổ hợp phím modifier như Ctrl+Shift (không áp dụng cho XKeyIM)": {
       "localizations": {
         "en": {
@@ -3576,13 +4520,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Press hotkey or hold modifier keys for 0.5s..."
+            "value": "Press shortcut or hold modifier keys for 0.5s..."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按快捷键或按住修饰键0.5秒..."
+            "value": "按快捷键或按住修饰键 0.5 秒..."
           }
         }
       }
@@ -3668,18 +4612,17 @@
       }
     },
     "Nhấn phím tắt...": {
-      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Press hotkey..."
+            "value": "Press shortcut..."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按下快捷键..."
+            "value": "请按快捷键..."
           }
         }
       }
@@ -3689,7 +4632,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Click to record hotkey"
+            "value": "Click to record shortcut"
           }
         },
         "zh-Hans": {
@@ -3701,12 +4644,11 @@
       }
     },
     "Nhấn để ghi phím tắt...": {
-      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Click to record hotkey..."
+            "value": "Click to record shortcut..."
           }
         },
         "zh-Hans": {
@@ -3928,7 +4870,22 @@
         }
       }
     },
-    "OK": {},
+    "OK": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        }
+      }
+    },
     "Pattern là biểu thức Regular Expression": {
       "localizations": {
         "en": {
@@ -3945,10 +4902,70 @@
         }
       }
     },
-    "Pattern matching": {},
-    "Pattern:": {},
-    "Pause (%llds)": {},
-    "Paused": {},
+    "Pattern matching": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pattern matching"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模式匹配"
+          }
+        }
+      }
+    },
+    "Pattern:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pattern:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模式:"
+          }
+        }
+      }
+    },
+    "Pause (%llds)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause (%llds)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂停 (%lld 秒)"
+          }
+        }
+      }
+    },
+    "Paused": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paused"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已暂停"
+          }
+        }
+      }
+    },
     "Phiên bản %@ đã được cài đặt.\n\nVui lòng chuyển sang input method khác rồi quay lại XKey để áp dụng.": {
       "localizations": {
         "en": {
@@ -4157,7 +5174,22 @@
         }
       }
     },
-    "Phím tắt: %@": {},
+    "Phím tắt: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shortcut: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "快捷键:%@"
+          }
+        }
+      }
+    },
     "Phương thức gửi text:": {
       "localizations": {
         "en": {
@@ -4191,7 +5223,22 @@
         }
       }
     },
-    "Pos: %lld": {},
+    "Pos: %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pos: %lld"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pos: %lld"
+          }
+        }
+      }
+    },
     "Quay lại": {
       "localizations": {
         "en": {
@@ -4352,7 +5399,22 @@
         }
       }
     },
-    "Recording": {},
+    "Recording": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "录制中"
+          }
+        }
+      }
+    },
     "Remote Desktop": {
       "localizations": {
         "en": {
@@ -4369,8 +5431,38 @@
         }
       }
     },
-    "Reset": {},
-    "Rule Match:": {},
+    "Reset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置"
+          }
+        }
+      }
+    },
+    "Rule Match:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rule Match:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "规则匹配:"
+          }
+        }
+      }
+    },
     "Sai kiểu dữ liệu cho %@: cần %@": {
       "extractionState": "stale",
       "localizations": {
@@ -4404,7 +5496,22 @@
         }
       }
     },
-    "Sao chép bản dịch": {},
+    "Sao chép bản dịch": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy translation"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制翻译"
+          }
+        }
+      }
+    },
     "Sao lưu": {
       "extractionState": "stale",
       "localizations": {
@@ -4454,7 +5561,22 @@
         }
       }
     },
-    "Search...": {},
+    "Search...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search..."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索..."
+          }
+        }
+      }
+    },
     "Secure Input đang bật": {
       "localizations": {
         "en": {
@@ -4478,6 +5600,18 @@
             "state": "new",
             "value": "Showing %1$lld of %2$lld entries"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Showing %lld of %lld entries"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示 %lld / %lld 条"
+          }
         }
       }
     },
@@ -4497,7 +5631,22 @@
         }
       }
     },
-    "Support XKey": {},
+    "Support XKey": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Support XKey"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支持 XKey"
+          }
+        }
+      }
+    },
     "Sử dụng AX patterns để match": {
       "localizations": {
         "en": {
@@ -4562,15 +5711,150 @@
         }
       }
     },
-    "TCVN3": {},
-    "Target:": {},
-    "Test App Behavior Detector (Spotlight/Raycast/Alfred/etc.)": {},
-    "Test Input": {},
-    "Test Log": {},
-    "Test if XKey injection works correctly in any app": {},
-    "Text (µs):": {},
-    "Text Sending": {},
-    "Text delay:": {},
+    "TCVN3": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TCVN3"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TCVN3"
+          }
+        }
+      }
+    },
+    "Target:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Target:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目标:"
+          }
+        }
+      }
+    },
+    "Test App Behavior Detector (Spotlight/Raycast/Alfred/etc.)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test App Behavior Detector (Spotlight/Raycast/Alfred/etc.)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试应用行为检测器 (Spotlight/Raycast/Alfred 等)"
+          }
+        }
+      }
+    },
+    "Test Input": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test Input"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试输入"
+          }
+        }
+      }
+    },
+    "Test Log": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test Log"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试日志"
+          }
+        }
+      }
+    },
+    "Test if XKey injection works correctly in any app": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test if XKey injection works correctly in any app"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试 XKey 在任意应用中的注入是否正常工作"
+          }
+        }
+      }
+    },
+    "Text (µs):": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text (µs):"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文本 (µs):"
+          }
+        }
+      }
+    },
+    "Text Sending": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text Sending"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文本发送"
+          }
+        }
+      }
+    },
+    "Text delay:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text delay:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文本延迟:"
+          }
+        }
+      }
+    },
     "Text đang chọn sẽ bị thay thế bằng bản dịch trong ô nhập liệu.": {
       "localizations": {
         "en": {
@@ -4990,7 +6274,22 @@
         }
       }
     },
-    "Title Pattern:": {},
+    "Title Pattern:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Title Pattern:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "标题模式:"
+          }
+        }
+      }
+    },
     "Title cửa sổ bắt đầu bằng pattern": {
       "localizations": {
         "en": {
@@ -5087,7 +6386,22 @@
         }
       }
     },
-    "Toggle AXManualAccessibility for target app": {},
+    "Toggle AXManualAccessibility for target app": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toggle AXManualAccessibility for target app"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "切换目标应用的 AXManualAccessibility"
+          }
+        }
+      }
+    },
     "Toàn bộ cài đặt, macro, từ điển tuỳ chỉnh, quy tắc và cấu hình dịch thuật sẽ bị xoá. XKey sẽ trở về trạng thái như mới cài đặt.\n\nHãy export backup trước nếu bạn muốn giữ lại thiết lập hiện tại.": {
       "localizations": {
         "en": {
@@ -5104,7 +6418,22 @@
         }
       }
     },
-    "Type characters directly. Example: 'asnh', 'xin chaof'": {},
+    "Type characters directly. Example: 'asnh', 'xin chaof'": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type characters directly. Example: 'asnh', 'xin chaof'"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直接输入字符。例如:'asnh'、'xin chaof'"
+          }
+        }
+      }
+    },
     "Tên:": {
       "localizations": {
         "en": {
@@ -5201,7 +6530,22 @@
         }
       }
     },
-    "Tăng cỡ chữ": {},
+    "Tăng cỡ chữ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Increase font size"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "增大字号"
+          }
+        }
+      }
+    },
     "Tạo quy tắc mới với thông tin đã phát hiện": {
       "localizations": {
         "en": {
@@ -5245,7 +6589,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "下载词典（约200KB）"
+            "value": "下载词典 (~200KB)"
           }
         }
       }
@@ -5603,9 +6947,54 @@
         }
       }
     },
-    "Unicode": {},
-    "VD: 5000": {},
-    "VD: AXTextArea": {},
+    "Unicode": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unicode"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unicode"
+          }
+        }
+      }
+    },
+    "VD: 5000": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g., 5000"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "例如:5000"
+          }
+        }
+      }
+    },
+    "VD: AXTextArea": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g., AXTextArea"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "例如:AXTextArea"
+          }
+        }
+      }
+    },
     "VD: Google Docs": {
       "localizations": {
         "en": {
@@ -5638,8 +7027,38 @@
         }
       }
     },
-    "VD: Terminal 1": {},
-    "VD: notranslate, code-block": {},
+    "VD: Terminal 1": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g., Terminal 1"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "例如:Terminal 1"
+          }
+        }
+      }
+    },
+    "VD: notranslate, code-block": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g., notranslate, code-block"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "例如:notranslate, code-block"
+          }
+        }
+      }
+    },
     "VD: pt, ar, hi, bn...": {
       "localizations": {
         "en": {
@@ -5656,10 +7075,70 @@
         }
       }
     },
-    "VD: urlbar-input": {},
-    "VI": {},
-    "VNI": {},
-    "Verbose": {},
+    "VD: urlbar-input": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g., urlbar-input"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "例如:urlbar-input"
+          }
+        }
+      }
+    },
+    "VI": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VI"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VI"
+          }
+        }
+      }
+    },
+    "VNI": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VNI"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VNI"
+          }
+        }
+      }
+    },
+    "Verbose": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbose"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "详细"
+          }
+        }
+      }
+    },
     "Vietnamese Input Method for macOS": {
       "localizations": {
         "en": {
@@ -5822,14 +7301,134 @@
         }
       }
     },
-    "Wait (µs):": {},
-    "Wait delay:": {},
-    "Web Content": {},
-    "Window Title:": {},
-    "Word After Caret": {},
-    "Word Before Caret": {},
-    "XKey": {},
-    "XKey Debug": {},
+    "Wait (µs):": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wait (µs):"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待 (µs):"
+          }
+        }
+      }
+    },
+    "Wait delay:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wait delay:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待延迟:"
+          }
+        }
+      }
+    },
+    "Web Content": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Web Content"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网页内容"
+          }
+        }
+      }
+    },
+    "Window Title:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Window Title:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "窗口标题:"
+          }
+        }
+      }
+    },
+    "Word After Caret": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Word After Caret"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "光标后的词"
+          }
+        }
+      }
+    },
+    "Word Before Caret": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Word Before Caret"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "光标前的词"
+          }
+        }
+      }
+    },
+    "XKey": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "XKey"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "XKey"
+          }
+        }
+      }
+    },
+    "XKey Debug": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "XKey Debug"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "XKey 调试"
+          }
+        }
+      }
+    },
     "XKey có thể tự động bật/tắt tính năng thêm dấu tiếng Việt dựa trên Input Source hiện tại của hệ điều hành.": {
       "localizations": {
         "en": {
@@ -6136,11 +7735,86 @@
         }
       }
     },
-    "cc→ch, gg→gi, kk→kh, nn→ng, pp→ph, qq→qu, tt→th": {},
-    "e.g., a + s + n + h": {},
-    "e.g., ánh": {},
-    "f→ph, j→gi, w→qu": {},
-    "github.com/1ec5/hunspell-vi": {},
+    "cc→ch, gg→gi, kk→kh, nn→ng, pp→ph, qq→qu, tt→th": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cc→ch, gg→gi, kk→kh, nn→ng, pp→ph, qq→qu, tt→th"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cc→ch, gg→gi, kk→kh, nn→ng, pp→ph, qq→qu, tt→th"
+          }
+        }
+      }
+    },
+    "e.g., a + s + n + h": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g., a + s + n + h"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g., a + s + n + h"
+          }
+        }
+      }
+    },
+    "e.g., ánh": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g., ánh"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g., ánh"
+          }
+        }
+      }
+    },
+    "f→ph, j→gi, w→qu": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "f→ph, j→gi, w→qu"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "f→ph, j→gi, w→qu"
+          }
+        }
+      }
+    },
+    "github.com/1ec5/hunspell-vi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "github.com/1ec5/hunspell-vi"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "github.com/1ec5/hunspell-vi"
+          }
+        }
+      }
+    },
     "giây": {
       "localizations": {
         "en": {
@@ -6174,14 +7848,56 @@
         }
       }
     },
-    "g→ng, h→nh, k→ch": {},
-    "lines": {},
+    "g→ng, h→nh, k→ch": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g→ng, h→nh, k→ch"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g→ng, h→nh, k→ch"
+          }
+        }
+      }
+    },
+    "lines": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "lines"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "行"
+          }
+        }
+      }
+    },
     "v%@ (%@)": {
       "localizations": {
         "vi": {
           "stringUnit": {
             "state": "new",
             "value": "v%1$@ (%2$@)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "v%@ (%@)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "v%@ (%@)"
           }
         }
       }
@@ -6202,8 +7918,38 @@
         }
       }
     },
-    "µs": {},
-    "·": {},
+    "µs": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "µs"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "µs"
+          }
+        }
+      }
+    },
+    "·": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "·"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "·"
+          }
+        }
+      }
+    },
     "Đang chạy": {
       "localizations": {
         "en": {
@@ -6334,7 +8080,6 @@
       }
     },
     "Đã import %lld từ thành công": {
-      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -6416,7 +8161,6 @@
       }
     },
     "Đã xuất %lld từ thành công": {
-      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -6544,13 +8288,118 @@
         }
       }
     },
-    "• Bấm phím tắt Ctrl/Option để bật/tắt tính năng": {},
-    "• Bấm vào nút trên thanh công cụ để bật/tắt tính năng": {},
-    "• License: GPL (GNU General Public License)": {},
-    "• Một dự án mã nguồn mở": {},
-    "• Nguồn: hunspell-vi by Minh Nguyen": {},
-    "• Nhấn %@ để hiện/ẩn thanh công cụ tại con trỏ": {},
-    "⚠️ %@": {},
+    "• Bấm phím tắt Ctrl/Option để bật/tắt tính năng": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Press Ctrl/Option hotkey to toggle the feature"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• 按 Ctrl/Option 快捷键切换功能"
+          }
+        }
+      }
+    },
+    "• Bấm vào nút trên thanh công cụ để bật/tắt tính năng": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Click the toolbar button to toggle the feature"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• 点击工具栏按钮切换功能"
+          }
+        }
+      }
+    },
+    "• License: GPL (GNU General Public License)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• License: GPL (GNU General Public License)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• 许可证:GPL (GNU 通用公共许可证)"
+          }
+        }
+      }
+    },
+    "• Một dự án mã nguồn mở": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• An open-source project"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• 一个开源项目"
+          }
+        }
+      }
+    },
+    "• Nguồn: hunspell-vi by Minh Nguyen": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Source: hunspell-vi by Minh Nguyen"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• 来源:hunspell-vi by Minh Nguyen"
+          }
+        }
+      }
+    },
+    "• Nhấn %@ để hiện/ẩn thanh công cụ tại con trỏ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Press %@ to show/hide the toolbar at the cursor"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• 按 %@ 在光标处显示/隐藏工具栏"
+          }
+        }
+      }
+    },
+    "⚠️ %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⚠️ %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⚠️ %@"
+          }
+        }
+      }
+    },
     "⚠️ Direct Mode - Không có gạch chân nhưng có thể gặp lỗi thêm dấu/double ký tự trong một số trường hợp trên các app khác nhau. Nếu gặp lỗi như vậy hãy bật tính năng này lên và thử lại.": {
       "localizations": {
         "en": {
@@ -6729,7 +8578,22 @@
         }
       }
     },
-    "📎": {},
+    "📎": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "📎"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "📎"
+          }
+        }
+      }
+    },
     "🔄 Dịch sang ngôn ngữ nguồn": {
       "localizations": {
         "en": {
@@ -6742,6 +8606,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "🔄 翻译为源语言"
+          }
+        }
+      }
+    },
+    "%@ (giữ 0.5s...)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ (hold 0.5s...)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@（按住 0.5 秒...）"
           }
         }
       }
