@@ -6,124 +6,50 @@
     <description>XKey - Vietnamese Input Method for macOS</description>
     <language>vi</language>
     <item>
-      <title>Version 1.2.22 (Build 20260525.1)</title>
-      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.22-20260525.1</link>
-      <sparkle:version>20260525.1</sparkle:version>
+      <title>Version 1.2.22 (Build 20260527)</title>
+      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.22-20260527</link>
+      <sparkle:version>20260527</sparkle:version>
       <sparkle:shortVersionString>1.2.22</sparkle:shortVersionString>
       <description><![CDATA[
         <p><h2>What's New</h2></p>
-<p>fix(engine): harden undoTyping path — Quick Telex, overflow, stable entry IDs (#276)</p>
-<p>Builds on #274 to make <code>undoTyping()</code> produce the user's exact original</p>
-<p>keystrokes across every supported typing flow, and closes the invariant gaps</p>
-<p>in TypingBuffer's keystroke tracking that previously caused undo to silently</p>
-<p>corrupt the output.</p>
-<p>Five concerns rolled into one change:</p>
-<ol>
-<li><strong>Quick Telex undo</strong> (<code>cc→ch</code>, <code>gg→gi</code>, <code>kk→kh</code>, <code>nn→ng</code>, <code>pp→ph</code>,</li>
-</ol>
-<p>   <code>qq→qu</code>, <code>tt→th</code>): <code>handleQuickTelex</code> appended the replacement key</p>
-<p>   directly without <code>recordKeystroke</code> and stored the replacement as the</p>
-<p>   entry's primary keystroke. Typing "chó" as <code>c-c-o-s</code> left the sequence</p>
-<p>   with <code>[c, o, s]</code> and the new entry's primary as <code>h</code> instead of <code>c</code>, so</p>
-<p>   ESC restored "cos" — silently dropping the duplicated consonant for</p>
-<p>   every Vietnamese word starting with ch/gh/kh/ng/ph/qu/th. Fix appends an</p>
-<p>   entry whose primary keystroke is the user's actual key, records it in</p>
-<p>   typing-order, then overwrites <code>processedData</code> with the replacement for</p>
-<p>   display.</p>
-<ol>
-<li><strong>Buffer overflow guard</strong>: <code>TypingBuffer</code> caps entries at MAX_SIZE (32)</li>
-</ol>
-<p>   and moves older entries to a separate overflow array, but</p>
-<p>   <code>keystrokeSequence</code> keeps growing — it isn't trimmed on overflow. For a</p>
-<p>   Vietnamese word longer than 32 chars, <code>backspaceCount</code> would only delete</p>
-<p>   32 displayed chars while undo injected 33+ keystrokes. <code>canUndoTyping</code></p>
-<p>   and <code>undoTyping</code> now refuse undo when <code>buffer.hasOverflow</code> is true.</p>
-<p>   Pass-through is the safe choice; overflowed words are too rare to</p>
-<p>   justify overflow-aware restoration.</p>
-<ol>
-<li><strong>Stable entry IDs for restore-then-undo</strong>: <code>restore(from:)</code> previously</li>
-</ol>
-<p>   overwrote <code>keystrokeSequence</code> with <code>getAllRawKeystrokes()</code> (per-entry</p>
-<p>   order, modifiers grouped with their owners) because <code>removeLast</code> popped</p>
-<p>   the sequence tail blindly. That hack discarded typing order, so after a</p>
-<p>   history restore (backspace across a word boundary) undo for a word with</p>
-<p>   non-adjacent modifiers like "thừa" (t-h-u-a-w-f) replayed "thuwfa"</p>
-<p>   instead of the user's actual "thuawf". Fix:</p>
-<p>   - Give every <code>CharacterEntry</code> a stable <code>id</code> from a lock-protected</p>
-<p>     monotonic counter (NSLock — XCTest can schedule test classes across</p>
-<p>     threads even though production typing is single-threaded; a torn</p>
-<p>     <code>+= 1</code> would hand two entries the same id).</p>
-<p>   - Stamp every <code>RawKeystroke</code> with the owning entry's id; modifiers carry</p>
-<p>     the id of their target entry, not the entry being typed.</p>
-<p>   - <code>addModifier(at:)</code> / <code>addModifierToLast</code> return the stamped keystroke</p>
-<p>     so callers (<code>insertStateAt</code>) hand the same instance to</p>
-<p>     <code>recordKeystroke</code>.</p>
-<p>   - <code>recordKeystroke</code> auto-stamps unstamped keystrokes with</p>
-<p>     <code>entries.last.id</code> for the common case right after</p>
-<p>     <code>append(keyCode:isCaps:)</code>.</p>
-<p>   - <code>removeLast()</code> / <code>remove(at:)</code> filter the sequence by <code>entryId</code></p>
-<p>     instead of popping the tail, so they remove the entry's keystrokes</p>
-<p>     from wherever they sit in typing order.</p>
-<p>   - <code>removeLastModifier*</code> walk from the tail and remove the matching</p>
-<p>     keystroke by entryId + keyCode + caps, so identical modifiers on the</p>
-<p>     same entry don't confuse it.</p>
-<p>   - <code>restore(from:)</code> now uses <code>snapshot.keystrokeSequence</code> verbatim.</p>
-<p>   - <code>id</code> and <code>entryId</code> are excluded from <code>Equatable</code> (identity, not</p>
-<p>     value), so existing value-based tests keep working.</p>
-<ol>
-<li><strong>Close remaining invariant gaps</strong>: three more places mutated the buffer</li>
-</ol>
-<p>   without keeping <code>keystrokeSequence</code> in sync with <code>totalKeystrokeCount</code>:</p>
-<p>   - <code>processWordBreak</code> spell-check restore built a temporary buffer from</p>
-<p>     keyStates and snapshotted it without ever recording keystrokes; the</p>
-<p>     resulting snapshot had non-empty entries but an empty sequence.</p>
-<p>   - <code>restoreFromLegacy</code> appended entries from legacy data without</p>
-<p>     populating the sequence.</p>
-<p>   - <code>checkQuickConsonant</code> (<code>f→ph</code>, <code>j→gi</code>, <code>w→qu</code>, <code>g→ng</code>, <code>h→nh</code>,</p>
-<p>     <code>k→ch</code> — all off by default) modified entries via <code>buffer.clear()</code></p>
-<p>     + re-append loop and via bare <code>buffer.append(...)</code> without recording.</p>
-<p>   All three now record each keystroke after the append so the invariant</p>
-<p>   <code>sequence.count == totalKeystrokeCount</code> holds.</p>
-<ol>
-<li><strong><code>saveSpaces</code> / <code>saveSpecialChar</code></strong>: both built snapshots with an empty</li>
-</ol>
-<p>   sequence; they now populate the sequence from each entry's primary</p>
-<p>   keystroke so the invariant survives that restore path too.</p>
-<p>Tests:</p>
+<p>feat(remote-desktop): machine B always-on session tap + dynamic status bar toggle</p>
+<p>Problem: regression introduced in af43119 changed session tap to lazy</p>
+<p>(frontmost-based), breaking Vietnamese input on machine B when machine A</p>
+<p>disables XKey. Remote desktop server daemons inject events at session level,</p>
+<p>bypassing HID tap — lazy tap never fires on B since the daemon is never frontmost.</p>
+<p>Solution: isRemoteDesktopTarget preference (default false) lets machine B opt in</p>
+<p>to an always-on tailAppendEventTap at cgSessionEventTap. Machine A retains the</p>
+<p>lazy strategy (session tap only while RD client is frontmost) to avoid timing</p>
+<p>interference with Notion/Kiro CLI.</p>
 <ul>
-<li>New <code>testUndoTyping<em>choQuickTelex</em>restoresFullInput</code> — c-c-o-s → engine</li>
+<li>Preferences: add isRemoteDesktopTarget (bool, default false)</li>
+<li>SharedSettings: add XKey.isRemoteDesktopTarget key + computed property;</li>
 </ul>
-<p>  shows "chó" → undo restores "ccos".</p>
+<p>  exclude from iCloud sync scalars (device-specific — B != A)</p>
 <ul>
-<li>New <code>testUndoTyping<em>bufferOverflow</em>refusesUndo</code> — 33 'a' + tone mark →</li>
+<li>EventTapManager: dual-mode session tap strategy controlled by isRemoteDesktopTarget;</li>
 </ul>
-<p>  <code>canUndoTyping</code> returns false; <code>undoTyping</code> returns doNothing.</p>
+<p>  tailAppendEventTap always-on for machine B, lazy frontmost-based for machine A</p>
 <ul>
-<li>New <code>testUndoTyping<em>afterHistoryRestore</em>preservesTypingOrder</code> — type</li>
+<li>AppDelegate.applyPreferences: restart event tap when isRemoteDesktopTarget changes</li>
+<li>AdvancedSection: toggle + description in Remote Desktop settings group</li>
+<li>StatusBarViewModel: detect running RD apps via NSWorkspace notifications;</li>
 </ul>
-<p>  "thừa", round-trip through a snapshot, ESC restores "thuawf".</p>
+<p>  expose isRemoteDesktopRunning + isRemoteDesktopTarget published vars;</p>
+<p>  setRemoteDesktopTarget() writes SharedSettings + restarts EventTapManager;</p>
+<p>  observe sharedSettingsDidChange to stay in sync with Settings panel changes</p>
 <ul>
-<li>Rewrote three <code>RestoreEditTests</code> cases that asserted the old per-entry</li>
+<li>StatusBarPopoverView: show "Remote Session Tap" toggle below "Gõ Tiếng Việt"</li>
 </ul>
-<p>  rebuild semantics; they now assert typing-order preservation.</p>
+<p>  only when a remote desktop app is running; multiline subtitle with fixedSize</p>
 <ul>
-<li>Migrated <code>testHistoryRestoreThenEditProducesCorrectRestore</code>,</li>
+<li>Localizable.xcstrings: add en/zh-Hans for 3 new UI strings</li>
 </ul>
-<p>  <code>testCreateSnapshotIncludesKeystrokeSequence</code>,</p>
-<p>  <code>testModifierAtOldEntryMaintainsTypingOrder</code>, and</p>
-<p>  <code>testTypingWithLateModifierProducesCorrectRestoreOrder</code> to the</p>
-<p>  stamped-keystroke pattern — auto-stamping inside <code>recordKeystroke</code> uses</p>
-<p>  <code>entries.last.id</code>, which would mis-label modifiers on non-last entries</p>
-<p>  unless callers pass the stamped value returned by <code>addModifier(at:)</code>.</p>
-<ul>
-<li>All existing undo / Quick Telex / overflow / canUndoTyping tests still</li>
-</ul>
-<p>  pass; full XKeyTests suite green.</p>
-<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.22-20260525.1">Xem chi tiết trên GitHub</a></p>
+<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.22-20260527">Xem chi tiết trên GitHub</a></p>
       ]]></description>
-      <pubDate>Mon, 25 May 2026 05:53:34 +0000</pubDate>
+      <pubDate>Wed, 27 May 2026 01:17:36 +0000</pubDate>
       <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.22-20260525.1/XKey.dmg" sparkle:version="20260525.1" sparkle:shortVersionString="1.2.22" length="10854774" type="application/octet-stream" sparkle:edSignature="uzNUtCWbHv5C+M4j4sRBn6ZogjRGXXgQdDDGkAxWpJfLX7OVDkjZGmsNIXFWkEr7ZpaFZOmoKUIMRLYgcUC/Bg==" />
+      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.22-20260527/XKey.dmg" sparkle:version="20260527" sparkle:shortVersionString="1.2.22" length="11379225" type="application/octet-stream" sparkle:edSignature="X8q098SLF/wNFZ/57FNit9gKltfvkYFxBRgl2RM2LCwGPlbAPAlqKNID0HLj4VQtZEF5gl1Vtm0wGI/Rv65MAA==" />
     </item>
   </channel>
 </rss>
