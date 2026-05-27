@@ -145,6 +145,13 @@ struct Preferences: Codable {
     //       so the remote machine receives final Vietnamese text. Useful when remote
     //       machine has no Vietnamese IME available.
     var remoteDesktopInjectMode: Bool = false
+
+    // Remote desktop target mode
+    // false (default): this machine is the controller (machine A) — session tap is lazy,
+    //                  activated only while a remote desktop client is frontmost.
+    // true: this machine is being remoted into (machine B) — session tap is always-on
+    //       so remote desktop daemon events (which bypass HID tap) are intercepted.
+    var isRemoteDesktopTarget: Bool = false
     
     // Window Title Rules toggle
     var windowTitleRulesEnabled: Bool = true         // Master switch for Window Title Rules (can be toggled via hotkey)

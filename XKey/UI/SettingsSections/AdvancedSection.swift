@@ -259,10 +259,20 @@ struct AdvancedSection: View {
 
                 SettingsGroup(title: "Remote Desktop") {
                     VStack(alignment: .leading, spacing: 10) {
+                        Toggle("Remote Session Tap",
+                               isOn: $viewModel.preferences.isRemoteDesktopTarget)
+
+                        Text("BẬT khi máy này là máy đích (machine B) — máy đang bị remote control bởi Jump Desktop, AnyDesk, TeamViewer, RustDesk, v.v.\n\nKhi BẬT: XKey luôn lắng nghe keyboard events từ remote desktop daemon (bypass HID tap). Cho phép gõ tiếng Việt bình thường trên máy B khi máy A disable XKey.\n\nĐể TẮT khi máy A disable XKey và bạn muốn gõ tiếng Việt trực tiếp trên máy B.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Divider()
+
                         Toggle("Gõ tiếng Việt xuyên qua remote desktop (Thử nghiệm)",
                                isOn: $viewModel.preferences.remoteDesktopInjectMode)
 
-                        Text("Mặc định TẮT: các ứng dụng remote desktop ở chế độ passthrough — máy từ xa tự xử lý gõ tiếng Việt.\n\nKhi BẬT: XKey inject tiếng Việt qua clipboard paste (Cmd+V / Ctrl+V). Hữu ích khi máy từ xa không có bộ gõ tiếng Việt.\n\nTương thích (thử nghiệm):\n• ✓ Jump Desktop — gõ chậm (~1 giây / từ) hoạt động ổn định\n• ✓ AnyDesk, Parallels, VMware Fusion, Apple Remote Desktop — tương tự Jump Desktop\n• ✗ RustDesk — KHÔNG hỗ trợ (strict-check HID modifier state, strip synthetic Cmd/Ctrl). Dùng manual Cmd+C/Ctrl+V.\n• ⚠ TeamViewer, Microsoft RDC — chưa kiểm thử kỹ\n\nYêu cầu:\n• Bật đồng bộ clipboard trong ứng dụng remote desktop.\n• Clipboard local sẽ bị ghi đè mỗi lần gõ — copy text quan trọng trước khi gõ.\n• Gõ chậm hơn bình thường (mỗi từ ~500ms-1s) để network kịp đồng bộ.")
+                        Text("Dành cho máy A (máy đang điều khiển). BẬT khi máy B không có bộ gõ tiếng Việt.\n\nKhi BẬT: XKey inject tiếng Việt qua clipboard paste (Cmd+V / Ctrl+V).\n\nTương thích (thử nghiệm):\n• ✓ Jump Desktop — gõ chậm (~1 giây / từ) hoạt động ổn định\n• ✓ AnyDesk, Parallels, VMware Fusion, Apple Remote Desktop — tương tự Jump Desktop\n• ✗ RustDesk — KHÔNG hỗ trợ (strict-check HID modifier state). Dùng manual Cmd+C/Ctrl+V.\n• ⚠ TeamViewer, Microsoft RDC — chưa kiểm thử kỹ\n\nYêu cầu: Bật đồng bộ clipboard trong ứng dụng remote desktop.")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)

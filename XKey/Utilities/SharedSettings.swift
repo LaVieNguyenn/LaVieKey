@@ -84,6 +84,9 @@ enum SharedSettingsKey: String {
 
     // Remote desktop injection mode
     case remoteDesktopInjectMode = "XKey.remoteDesktopInjectMode"
+
+    // Remote desktop target mode (this machine is being remoted into)
+    case isRemoteDesktopTarget = "XKey.isRemoteDesktopTarget"
     
     // Window Title Rules toggle
     case windowTitleRulesEnabled = "XKey.windowTitleRulesEnabled"
@@ -774,6 +777,14 @@ class SharedSettings {
         }
     }
 
+    var isRemoteDesktopTarget: Bool {
+        get { readBool(forKey: SharedSettingsKey.isRemoteDesktopTarget.rawValue) }
+        set {
+            writeBool(newValue, forKey: SharedSettingsKey.isRemoteDesktopTarget.rawValue)
+            notifySettingsChanged()
+        }
+    }
+
     var toggleExclusionHotkeyCode: UInt16 {
         get { UInt16(readInt(forKey: SharedSettingsKey.toggleExclusionHotkeyCode.rawValue)) }
         set { writeInt(Int(newValue), forKey: SharedSettingsKey.toggleExclusionHotkeyCode.rawValue) }
@@ -975,11 +986,15 @@ class SharedSettings {
 
     /// Keys excluded from the scalar payload because they are owned by dedicated sync categories
     /// (macros / rules / excluded apps / user dictionary). Keeping them out prevents double-writes.
+    /// Also excludes device-specific keys that must not sync across machines.
     private static let scalarsExcludedKeys: Set<String> = [
         SharedSettingsKey.macrosData.rawValue,
         SharedSettingsKey.excludedApps.rawValue,
         SharedSettingsKey.windowTitleRules.rawValue,
         SharedSettingsKey.userDictionaryWords.rawValue,
+        // Device-specific: machine B (remote target) ≠ machine A (controller).
+        // Syncing this would break Notion/Kiro on the controller machine.
+        SharedSettingsKey.isRemoteDesktopTarget.rawValue,
     ]
 
     /// Sensitive keys that must never leave the device. Currently empty — translation providers
@@ -1344,6 +1359,7 @@ class SharedSettings {
         }
         prefs.exclusionRulesEnabled = exclusionRulesEnabled
         prefs.remoteDesktopInjectMode = remoteDesktopInjectMode
+        prefs.isRemoteDesktopTarget = isRemoteDesktopTarget
         let exclHotkeyCode = toggleExclusionHotkeyCode
         let exclHotkeyModifiers = toggleExclusionHotkeyModifiers
         if exclHotkeyCode != 0 || exclHotkeyModifiers != 0 {
@@ -1502,6 +1518,7 @@ class SharedSettings {
         toggleExclusionHotkeyCode = prefs.toggleExclusionHotkey.keyCode
         toggleExclusionHotkeyModifiers = prefs.toggleExclusionHotkey.modifiers.rawValue
         remoteDesktopInjectMode = prefs.remoteDesktopInjectMode
+        isRemoteDesktopTarget = prefs.isRemoteDesktopTarget
 
         // Window Title Rules toggle
         windowTitleRulesEnabled = prefs.windowTitleRulesEnabled

@@ -17,9 +17,13 @@ class StatusBarViewModel: ObservableObject {
     @Published var hotkeyKeyEquivalent: KeyEquivalent = "v"
     @Published var hotkeyModifiers: EventModifiers = [.command, .shift]
     @Published var debugModeEnabled = false
-    
+    @Published var isRemoteDesktopRunning = false
+    @Published var isRemoteDesktopTarget = false
+
     private weak var keyboardHandler: KeyboardEventHandler?
     private weak var eventTapManager: EventTapManager?
+    private var remoteDesktopWorkspaceObservers: [NSObjectProtocol] = []
+    private var settingsObserver: NSObjectProtocol?
     
     // Debug logging callback
     var debugLogCallback: ((String) -> Void)?
@@ -41,10 +45,53 @@ class StatusBarViewModel: ObservableObject {
         
         // Load hotkey from preferences
         updateHotkeyDisplay()
+
+        // Remote desktop target state
+        isRemoteDesktopTarget = SharedSettings.shared.isRemoteDesktopTarget
+        checkRemoteDesktopRunning()
+        setupRemoteDesktopMonitoring()
+    }
+
+    deinit {
+        remoteDesktopWorkspaceObservers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
+        if let obs = settingsObserver { NotificationCenter.default.removeObserver(obs) }
     }
     
     private func log(_ message: String) {
         debugLogCallback?(message)
+    }
+
+    private func checkRemoteDesktopRunning() {
+        let runningIds = NSWorkspace.shared.runningApplications.compactMap { $0.bundleIdentifier?.lowercased() }
+        isRemoteDesktopRunning = runningIds.contains { RemoteDesktopBundleIds.all.contains($0) }
+    }
+
+    private func setupRemoteDesktopMonitoring() {
+        let workspaceCenter = NSWorkspace.shared.notificationCenter
+        let onLaunch = workspaceCenter.addObserver(forName: NSWorkspace.didLaunchApplicationNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.checkRemoteDesktopRunning()
+        }
+        let onTerminate = workspaceCenter.addObserver(forName: NSWorkspace.didTerminateApplicationNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.checkRemoteDesktopRunning()
+        }
+        remoteDesktopWorkspaceObservers = [onLaunch, onTerminate]
+
+        // Refresh isRemoteDesktopTarget when Settings panel saves (avoids stale toggle state)
+        settingsObserver = NotificationCenter.default.addObserver(forName: .sharedSettingsDidChange, object: nil, queue: .main) { [weak self] _ in
+            let newValue = SharedSettings.shared.isRemoteDesktopTarget
+            if self?.isRemoteDesktopTarget != newValue {
+                self?.isRemoteDesktopTarget = newValue
+            }
+        }
+    }
+
+    func setRemoteDesktopTarget(_ enabled: Bool) {
+        isRemoteDesktopTarget = enabled
+        SharedSettings.shared.isRemoteDesktopTarget = enabled
+        if eventTapManager?.isRunning == true {
+            try? eventTapManager?.restart()
+        }
+        log("Remote desktop target mode: \(enabled ? "ON" : "OFF")")
     }
     
     func toggleVietnamese() {

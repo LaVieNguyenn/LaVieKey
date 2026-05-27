@@ -9137,6 +9137,54 @@
           }
         }
       }
+    },
+    "Remote Session Tap": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remote Session Tap"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "远程会话拦截"
+          }
+        }
+      }
+    },
+    "Hỗ trợ gõ tiếng Việt khi máy A remote (tắt XKey) -> máy B được remote (bật XKey + bật tính năng này)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supports Vietnamese input when machine A is the controller (XKey off) → machine B is being remoted into (XKey on + enable this)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支持在机器A远控（关XKey）→机器B被远控（开XKey+开此功能）时输入越南语"
+          }
+        }
+      }
+    },
+    "Máy này đang bị remote vào (Machine B)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This machine is being remoted into (Machine B)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此机器正在被远程控制（机器B）"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

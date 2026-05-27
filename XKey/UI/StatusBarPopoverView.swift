@@ -20,6 +20,11 @@ struct StatusBarPopoverView: View {
             // MARK: - Toggle Vietnamese
             toggleSection
 
+            // MARK: - Remote Desktop Target (shown only when remote desktop app is running)
+            if viewModel.isRemoteDesktopRunning {
+                remoteDesktopTargetSection
+            }
+
             // MARK: - Input Method
             inputMethodSection
 
@@ -58,6 +63,32 @@ struct StatusBarPopoverView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 4)
+        .menuCardStyle()
+    }
+
+    // MARK: - Remote Desktop Target Section
+    private var remoteDesktopTargetSection: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Remote Session Tap")
+                    .font(.system(size: 13, weight: .semibold))
+                Text("Hỗ trợ gõ tiếng Việt khi máy A remote (tắt XKey) -> máy B được remote (bật XKey + bật tính năng này)")
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 8)
+            Toggle("", isOn: Binding(
+                get: { viewModel.isRemoteDesktopTarget },
+                set: { viewModel.setRemoteDesktopTarget($0) }
+            ))
+            .toggleStyle(.switch)
+            .labelsHidden()
+            .controlSize(.small)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 6)
         .menuCardStyle()
     }
 

@@ -678,6 +678,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Update toggle window rules hotkey (pass hotkey directly to avoid re-loading preferences)
         updateToggleWindowRulesHotkey(hotkey: preferences.toggleWindowRulesHotkey)
 
+        // Restart event tap if remote target mode changed — session tap strategy differs
+        // (always-on tailAppend vs lazy frontmost-based).
+        let currentTargetMode = SharedSettings.shared.isRemoteDesktopTarget
+        if currentTargetMode != preferences.isRemoteDesktopTarget {
+            SharedSettings.shared.isRemoteDesktopTarget = preferences.isRemoteDesktopTarget
+            if eventTapManager?.isRunning == true {
+                try? eventTapManager?.restart()
+                debugWindowController?.logEvent("Event tap restarted (isRemoteDesktopTarget → \(preferences.isRemoteDesktopTarget))")
+            }
+        }
+
         debugWindowController?.logEvent("Preferences applied (including advanced features)")
     }
 
