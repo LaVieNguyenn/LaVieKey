@@ -7123,6 +7123,22 @@
         }
       }
     },
+    "Tự nhận kiểu gõ (Telex + VNI)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adaptive Input (Telex + VNI)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自适应输入 (Telex + VNI)"
+          }
+        }
+      }
+    },
     "Verbose": {
       "localizations": {
         "en": {

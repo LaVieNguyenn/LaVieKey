@@ -43,6 +43,8 @@ class InputProcessor {
             return processVNIKey(lowerChar, isUppercase: isUppercase)
         case .simpleTelex1, .simpleTelex2:
             return processSimpleTelexKey(lowerChar, isUppercase: isUppercase)
+        case .adaptive:
+            return processTelexKey(lowerChar, isUppercase: isUppercase)
         }
     }
     
@@ -174,6 +176,9 @@ class InputProcessor {
             return ["s", "f", "r", "x", "j"].contains(char.lowercased().first ?? char)
         case .vni:
             return ["1", "2", "3", "4", "5"].contains(char)
+        case .adaptive:
+            return ["s", "f", "r", "x", "j"].contains(char.lowercased().first ?? char)
+                || ["1", "2", "3", "4", "5"].contains(char)
         }
     }
     
@@ -183,6 +188,9 @@ class InputProcessor {
             return char.lowercased().first == "w" || char == "^"
         case .vni:
             return ["6", "7", "8", "9"].contains(char)
+        case .adaptive:
+            return char.lowercased().first == "w" || char == "^"
+                || ["6", "7", "8", "9"].contains(char)
         }
     }
     

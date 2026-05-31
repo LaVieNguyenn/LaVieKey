@@ -139,6 +139,7 @@
 		TEST00023 /* TranslationProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TEST00024 /* TranslationProviderTests.swift */; };
 		TEST00025 /* AXDirectFallbackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TEST00026 /* AXDirectFallbackTests.swift */; };
 		TEST00027 /* VNEngineAutoCapitalizeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = TEST00028 /* VNEngineAutoCapitalizeTests.swift */; };
+		ADAPT0001 /* VNEngineAdaptiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADAPT0002 /* VNEngineAdaptiveTests.swift */; };
 		TOMBSTONE001 /* SyncTombstoneStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = TOMBSTONE002 /* SyncTombstoneStore.swift */; };
 		TOMBSTONE003 /* SyncTombstoneStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = TOMBSTONE002 /* SyncTombstoneStore.swift */; };
 		TRANSLATTB001 /* TranslationToolbarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = TRANSLATTB002 /* TranslationToolbarController.swift */; };
@@ -271,6 +272,7 @@
 		TEST00024 /* TranslationProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationProviderTests.swift; sourceTree = "<group>"; };
 		TEST00026 /* AXDirectFallbackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AXDirectFallbackTests.swift; sourceTree = "<group>"; };
 		TEST00028 /* VNEngineAutoCapitalizeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VNEngineAutoCapitalizeTests.swift; sourceTree = "<group>"; };
+		ADAPT0002 /* VNEngineAdaptiveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VNEngineAdaptiveTests.swift; sourceTree = "<group>"; };
 		TOMBSTONE002 /* SyncTombstoneStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTombstoneStore.swift; sourceTree = "<group>"; };
 		TRANSLATTB002 /* TranslationToolbarController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TranslationToolbarController.swift; sourceTree = "<group>"; };
 		TRANSLATTB004 /* TranslationToolbarView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TranslationToolbarView.swift; sourceTree = "<group>"; };
@@ -560,6 +562,7 @@
 				LANG0002 /* AppLanguageTests.swift */,
 				ICLOUDSYNCTEST002 /* iCloudSyncManagerTests.swift */,
 				MACR0002 /* MacroManagerTests.swift */,
+				ADAPT0002 /* VNEngineAdaptiveTests.swift */,
 			);
 			path = XKeyTests;
 			sourceTree = "<group>";
@@ -861,6 +864,7 @@
 				LANG0001 /* AppLanguageTests.swift in Sources */,
 				ICLOUDSYNCTEST001 /* iCloudSyncManagerTests.swift in Sources */,
 				MACR0001 /* MacroManagerTests.swift in Sources */,
+				ADAPT0001 /* VNEngineAdaptiveTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

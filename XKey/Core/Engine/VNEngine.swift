@@ -55,6 +55,7 @@ class VNEngine {
     
     var vLanguage = 1              // 0: English, 1: Vietnamese
     var vInputType = 0             // 0: Telex, 1: VNI
+    var vAdaptiveEnabled = false   // Adaptive: accept BOTH Telex & VNI keys, decided per keystroke
     var vCodeTable = 0             // 0: Unicode, 1: TCVN3, 2: VNI-Windows
     var vCheckSpelling = 1         // 0: No, 1: Yes
     var vUseModernOrthography = 1  // 0: òa/úy, 1: oà/uý
@@ -243,6 +244,15 @@ class VNEngine {
         hookState.macroKey = savedMacroKey
         
         let isCaps = isUppercase
+
+        // Adaptive input method: choose the effective input type for THIS keystroke
+        // (boundary translation). Digits route to VNI logic; every other key routes
+        // to Telex. Telex/VNI trigger keys are disjoint, so each keystroke maps to
+        // exactly one method. Downstream code keeps reading a concrete vInputType
+        // (0/1) and never sees the adaptive sentinel (4).
+        if vAdaptiveEnabled {
+            vInputType = vietnameseData.isNumberKey(keyCode) ? 1 : 0
+        }
 
         // Check if number key with shift or has other modifier
         if (vietnameseData.isNumberKey(keyCode) && isUppercase) || hasOtherModifier || isWordBreak(keyCode: keyCode) {
@@ -1270,20 +1280,21 @@ class VNEngine {
     /// - VNI: 0-9
     /// - Simple Telex 1: w, a, e, o, s, f, r, x, j, z, d (NO [ ])
     /// - Simple Telex 2: w, a, e, o, s, f, r, x, j, z, d (NO [ ])
+    /// - Adaptive: Telex keys ∪ VNI keys (letters s/f/r/x/j/w/z, [, ], double letters, and 0-9)
     static func isVietnameseSpecialKey(character: Character, inputMethod: InputMethod) -> Bool {
         // Letters are always processed (Vietnamese engine handles them)
         if character.isLetter {
             return true
         }
         
-        // Numbers: only in VNI mode (0-9 are tone marks)
+        // Numbers: tone marks in VNI mode and Adaptive mode (0-9)
         if character.isNumber {
-            return inputMethod == .vni
+            return inputMethod == .vni || inputMethod == .adaptive
         }
-        
-        // Bracket keys: only in Telex mode ([ → ơ, ] → ư)
+
+        // Bracket keys: ơ/ư in Telex mode and Adaptive mode ([ → ơ, ] → ư)
         if character == "[" || character == "]" {
-            return inputMethod == .telex
+            return inputMethod == .telex || inputMethod == .adaptive
         }
         
         // Other characters are not Vietnamese special keys
@@ -1297,7 +1308,7 @@ class VNEngine {
     ///   - inputMethod: The current input method
     /// - Returns: true if this character is a word break
     ///
-    /// Note: In Telex mode, [ and ] are NOT word breaks (they produce ơ and ư)
+    /// Note: In Telex and Adaptive modes, [ and ] are NOT word breaks (they produce ơ and ư)
     static func isWordBreak(character: Character, inputMethod: InputMethod) -> Bool {
         // Whitespace and common punctuation
         let baseWordBreaks: Set<Character> = [
@@ -1314,9 +1325,10 @@ class VNEngine {
             return true
         }
         
-        // Bracket keys: word break in all modes EXCEPT Telex
+        // Bracket keys: word break in all modes EXCEPT Telex and Adaptive
+        // (in those modes they produce ơ and ư).
         if character == "[" || character == "]" {
-            return inputMethod != .telex
+            return inputMethod != .telex && inputMethod != .adaptive
         }
         
         return false

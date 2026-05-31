@@ -48,7 +48,10 @@ extension VNEngine {
             vInputType = 2
         case .simpleTelex2:
             vInputType = 3
+        case .adaptive:
+            vInputType = 0   // base type; per-keystroke effectiveType overrides (boundary translation)
         }
+        vAdaptiveEnabled = (settings.inputMethod == .adaptive)
         
         // Map CodeTable to vCodeTable
         vCodeTable = settings.codeTable.rawValue
@@ -88,17 +91,21 @@ extension VNEngine {
         var settings = EngineSettings()
         
         // Map vInputType to InputMethod
-        switch vInputType {
-        case 0:
-            settings.inputMethod = .telex
-        case 1:
-            settings.inputMethod = .vni
-        case 2:
-            settings.inputMethod = .simpleTelex1
-        case 3:
-            settings.inputMethod = .simpleTelex2
-        default:
-            settings.inputMethod = .telex
+        if vAdaptiveEnabled {
+            settings.inputMethod = .adaptive
+        } else {
+            switch vInputType {
+            case 0:
+                settings.inputMethod = .telex
+            case 1:
+                settings.inputMethod = .vni
+            case 2:
+                settings.inputMethod = .simpleTelex1
+            case 3:
+                settings.inputMethod = .simpleTelex2
+            default:
+                settings.inputMethod = .telex
+            }
         }
         
         // Map vCodeTable to CodeTable
