@@ -891,6 +891,38 @@ class AppBehaviorDetector {
             textSendingMethod: .oneByOne,
             description: "Telegram Web (all browsers) - selection method to avoid popup dismiss on backspace"
         ),
+
+        // ============================================
+        // Microsoft Office for the web (Word/Excel/PowerPoint Online, all browsers)
+        // ============================================
+        //
+        // Office for the web renders into a custom "WAC" editing surface
+        // (DOM class "WACEditing" / "EditingSurfaceBody"). Diacritics that XKey
+        // injects via synthetic key events (the default .fast method) are held in
+        // a provisional state and DROPPED when the surface loses focus (user clicks
+        // a blank area) or autosave normalizes the DOM — the just-typed text
+        // disappears. Real ASCII keystrokes (pass-through) survive; only the
+        // injected characters are lost.
+        //
+        // Fix: use the same slow + one-by-one strategy as Google Docs so the
+        // editor has time to commit each character before the next event.
+        //
+        // Matched by DOM class (robust across filenames and UI locales) rather
+        // than window title, since the title is only "<filename>.docx - <browser>".
+        WindowTitleRule(
+            name: "Office for the web",
+            bundleIdPattern: "",  // Match all browsers
+            titlePattern: "",     // Match any title — rely on DOM class below
+            matchMode: .contains,
+            axDOMClassList: ["WACEditing", "EditingSurfaceBody"],
+            useMarkedText: false,
+            hasMarkedTextIssues: true,
+            commitDelay: 5000,
+            injectionMethod: .slow,
+            injectionDelays: [5000, 10000, 8000],
+            textSendingMethod: .oneByOne,
+            description: "Office for the web (Word/Excel/PowerPoint Online) - one-by-one like Google Docs"
+        ),
     ]
 
     

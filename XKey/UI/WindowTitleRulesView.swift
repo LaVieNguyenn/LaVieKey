@@ -552,12 +552,12 @@ struct RuleRowView: View {
                         FlowLayoutView(spacing: 4) {
                             // AX Patterns badge
                             if rule.hasAXPatterns {
-                                BehaviorBadge(text: "🎯AX", color: .mint)
+                                BehaviorBadge(text: "AX Detection", color: .mint)
                                     .help(rule.axPatternsSummary)
                             }
                             // Force Accessibility badge
                             if rule.enableForceAccessibility == true {
-                                BehaviorBadge(text: "AX", color: .indigo)
+                                BehaviorBadge(text: "Force AX", color: .indigo)
                             }
                             if rule.useMarkedText == false {
                                 BehaviorBadge(text: "NoMark", color: .orange)
@@ -594,7 +594,7 @@ struct RuleRowView: View {
         case .slow: return "Slow"
         case .selection: return "Select"
         case .autocomplete: return "Auto"
-        case .axDirect: return "AX"
+        case .axDirect: return "AXDirect"
         case .passthrough: return "Pass"
         }
     }
