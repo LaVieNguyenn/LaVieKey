@@ -6,33 +6,37 @@
     <description>XKey - Vietnamese Input Method for macOS</description>
     <language>vi</language>
     <item>
-      <title>Version 1.2.22 (Build 20260602)</title>
-      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.22-20260602</link>
-      <sparkle:version>20260602</sparkle:version>
+      <title>Version 1.2.22 (Build 20260602.1)</title>
+      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.22-20260602.1</link>
+      <sparkle:version>20260602.1</sparkle:version>
       <sparkle:shortVersionString>1.2.22</sparkle:shortVersionString>
       <description><![CDATA[
         <p><h2>What's New</h2></p>
-<p>fix(injection): prevent diacritic loss in Office for the web</p>
-<p>Word/Excel/PowerPoint Online (WAC editing surface) holds characters</p>
-<p>injected via the default .fast synthetic key events in a provisional</p>
-<p>state and discards them when the surface loses focus (clicking a blank</p>
-<p>area) or autosave normalizes the DOM, deleting the just-typed Vietnamese</p>
-<p>text.</p>
-<p>Add a built-in Window Title Rule matched by DOM class (WACEditing /</p>
-<p>EditingSurfaceBody) that switches Office for the web to slow + one-by-one</p>
-<p>injection (same strategy as Google Docs), giving the editor time to</p>
-<p>commit each character.</p>
-<p>Also disambiguate the three rule badges that all read "AX":</p>
+<p>fix(injection): match Word for the web by title, not DOM class</p>
+<p>Chrome often exposes the Word Online (WAC) editing surface as</p>
+<p>role=Unknown with no AXDOMClassList, so the previous DOM-class match</p>
+<p>silently failed and the diacritic-loss fix never applied for users</p>
+<p>whose Chrome had not built its accessibility tree. Match by the</p>
+<p>".docx" document extension in the window title instead, which is</p>
+<p>always available regardless of Chrome's accessibility state.</p>
 <ul>
-<li>matching-condition badge -> "AX Detection"</li>
-<li>force-accessibility badge -> "Force AX"</li>
-<li>axDirect injection method -> "AXDirect"</li>
+<li>Applied to all apps (no browser allowlist); any window whose title</li>
 </ul>
-<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.22-20260602">Xem chi tiết trên GitHub</a></p>
+<p>  contains ".docx" matches. This can include the native Word desktop</p>
+<p>  app, which is harmless (slow + one-by-one is correct, only slower).</p>
+<ul>
+<li>Scope to .docx (Word) only; Excel/PowerPoint Online use different</li>
+</ul>
+<p>  editing surfaces and are not yet verified.</p>
+<ul>
+<li>Rule stays gated by the Window Title Rules master toggle.</li>
+</ul>
+<p>Also bump build to 20260602.1.</p>
+<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.22-20260602.1">Xem chi tiết trên GitHub</a></p>
       ]]></description>
-      <pubDate>Tue, 02 Jun 2026 02:03:03 +0000</pubDate>
+      <pubDate>Tue, 02 Jun 2026 04:39:39 +0000</pubDate>
       <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.22-20260602/XKey.dmg" sparkle:version="20260602" sparkle:shortVersionString="1.2.22" length="11399445" type="application/octet-stream" sparkle:edSignature="JJ+JyCgwio9+u6xfQTyyD1Uchzb300S37htXUIjR5xXzDXNEv5j2AZEpWjXqKXoc8XS/OMp1GRKcjrpkiqwMDA==" />
+      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.22-20260602.1/XKey.dmg" sparkle:version="20260602.1" sparkle:shortVersionString="1.2.22" length="11400550" type="application/octet-stream" sparkle:edSignature="rq1AOHcwGNnp236rhFUasX0gUgWB+hKs2kPQSc9gELdDfpkOthg4Du7lxjZs59LAeF3qolyT2agly1NQEl3rDA==" />
     </item>
   </channel>
 </rss>
