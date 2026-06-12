@@ -6,39 +6,62 @@
     <description>XKey - Vietnamese Input Method for macOS</description>
     <language>vi</language>
     <item>
-      <title>Version 1.2.24 (Build 20260611.1)</title>
-      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260611.1</link>
-      <sparkle:version>20260611.1</sparkle:version>
+      <title>Version 1.2.24 (Build 20260612)</title>
+      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260612</link>
+      <sparkle:version>20260612</sparkle:version>
       <sparkle:shortVersionString>1.2.24</sparkle:shortVersionString>
       <description><![CDATA[
         <p><h2>What's New</h2></p>
-<p>fix(injection): re-detect method on first keystroke after focus-moving Cmd-chord in browsers</p>
-<p>Cmd+L/Cmd+T move focus into the browser address bar (Cmd+F/Cmd+K into</p>
-<p>the find/search field), but the injection method is re-detected</p>
-<p>asynchronously (AXObserver with a 100ms throttle, mouse-click retries),</p>
-<p>so characters typed immediately after the chord could still use the</p>
-<p>previous context's method and race the omnibox autocomplete (e.g.</p>
-<p>'caau' → 'caâu').</p>
-<p>Reuse the one-shot probe pattern from the overlay fix at the injection-</p>
-<p>method level: EventTapManager arms a reprobe on focus-moving Cmd-chords</p>
-<p>(L/T/N/F/K only — broader chords like Cmd+C/V/W/R don't move focus into</p>
-<p>chrome UI and would only add AX cost and sample transitional AX states),</p>
-<p>and the next plain keyDown consumes it in shouldProcessEvent,</p>
-<p>synchronously re-detecting and confirming the method before the first</p>
-<p>character is processed. A keystroke landing within 30ms of the chord</p>
-<p>keeps the probe armed instead of consuming it — the browser hasn't</p>
-<p>moved focus yet, and re-detecting that early would pin the OLD context's</p>
-<p>method. There is deliberately no 'a newer confirmation already landed'</p>
-<p>shortcut: async confirmations can carry a pre-chord focus snapshot with</p>
-<p>a post-chord timestamp, so timestamps cannot prove freshness.</p>
-<p>The reprobe is restricted to browser bundle IDs; other apps keep the</p>
-<p>existing event-driven detection. Cost: at most one detectInjectionMethod()</p>
-<p>per focus-moving chord; plain typing pays a single comparison.</p>
-<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260611.1">Xem chi tiết trên GitHub</a></p>
+<p>feat(injection): use Accessibility API atomic replacement for overlay launchers</p>
+<p>Switch Spotlight/Raycast/Alfred from synthetic CGEvent (.autocomplete)</p>
+<p>to AX atomic replacement (.axDirect), eliminating the race with inline</p>
+<p>autocomplete that scrambled fast Vietnamese typing.</p>
+<ul>
+<li>Map overlay launchers to .axDirect in AppBehaviorDetector</li>
+<li>Rewrite injectViaAX with UTF-16 (NSString) offset math, fixing the</li>
+</ul>
+<p>  grapheme/UTF-16 mismatch that corrupted cut positions for diacritics;</p>
+<p>  add selection-based + full-value strategies, suggestion merge,</p>
+<p>  bounds-check and precomposed mapping</p>
+<ul>
+<li>Hoist .axDirect out of the backspace step; bs==0 goes through AX for</li>
+</ul>
+<p>  overlay launchers only (InjectionMethodInfo.isOverlay) so an</p>
+<p>  auto-selected suggestion is cleared atomically, while Firefox-style</p>
+<p>  contexts keep the synthetic path for plain inserts</p>
+<ul>
+<li>Context-aware fallback (.autocomplete for overlays, backspace+text for</li>
+</ul>
+<p>  Firefox content areas)</p>
+<ul>
+<li>Migrate word-break path to atomic injectSync for consistency</li>
+</ul>
+<p>Hardening:</p>
+<ul>
+<li>Restore the original selection when the selection-based strategy</li>
+</ul>
+<p>  partially fails and the full-value rewrite cannot complete, preventing</p>
+<p>  the synthetic fallback from over-deleting</p>
+<ul>
+<li>Read field length via kAXNumberOfCharacters and defer the full kAXValue</li>
+</ul>
+<p>  copy to the full-value strategy; guard against a stale value before</p>
+<p>  splicing</p>
+<ul>
+<li>Compute the full-value caret from recomposed prefix+insert to survive</li>
+</ul>
+<p>  canonical recomposition across the splice boundary</p>
+<ul>
+<li>Set a process-wide AX messaging timeout (0.25s) at startup and a</li>
+</ul>
+<p>  tighter per-element timeout (0.1s) in injectViaAX; cap AX retries at a</p>
+<p>  250ms budget so a hung app degrades to the synthetic fallback instead</p>
+<p>  of stalling the event tap</p>
+<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260612">Xem chi tiết trên GitHub</a></p>
       ]]></description>
-      <pubDate>Thu, 11 Jun 2026 05:29:50 +0000</pubDate>
+      <pubDate>Fri, 12 Jun 2026 00:39:35 +0000</pubDate>
       <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.24-20260611.1/XKey.dmg" sparkle:version="20260611.1" sparkle:shortVersionString="1.2.24" length="11559962" type="application/octet-stream" sparkle:edSignature="utz08CfkUwhKvuIM5qP4IhoFI23C/MT34eJPABMWc3zKnZcaWBYEOBq9okEfRgEZwMeHmlZwqqxNFi329r/5DA==" />
+      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.24-20260612/XKey.dmg" sparkle:version="20260612" sparkle:shortVersionString="1.2.24" length="11554586" type="application/octet-stream" sparkle:edSignature="5sGkh3A/PhnYnS9NTxLAx/EfKhOJYNx7yAwpXAEv3hQ/Mi205VX4rQSD6qL98Aqq857I/8o3IAPv03MpML3AAQ==" />
     </item>
   </channel>
 </rss>
