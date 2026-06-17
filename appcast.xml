@@ -6,62 +6,33 @@
     <description>XKey - Vietnamese Input Method for macOS</description>
     <language>vi</language>
     <item>
-      <title>Version 1.2.24 (Build 20260612)</title>
-      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260612</link>
-      <sparkle:version>20260612</sparkle:version>
+      <title>Version 1.2.24 (Build 20260617)</title>
+      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260617</link>
+      <sparkle:version>20260617</sparkle:version>
       <sparkle:shortVersionString>1.2.24</sparkle:shortVersionString>
       <description><![CDATA[
         <p><h2>What's New</h2></p>
-<p>feat(injection): use Accessibility API atomic replacement for overlay launchers</p>
-<p>Switch Spotlight/Raycast/Alfred from synthetic CGEvent (.autocomplete)</p>
-<p>to AX atomic replacement (.axDirect), eliminating the race with inline</p>
-<p>autocomplete that scrambled fast Vietnamese typing.</p>
-<ul>
-<li>Map overlay launchers to .axDirect in AppBehaviorDetector</li>
-<li>Rewrite injectViaAX with UTF-16 (NSString) offset math, fixing the</li>
-</ul>
-<p>  grapheme/UTF-16 mismatch that corrupted cut positions for diacritics;</p>
-<p>  add selection-based + full-value strategies, suggestion merge,</p>
-<p>  bounds-check and precomposed mapping</p>
-<ul>
-<li>Hoist .axDirect out of the backspace step; bs==0 goes through AX for</li>
-</ul>
-<p>  overlay launchers only (InjectionMethodInfo.isOverlay) so an</p>
-<p>  auto-selected suggestion is cleared atomically, while Firefox-style</p>
-<p>  contexts keep the synthetic path for plain inserts</p>
-<ul>
-<li>Context-aware fallback (.autocomplete for overlays, backspace+text for</li>
-</ul>
-<p>  Firefox content areas)</p>
-<ul>
-<li>Migrate word-break path to atomic injectSync for consistency</li>
-</ul>
-<p>Hardening:</p>
-<ul>
-<li>Restore the original selection when the selection-based strategy</li>
-</ul>
-<p>  partially fails and the full-value rewrite cannot complete, preventing</p>
-<p>  the synthetic fallback from over-deleting</p>
-<ul>
-<li>Read field length via kAXNumberOfCharacters and defer the full kAXValue</li>
-</ul>
-<p>  copy to the full-value strategy; guard against a stale value before</p>
-<p>  splicing</p>
-<ul>
-<li>Compute the full-value caret from recomposed prefix+insert to survive</li>
-</ul>
-<p>  canonical recomposition across the splice boundary</p>
-<ul>
-<li>Set a process-wide AX messaging timeout (0.25s) at startup and a</li>
-</ul>
-<p>  tighter per-element timeout (0.1s) in injectViaAX; cap AX retries at a</p>
-<p>  250ms budget so a hung app degrades to the synthetic fallback instead</p>
-<p>  of stalling the event tap</p>
-<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260612">Xem chi tiết trên GitHub</a></p>
+<p>feat(autocap): add option to capitalize only after a space following sentence punctuation</p>
+<p>Add a sub-option (capitalizeOnlyAfterSpace, default on) under the existing</p>
+<p>auto-capitalize-first-letter feature. When enabled, a sentence-ending mark</p>
+<p>(. ? !) only triggers capitalization if it is followed by a space, so tokens</p>
+<p>like "google.com", "3.14", and "file.txt" are no longer mangled. A newline</p>
+<p>always capitalizes regardless of this option. When disabled, the legacy</p>
+<p>behavior is preserved (capitalize right after . ? ! even with no space).</p>
+<p>Engine: extend upperCaseStatus with value 3 (sentence-ender + space seen) and</p>
+<p>gate the apply step on vUpperCaseRequireSpace. All status transitions stay</p>
+<p>centralized in updateUpperCaseStatus, so both the CGEvent-tap and IMKit input</p>
+<p>paths inherit the behavior. The flag is threaded through Preferences,</p>
+<p>SharedSettings (default true), KeyboardEventHandler, AppDelegate,</p>
+<p>XKeyIMController, and VNEngineSettings, with a settings UI toggle and a debug</p>
+<p>line.</p>
+<p>Tests: update the two cases that assumed legacy no-space capitalization and add</p>
+<p>coverage for both modes, domain-like input, and newline-always-caps.</p>
+<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260617">Xem chi tiết trên GitHub</a></p>
       ]]></description>
-      <pubDate>Fri, 12 Jun 2026 00:39:35 +0000</pubDate>
+      <pubDate>Wed, 17 Jun 2026 10:57:08 +0000</pubDate>
       <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.24-20260612/XKey.dmg" sparkle:version="20260612" sparkle:shortVersionString="1.2.24" length="11554586" type="application/octet-stream" sparkle:edSignature="5sGkh3A/PhnYnS9NTxLAx/EfKhOJYNx7yAwpXAEv3hQ/Mi205VX4rQSD6qL98Aqq857I/8o3IAPv03MpML3AAQ==" />
+      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.24-20260617/XKey.dmg" sparkle:version="20260617" sparkle:shortVersionString="1.2.24" length="11561791" type="application/octet-stream" sparkle:edSignature="./build_release.sh: line 706: /tmp/Sparkle-2.9.0/bin/sign_update: No such file or directory" />
     </item>
   </channel>
 </rss>
