@@ -6,33 +6,18 @@
     <description>XKey - Vietnamese Input Method for macOS</description>
     <language>vi</language>
     <item>
-      <title>Version 1.2.24 (Build 20260617)</title>
-      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260617</link>
-      <sparkle:version>20260617</sparkle:version>
+      <title>Version 1.2.24 (Build 20260620)</title>
+      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260620</link>
+      <sparkle:version>20260620</sparkle:version>
       <sparkle:shortVersionString>1.2.24</sparkle:shortVersionString>
       <description><![CDATA[
         <p><h2>What's New</h2></p>
-<p>feat(autocap): add option to capitalize only after a space following sentence punctuation</p>
-<p>Add a sub-option (capitalizeOnlyAfterSpace, default on) under the existing</p>
-<p>auto-capitalize-first-letter feature. When enabled, a sentence-ending mark</p>
-<p>(. ? !) only triggers capitalization if it is followed by a space, so tokens</p>
-<p>like "google.com", "3.14", and "file.txt" are no longer mangled. A newline</p>
-<p>always capitalizes regardless of this option. When disabled, the legacy</p>
-<p>behavior is preserved (capitalize right after . ? ! even with no space).</p>
-<p>Engine: extend upperCaseStatus with value 3 (sentence-ender + space seen) and</p>
-<p>gate the apply step on vUpperCaseRequireSpace. All status transitions stay</p>
-<p>centralized in updateUpperCaseStatus, so both the CGEvent-tap and IMKit input</p>
-<p>paths inherit the behavior. The flag is threaded through Preferences,</p>
-<p>SharedSettings (default true), KeyboardEventHandler, AppDelegate,</p>
-<p>XKeyIMController, and VNEngineSettings, with a settings UI toggle and a debug</p>
-<p>line.</p>
-<p>Tests: update the two cases that assumed legacy no-space capitalization and add</p>
-<p>coverage for both modes, domain-like input, and newline-always-caps.</p>
-<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260617">Xem chi tiết trên GitHub</a></p>
+<p>fix: harden sparkle release signing</p>
+<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260620">Xem chi tiết trên GitHub</a></p>
       ]]></description>
-      <pubDate>Thu, 18 Jun 2026 10:54:32 +0000</pubDate>
+      <pubDate>Sat, 20 Jun 2026 14:40:45 +0000</pubDate>
       <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.24-20260617/XKey.dmg" sparkle:version="20260617" sparkle:shortVersionString="1.2.24" length="11561828" type="application/octet-stream" sparkle:edSignature="JoKOwSzov1SmOA5deAuiAtnY+oZVv+5YLaxX9mqWUMtOJGDgs4s6DCwNGW+fx9RtajszCOmxV0g5T9jwovxjBg==" />
+      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.24-20260620/XKey.dmg" sparkle:version="20260620" sparkle:shortVersionString="1.2.24" length="11561924" type="application/octet-stream" sparkle:edSignature="opqPfX+9wntaij0tPNuvDw5nX/LIMUI4GJJ5hDIvKO06cg2cONBFOXPon9vB0fSG9pRa8OJJOymL7QuI5YOZCg==" />
     </item>
   </channel>
 </rss>
