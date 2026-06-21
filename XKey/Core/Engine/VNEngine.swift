@@ -1448,6 +1448,21 @@ class VNEngine {
         logCallback?("  Current buffer: \(getCurrentWord())")
         logCallback?("  vowelStartIndex=\(vowelStartIndex), vowelEndIndex=\(vowelEndIndex)")
 
+        // Whether the vowel that will receive the circumflex currently carries a horn/breve.
+        // Stripping horn from the whole cluster is only correct when we are breaking a horn
+        // diphthong, i.e. the circumflex target itself is horned (e.g. "cươi" + "o" → "cuôi").
+        // When the target is a plain vowel sitting next to a horned vowel (e.g. "ưa" + "a"),
+        // the neighbour's horn must be preserved; otherwise "ừa" → "uầ" silently drops the horn.
+        var circumflexTargetHasHorn = false
+        if vowelCount >= 1 {
+            for i in stride(from: vowelEndIndex, through: vowelStartIndex, by: -1) {
+                if chr(i) == keyCode {
+                    circumflexTargetHasHorn = (typingWord[i] & VNEngine.TONEW_MASK) != 0
+                    break
+                }
+            }
+        }
+
         // Check if vowel sequence is valid before adding circumflex
         // Invalid sequences like "ee", "eee", "aa", "aaa" should NOT get circumflex added
         // This prevents "nhée" + "e" from becoming "nhéê" (should stay as "nhéee")
@@ -1481,12 +1496,20 @@ class VNEngine {
                             default: break
                             }
                         } else if let vowel = convertToVNVowel(at: j) {
-                            // Remove horn (TONEW) from prediction since insertAOE strips it
-                            switch vowel {
-                            case .oHorn: predictedSequence.append(.o)
-                            case .uHorn: predictedSequence.append(.u)
-                            case .aBreve: predictedSequence.append(.a)
-                            default: predictedSequence.append(vowel)
+                            // Mirror insertAOE: horn is only stripped from neighbours when the
+                            // circumflex target is itself horned (breaking a horn diphthong).
+                            // For a plain target (e.g. "ưa" + "a") the neighbour keeps its horn,
+                            // so the prediction must too — making "ưâ" correctly fail validation
+                            // and fall back to inserting the literal vowel instead of "uâ".
+                            if circumflexTargetHasHorn {
+                                switch vowel {
+                                case .oHorn: predictedSequence.append(.o)
+                                case .uHorn: predictedSequence.append(.u)
+                                case .aBreve: predictedSequence.append(.a)
+                                default: predictedSequence.append(vowel)
+                                }
+                            } else {
+                                predictedSequence.append(vowel)
                             }
                         }
                     }
@@ -1505,15 +1528,19 @@ class VNEngine {
         // This is needed to update the output for ALL affected vowels, not just the one getting ^
         // Example: "cươi" + "o" → need to update both ư→u AND ơ→ô
         var earliestAffectedIndex = Int(index)  // Start with no affected vowels
-        
-        // Remove W tone from all vowels and track the earliest affected vowel
-        for i in vowelStartIndex...vowelEndIndex {
-            if (typingWord[i] & VNEngine.TONEW_MASK) != 0 {
-                typingWord[i] &= ~VNEngine.TONEW_MASK
-                if i < earliestAffectedIndex {
-                    earliestAffectedIndex = i
+
+        // Remove W tone from all vowels and track the earliest affected vowel.
+        // Only when breaking a horn diphthong (circumflex target itself horned). A plain
+        // circumflex target must not strip a neighbour's horn (e.g. "ưa" + "a" keeps ư).
+        if circumflexTargetHasHorn {
+            for i in vowelStartIndex...vowelEndIndex {
+                if (typingWord[i] & VNEngine.TONEW_MASK) != 0 {
+                    typingWord[i] &= ~VNEngine.TONEW_MASK
+                    if i < earliestAffectedIndex {
+                        earliestAffectedIndex = i
+                    }
+                    logCallback?("  Removed TONEW_MASK from index \(i), key=\(chr(i))")
                 }
-                logCallback?("  Removed TONEW_MASK from index \(i), key=\(chr(i))")
             }
         }
         

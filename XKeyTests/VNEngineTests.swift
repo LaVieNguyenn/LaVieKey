@@ -118,6 +118,67 @@ class VNEngineTests: XCTestCase {
         XCTAssertTrue(result.shouldConsume)
         XCTAssertEqual(engine.getCurrentWord(), "ư")
     }
+
+    // MARK: - Repro: extending 'a' after horned+toned vowel must keep horn
+    /// Regression: extending the trailing 'a' of a horned + toned vowel must keep the horn.
+    /// Bug: "wfa" → "ừa" (correct), then holding 'a' → "ùaaa" (horn on ư silently dropped).
+    /// Root cause: insertAOE stripped TONEW (horn) from the whole vowel cluster while
+    /// circumflexing the unrelated 'a', so the aa→â step turned ừ into ù.
+    func testTelex_WFA_ExtendA_KeepsHorn() {
+        engine.reset()
+
+        _ = engine.processKey(character: "w", keyCode: VietnameseData.KEY_W, isUppercase: false)
+        XCTAssertEqual(engine.getCurrentWord(), "ư")
+        _ = engine.processKey(character: "f", keyCode: VietnameseData.KEY_F, isUppercase: false)
+        XCTAssertEqual(engine.getCurrentWord(), "ừ")
+        _ = engine.processKey(character: "a", keyCode: VietnameseData.KEY_A, isUppercase: false)
+        XCTAssertEqual(engine.getCurrentWord(), "ừa")
+        _ = engine.processKey(character: "a", keyCode: VietnameseData.KEY_A, isUppercase: false)
+        XCTAssertEqual(engine.getCurrentWord(), "ừaa", "Second 'a' must not strip the horn from ư")
+        _ = engine.processKey(character: "a", keyCode: VietnameseData.KEY_A, isUppercase: false)
+        XCTAssertEqual(engine.getCurrentWord(), "ừaaa", "Extending 'a' must keep the horn on ư")
+    }
+
+    /// Same bug via the "uwfa" entry path (u + w → ư) reported alongside "wfa".
+    func testTelex_UWFA_ExtendA_KeepsHorn() {
+        engine.reset()
+
+        _ = engine.processKey(character: "u", keyCode: VietnameseData.KEY_U, isUppercase: false)
+        _ = engine.processKey(character: "w", keyCode: VietnameseData.KEY_W, isUppercase: false)
+        _ = engine.processKey(character: "f", keyCode: VietnameseData.KEY_F, isUppercase: false)
+        _ = engine.processKey(character: "a", keyCode: VietnameseData.KEY_A, isUppercase: false)
+        XCTAssertEqual(engine.getCurrentWord(), "ừa")
+        _ = engine.processKey(character: "a", keyCode: VietnameseData.KEY_A, isUppercase: false)
+        _ = engine.processKey(character: "a", keyCode: VietnameseData.KEY_A, isUppercase: false)
+        XCTAssertEqual(engine.getCurrentWord(), "ừaaa", "Extending 'a' must keep the horn on ư")
+    }
+
+    // TEMP exploratory matrix — dumps results to /tmp, no assertions. Delete after review.
+    /// Guards the behaviour surface around the horn-vs-circumflex fix in insertAOE:
+    /// the horn must only be stripped when the circumflex target is itself horned
+    /// (breaking a horn diphthong), never from a plain neighbour.
+    func testTelex_HornCircumflex_BehaviourSurface() {
+        func type(_ s: String) -> String {
+            engine.reset()
+            for ch in s {
+                let kc = VietnameseData.keyCode(for: ch) ?? 0
+                _ = engine.processKey(character: ch, keyCode: kc, isUppercase: false)
+            }
+            return engine.getCurrentWord()
+        }
+
+        // Symmetric to the ư bug: ơ + extended 'a' must keep its horn too.
+        XCTAssertEqual(type("owfaaa"), "ờaaa", "ơ horn must survive extending 'a'")
+
+        // Legit horn-diphthong break: the circumflex target (ơ) is itself horned,
+        // so the whole ươ cluster collapses to uô — this must still work.
+        XCTAssertEqual(type("cuoiwo"), "cuôi", "ươ + circumflex on ơ → uô")
+        XCTAssertEqual(type("uowo"), "uô", "ươ + circumflex on ơ → uô")
+
+        // Real uô words (typed without 'w') are unaffected.
+        XCTAssertEqual(type("muoon"), "muôn")
+        XCTAssertEqual(type("buoonf"), "buồn")
+    }
     
     func testTelex_HW_ToStandaloneUHorn() {
         engine.reset()
