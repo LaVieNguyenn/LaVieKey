@@ -6,26 +6,38 @@
     <description>XKey - Vietnamese Input Method for macOS</description>
     <language>vi</language>
     <item>
-      <title>Version 1.2.24 (Build 20260620.1)</title>
-      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260620.1</link>
-      <sparkle:version>20260620.1</sparkle:version>
+      <title>Version 1.2.24 (Build 20260623)</title>
+      <link>https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260623</link>
+      <sparkle:version>20260623</sparkle:version>
       <sparkle:shortVersionString>1.2.24</sparkle:shortVersionString>
       <description><![CDATA[
         <p><h2>What's New</h2></p>
-<p>fix(telex): preserve horn when extending vowel after horned+toned syllable</p>
-<p>insertAOE stripped TONEW_MASK (horn/breve) from every vowel in the cluster</p>
-<p>when adding a circumflex (aa->a^), so typing "wfa" then holding 'a' turned</p>
-<p>"ua" into "uaa" with the horn on u silently dropped.</p>
-<p>Only strip the horn when the circumflex target is itself horned (breaking a</p>
-<p>horn diphthong, e.g. cuoi+o -> cuoi). For a plain target next to a horned</p>
-<p>vowel (ua+a) keep the neighbour's horn; post-transform validation then</p>
-<p>rejects the invalid cluster and falls back to inserting the literal vowel.</p>
-<p>Symmetric for o-horn. Adds regression tests.</p>
-<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260620.1">Xem chi tiết trên GitHub</a></p>
+<p>feat(engine): support Central Highlands place names with final 'k'</p>
+<p>Ethnic-minority place names (Đắk Lắk, Krông Búk, M'Đrắk) use 'k' as a final</p>
+<p>consonant and the "kr" onset, neither standard Vietnamese phonology. Typing</p>
+<p>"ddawks" in Telex produced "đăks" because the sắc tone could not be placed</p>
+<p>after the non-standard final 'k'.</p>
+<ul>
+<li>VietnameseData: add literal final 'k' to endConsonantTable; add the</li>
+</ul>
+<p>  [KEY<em>A,KEY</em>K] / [KEY<em>U,KEY</em>K] mark-placement entries so a tone typed after</p>
+<p>  'k' finds its vowel; add the [KEY<em>K,KEY</em>R] initial cluster (Krông).</p>
+<ul>
+<li>VNEngine: restrict stop-final 'k' to sắc/nặng (handleMarkKey + checkSpelling)</li>
+</ul>
+<p>  and reject a circumflex vowel before 'k' (foreign words like network/book).</p>
+<ul>
+<li>VNEngineEnglishDetection: allow the "kr" onset (drop it from the impossible</li>
+</ul>
+<p>  prefixes) for Krông.</p>
+<p>Tested in VNEngineTests (Telex + VNI, uppercase, multi-word, adjacent</p>
+<p>Vietnamese words, English collision cases). Full XKeyTests: 510/510 passing.</p>
+<p>Bump build version to 20260623.</p>
+<p><a href="https://github.com/xmannv/xkey/releases/tag/v1.2.24-20260623">Xem chi tiết trên GitHub</a></p>
       ]]></description>
-      <pubDate>Sun, 21 Jun 2026 04:05:03 +0000</pubDate>
+      <pubDate>Mon, 22 Jun 2026 17:41:14 +0000</pubDate>
       <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.24-20260620.1/XKey.dmg" sparkle:version="20260620.1" sparkle:shortVersionString="1.2.24" length="11561036" type="application/octet-stream" sparkle:edSignature="MT2EBtrkIMUmNrYM2LAXTlPGL4IsUB1YLJEyIhYXz+V8TW/UKQ8ASnEvSXONIqG3Y3ORuQndhWDwXRSXnQH9CA==" />
+      <enclosure url="https://github.com/xmannv/xkey/releases/download/v1.2.24-20260623/XKey.dmg" sparkle:version="20260623" sparkle:shortVersionString="1.2.24" length="11565195" type="application/octet-stream" sparkle:edSignature="zEmILi7WXLGiOlkXPaCEDvMsHGmEloROMUbdJAvPOLE1lT7naTgwFBNG98JcQkRYi0bbBJvKEHrgiEB/XiddAw==" />
     </item>
   </channel>
 </rss>
