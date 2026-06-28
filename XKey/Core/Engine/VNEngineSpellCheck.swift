@@ -90,6 +90,19 @@ extension VNEngine {
             }
         }
 
+        // Proper-name abbreviations like ĐN/ĐL are valid short forms even though
+        // they are not dictionary words. Only uppercase abbreviations bypass restore;
+        // lowercase đn/đl still follow normal spell-check/restore behavior.
+        if word.count == 2,
+           word.first == "Đ",
+           let lastChar = word.last,
+           String(lastChar) == String(lastChar).uppercased(),
+           let lastKey = VietnameseData.keyCode(for: Character(String(lastChar).lowercased())),
+           vietnameseData.isConsonant(lastKey) {
+            logCallback?("📖 checkWordSpelling: SKIPPED (uppercase d-stroke abbreviation), word='\(word)'")
+            return true
+        }
+
         // Check user dictionary
         if SharedSettings.shared.isWordInUserDictionary(word) {
             logCallback?("📖 checkWordSpelling: FOUND in User Dictionary, word='\(word)'")

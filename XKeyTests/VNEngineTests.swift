@@ -2832,6 +2832,32 @@ class VNEngineTests: XCTestCase {
                                  ("k",K,false),("s",S,false)]), "Lắk", "Caps Lawks → Lắk")
     }
 
+    /// REGRESSION: normal typing proper-name abbreviations must allow uppercase Đ
+    /// followed by an uppercase consonant (ĐL/ĐN) without restoring to raw DDL/DDN.
+    /// Lowercase đl/đn still follow normal spell-check path (no uppercase bypass).
+    func testTyping_DStrokeAbbreviation_StaysComposedOnWordBreak() {
+        func assertUppercaseAbbreviation(secondDIsUppercase: Bool, finalChar: Character, finalKey: UInt16, expected: String, file: StaticString = #filePath, line: UInt = #line) {
+            engine.reset()
+            _ = engine.processKey(character: "D", keyCode: VietnameseData.KEY_D, isUppercase: true)
+            let dStrokeResult = engine.processKey(character: secondDIsUppercase ? "D" : "d",
+                                                  keyCode: VietnameseData.KEY_D,
+                                                  isUppercase: secondDIsUppercase)
+            XCTAssertTrue(dStrokeResult.shouldConsume, "second D should compose Đ", file: file, line: line)
+
+            let finalResult = engine.processKey(character: finalChar, keyCode: finalKey, isUppercase: true)
+            XCTAssertFalse(finalResult.shouldConsume, "\(expected) must keep Đ and pass through final consonant", file: file, line: line)
+            XCTAssertEqual(engine.getCurrentWord(), expected, file: file, line: line)
+
+            let breakResult = engine.processWordBreak(character: " ")
+            XCTAssertFalse(breakResult.shouldConsume, "\(expected) must not restore to raw DD\(finalChar) on word break", file: file, line: line)
+        }
+
+        assertUppercaseAbbreviation(secondDIsUppercase: true, finalChar: "L", finalKey: VietnameseData.KEY_L, expected: "ĐL")
+        assertUppercaseAbbreviation(secondDIsUppercase: true, finalChar: "N", finalKey: VietnameseData.KEY_N, expected: "ĐN")
+        assertUppercaseAbbreviation(secondDIsUppercase: false, finalChar: "L", finalKey: VietnameseData.KEY_L, expected: "ĐL")
+        assertUppercaseAbbreviation(secondDIsUppercase: false, finalChar: "N", finalKey: VietnameseData.KEY_N, expected: "ĐN")
+    }
+
     /// REVIEW: a tone letter after vowel+k behaves like the existing vowel+t case
     /// (cats→cát). Final-k introduces NO new English-handling class; English words are
     /// handled uniformly by auto-restore / the user dictionary, same as before.
