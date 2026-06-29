@@ -115,6 +115,161 @@ class ToggleWindowTitleRulesTests: XCTestCase {
         detector.windowTitleRulesEnabled = true
         XCTAssertTrue(detector.windowTitleRulesEnabled)
     }
+
+    // MARK: - Input Method Policy Tests
+
+    func testWindowTitleRuleInputMethodPolicy_RoundTripsThroughCodable() throws {
+        let rule = WindowTitleRule(
+            name: "Enable Vietnamese in specific window",
+            bundleIdPattern: "com.example.App",
+            titlePattern: "Editor",
+            matchMode: .contains,
+            inputMethodPolicy: .enable
+        )
+
+        let data = try JSONEncoder().encode(rule)
+        let decoded = try JSONDecoder().decode(WindowTitleRule.self, from: data)
+
+        XCTAssertEqual(decoded.inputMethodPolicy, .enable)
+    }
+
+    func testMergedRuleResult_InputMethodPolicyLaterRuleOverridesEarlierRule() {
+        let disableRule = WindowTitleRule(
+            name: "Base disable",
+            bundleIdPattern: "com.example.App",
+            titlePattern: "",
+            matchMode: .contains,
+            inputMethodPolicy: .disable
+        )
+        let enableRule = WindowTitleRule(
+            name: "Specific enable",
+            bundleIdPattern: "com.example.App",
+            titlePattern: "Editor",
+            matchMode: .contains,
+            inputMethodPolicy: .enable
+        )
+
+        var result = MergedRuleResult()
+        result.merge(from: disableRule)
+        result.merge(from: enableRule)
+
+        XCTAssertEqual(result.inputMethodPolicy, .enable)
+    }
+
+    func testMergedRuleResult_InputMethodPolicyEnableThenDisable_DisableWins() {
+        let enableRule = WindowTitleRule(
+            name: "Base enable",
+            bundleIdPattern: "com.example.App",
+            titlePattern: "",
+            matchMode: .contains,
+            inputMethodPolicy: .enable
+        )
+        let disableRule = WindowTitleRule(
+            name: "Specific disable",
+            bundleIdPattern: "com.example.App",
+            titlePattern: "Terminal",
+            matchMode: .contains,
+            inputMethodPolicy: .disable
+        )
+
+        var result = MergedRuleResult()
+        result.merge(from: enableRule)
+        result.merge(from: disableRule)
+
+        XCTAssertEqual(result.inputMethodPolicy, .disable,
+            "A later matching rule's policy must override an earlier one (cascade order)")
+    }
+
+    func testMergedRuleResult_InputMethodPolicyNilDoesNotOverrideEarlierPolicy() {
+        let enableRule = WindowTitleRule(
+            name: "Sets enable",
+            bundleIdPattern: "com.example.App",
+            titlePattern: "",
+            matchMode: .contains,
+            inputMethodPolicy: .enable
+        )
+        let noPolicyRule = WindowTitleRule(
+            name: "No policy override",
+            bundleIdPattern: "com.example.App",
+            titlePattern: "Editor",
+            matchMode: .contains,
+            inputMethodPolicy: nil
+        )
+
+        var result = MergedRuleResult()
+        result.merge(from: enableRule)
+        result.merge(from: noPolicyRule)
+
+        XCTAssertEqual(result.inputMethodPolicy, .enable,
+            "A later rule with no policy (nil) must not clear an earlier rule's policy")
+    }
+
+    func testMergedRuleResult_InputMethodPolicySingleRuleSetsPolicy() {
+        let rule = WindowTitleRule(
+            name: "Disable",
+            bundleIdPattern: "com.example.App",
+            titlePattern: "",
+            matchMode: .contains,
+            inputMethodPolicy: .disable
+        )
+
+        var result = MergedRuleResult()
+        result.merge(from: rule)
+
+        XCTAssertEqual(result.inputMethodPolicy, .disable)
+    }
+
+    func testMergedRuleResult_DefaultsToNilInputMethodPolicy() {
+        let empty = MergedRuleResult()
+        XCTAssertNil(empty.inputMethodPolicy,
+            "A fresh MergedRuleResult should carry no policy override")
+
+        let ruleWithoutPolicy = WindowTitleRule(
+            name: "No policy",
+            bundleIdPattern: "com.example.App",
+            titlePattern: "",
+            matchMode: .contains
+        )
+        var merged = MergedRuleResult()
+        merged.merge(from: ruleWithoutPolicy)
+        XCTAssertNil(merged.inputMethodPolicy,
+            "Merging a rule without a policy must leave the result's policy nil")
+    }
+
+    func testWindowTitleRuleInputMethodPolicyDisable_RoundTripsThroughCodable() throws {
+        let rule = WindowTitleRule(
+            name: "Disable Vietnamese in terminal",
+            bundleIdPattern: "com.example.Terminal",
+            titlePattern: "",
+            matchMode: .contains,
+            inputMethodPolicy: .disable
+        )
+
+        let data = try JSONEncoder().encode(rule)
+        let decoded = try JSONDecoder().decode(WindowTitleRule.self, from: data)
+
+        XCTAssertEqual(decoded.inputMethodPolicy, .disable)
+    }
+
+    func testWindowTitleRule_OmitsInputMethodPolicyWhenNil_AndDecodesAbsentKeyAsNil() throws {
+        // Backward compatibility: a rule without a policy must not emit the key,
+        // and rules saved before this feature (no key) must decode with a nil policy.
+        let rule = WindowTitleRule(
+            name: "No policy",
+            bundleIdPattern: "com.example.App",
+            titlePattern: "",
+            matchMode: .contains
+        )
+
+        let data = try JSONEncoder().encode(rule)
+        let json = String(data: data, encoding: .utf8) ?? ""
+        XCTAssertFalse(json.contains("inputMethodPolicy"),
+            "Encoder must omit inputMethodPolicy when nil (encodeIfPresent)")
+
+        let decoded = try JSONDecoder().decode(WindowTitleRule.self, from: data)
+        XCTAssertNil(decoded.inputMethodPolicy,
+            "Decoding a rule whose JSON has no inputMethodPolicy key must yield nil")
+    }
 }
 
 // MARK: - EventTapManager Toggle Hotkey Slot Tests

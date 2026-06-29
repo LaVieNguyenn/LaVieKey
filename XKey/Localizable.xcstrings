@@ -9617,6 +9617,118 @@
           }
         }
       }
+    },
+    "Trạng thái bộ gõ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Input engine state"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入引擎状态"
+          }
+        }
+      }
+    },
+    "Ghi đè trạng thái bộ gõ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Override input engine state"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "覆盖输入引擎状态"
+          }
+        }
+      }
+    },
+    "Bộ gõ:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Input engine:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入引擎："
+          }
+        }
+      }
+    },
+    "Bật bộ gõ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable input engine"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "启用输入引擎"
+          }
+        }
+      }
+    },
+    "Tắt bộ gõ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disable input engine"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "禁用输入引擎"
+          }
+        }
+      }
+    },
+    "Ép bật xử lý tiếng Việt cho window/app này": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Force-enable Vietnamese processing for this window/app"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为此窗口/应用强制启用越南语处理"
+          }
+        }
+      }
+    },
+    "Ép tắt xử lý tiếng Việt cho window/app này": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Force-disable Vietnamese processing for this window/app"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为此窗口/应用强制禁用越南语处理"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

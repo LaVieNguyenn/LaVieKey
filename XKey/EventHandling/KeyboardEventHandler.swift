@@ -235,6 +235,21 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
             engine.reset()
         }
     }
+
+    /// Effective Vietnamese state for the current context: a window-title rule may force
+    /// enable/disable (InputMethodPolicy), otherwise fall back to the global toggle.
+    /// The policy lookup is O(1) (cached in AppBehaviorDetector, refreshed on focus/title/app
+    /// changes), so it is safe to call multiple times per keystroke.
+    private func effectiveVietnameseEnabled() -> Bool {
+        switch AppBehaviorDetector.shared.getInputMethodPolicyOverride().policy {
+        case .enable:
+            return true
+        case .disable:
+            return false
+        case .none:
+            return isVietnameseEnabled
+        }
+    }
     
     // MARK: - Undo Typing
     
@@ -313,6 +328,14 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
             return false
         }
 
+        let effectiveVietnameseEnabled = effectiveVietnameseEnabled()
+        // Sync the engine's language flag to the effective state so the engine's macro
+        // decision (shouldUseMacro reads vLanguage) matches a policy override. Letter
+        // processing is gated below, but macro mode is read from vLanguage inside the engine.
+        // Recomputed every keystroke, so it never goes stale; Smart Switch reads the StatusBar
+        // state (not vLanguage), so this does not interfere with it.
+        engine.vLanguage = effectiveVietnameseEnabled ? 1 : 0
+
         // Consume a pending injection-method reprobe (armed by focus-moving
         // Cmd-chords in EventTapManager) before reading the confirmed method,
         // so the first character typed after Cmd+L/Cmd+T already uses the
@@ -323,12 +346,11 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
         // mode macros): the method is unused then, the detect would be wasted —
         // the probe stays armed and is consumed if processing is re-enabled.
         if type == .keyDown && !event.flags.contains(.maskCommand)
-            && (isVietnameseEnabled || (macroEnabled && macroInEnglishMode)) {
+            && (effectiveVietnameseEnabled || (macroEnabled && macroInEnglishMode)) {
             AppBehaviorDetector.shared.consumePendingMethodReprobe()
         }
 
-        // Check if injection method is passthrough - bypass all Vietnamese processing
-        // This is checked BEFORE Vietnamese mode check because passthrough applies regardless
+        // Check if injection method is passthrough - bypass all XKey processing.
         let confirmedMethod = AppBehaviorDetector.shared.getConfirmedInjectionMethod()
         if confirmedMethod.method == .passthrough {
             return false
@@ -340,10 +362,10 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
         // No additional filtering needed here.
 
         // Check if we should process in English mode (for macro support)
-        let shouldProcessInEnglishMode = !isVietnameseEnabled && macroEnabled && macroInEnglishMode
+        let shouldProcessInEnglishMode = !effectiveVietnameseEnabled && macroEnabled && macroInEnglishMode
 
         // Only process key down events when Vietnamese is enabled OR macro in English mode is enabled
-        guard isVietnameseEnabled || shouldProcessInEnglishMode else {
+        guard effectiveVietnameseEnabled || shouldProcessInEnglishMode else {
             return false
         }
 
@@ -539,7 +561,8 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
         }
 
         // Check if we're in English mode with macro support
-        let isEnglishModeWithMacro = !isVietnameseEnabled && macroEnabled && macroInEnglishMode
+        let vietnameseEnabledForContext = effectiveVietnameseEnabled()
+        let isEnglishModeWithMacro = !vietnameseEnabledForContext && macroEnabled && macroInEnglishMode
 
         if isWordBreakKey(character) {
             // Wait for any pending injection to complete before processing word break
@@ -678,7 +701,8 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
 
     private func handleBackspace(event: CGEvent, proxy: CGEventTapProxy) -> CGEvent? {
         // In English mode with macro, only update macro buffer
-        let isEnglishModeWithMacro = !isVietnameseEnabled && macroEnabled && macroInEnglishMode
+        let vietnameseEnabledForContext = effectiveVietnameseEnabled()
+        let isEnglishModeWithMacro = !vietnameseEnabledForContext && macroEnabled && macroInEnglishMode
         if isEnglishModeWithMacro {
             debugLogCallback?("[\(getTimestamp())] ⌫ Backspace in English+Macro mode - pass through")
             engine.updateMacroBufferOnBackspace()

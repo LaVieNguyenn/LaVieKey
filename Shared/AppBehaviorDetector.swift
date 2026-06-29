@@ -97,7 +97,7 @@ enum InjectionMethod: String, Codable, CaseIterable {
         case .selection: return "Selection"
         case .autocomplete: return "Autocomplete"
         case .axDirect: return "AX Direct"
-        case .passthrough: return "Passthrough (tắt tiếng việt)"
+        case .passthrough: return "Passthrough (không inject)"
         }
     }
 
@@ -108,7 +108,7 @@ enum InjectionMethod: String, Codable, CaseIterable {
         case .selection: return "Shift+Left select + gõ thay thế (Browser address bar)"
         case .autocomplete: return "Forward Delete + backspace + text (Spotlight, Raycast)"
         case .axDirect: return "Dùng Accessibility API trực tiếp (Firefox content area)"
-        case .passthrough: return "Bỏ qua xử lý Tiếng Việt - chỉ truyền phím thẳng qua"
+        case .passthrough: return "Bỏ qua xử lý XKey - chỉ truyền phím thẳng qua"
         }
     }
 
@@ -122,6 +122,28 @@ enum InjectionMethod: String, Codable, CaseIterable {
         case .autocomplete: return (1000, 3000, 1000)   // Fast text, for overlays like Spotlight
         case .axDirect:     return (1000, 3000, 2000)   // Medium delays for AX API injection
         case .passthrough:  return (0, 0, 0)            // No delays needed - passthrough doesn't inject
+        }
+    }
+}
+
+/// Input method policy for window title rules.
+/// This controls WHETHER Vietnamese processing is enabled for a matched context,
+/// while InjectionMethod controls HOW text is injected when processing is enabled.
+enum InputMethodPolicy: String, Codable, CaseIterable {
+    case enable
+    case disable
+
+    var displayName: String {
+        switch self {
+        case .enable: return String(localized: "Bật bộ gõ")
+        case .disable: return String(localized: "Tắt bộ gõ")
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .enable: return String(localized: "Ép bật xử lý tiếng Việt cho window/app này")
+        case .disable: return String(localized: "Ép tắt xử lý tiếng Việt cho window/app này")
         }
     }
 }
@@ -326,6 +348,9 @@ struct MergedRuleResult {
     /// Enable AXManualAccessibility for Electron/Chromium apps
     var enableForceAccessibility: Bool?
     
+    /// Override Vietnamese input processing state (nil = use global state)
+    var inputMethodPolicy: InputMethodPolicy?
+    
     /// Target input source ID to switch to when rule matches (nil = use XKey/current)
     /// When set, XKey will automatically switch to this input source when the rule matches
     var targetInputSourceId: String?
@@ -356,6 +381,7 @@ struct MergedRuleResult {
         if let value = rule.textSendingMethod { textSendingMethod = value }
         if let value = rule.pasteConfig { pasteConfig = value }
         if let value = rule.enableForceAccessibility { enableForceAccessibility = value }
+        if let value = rule.inputMethodPolicy { inputMethodPolicy = value }
         if let value = rule.targetInputSourceId { targetInputSourceId = value }
         if let value = rule.description { description = value }
     }
@@ -439,6 +465,9 @@ struct WindowTitleRule: Codable, Identifiable {
     /// When enabled, XKey will set AXManualAccessibility = true when this app is focused
     /// This helps retrieve more detailed text info from Electron apps (VS Code, Slack, etc.)
     let enableForceAccessibility: Bool?
+    
+    /// Override: Vietnamese input processing state for this matched context
+    let inputMethodPolicy: InputMethodPolicy?
     
     /// Override: Target input source to switch to when rule matches
     /// When set, XKey will automatically switch to this input source when the rule matches
@@ -556,7 +585,7 @@ struct WindowTitleRule: Codable, Identifiable {
         // Behavior overrides
         case useMarkedText, hasMarkedTextIssues, commitDelay
         case injectionMethod, injectionDelays, textSendingMethod, pasteConfig
-        case enableForceAccessibility, targetInputSourceId, description
+        case enableForceAccessibility, inputMethodPolicy, targetInputSourceId, description
     }
     
     init(from decoder: Decoder) throws {
@@ -583,6 +612,7 @@ struct WindowTitleRule: Codable, Identifiable {
         textSendingMethod = try container.decodeIfPresent(TextSendingMethod.self, forKey: .textSendingMethod)
         pasteConfig = try container.decodeIfPresent(PasteConfig.self, forKey: .pasteConfig)
         enableForceAccessibility = try container.decodeIfPresent(Bool.self, forKey: .enableForceAccessibility)
+        inputMethodPolicy = try container.decodeIfPresent(InputMethodPolicy.self, forKey: .inputMethodPolicy)
         targetInputSourceId = try container.decodeIfPresent(String.self, forKey: .targetInputSourceId)
         description = try container.decodeIfPresent(String.self, forKey: .description)
         
@@ -626,6 +656,7 @@ struct WindowTitleRule: Codable, Identifiable {
         try container.encodeIfPresent(textSendingMethod, forKey: .textSendingMethod)
         try container.encodeIfPresent(pasteConfig, forKey: .pasteConfig)
         try container.encodeIfPresent(enableForceAccessibility, forKey: .enableForceAccessibility)
+        try container.encodeIfPresent(inputMethodPolicy, forKey: .inputMethodPolicy)
         try container.encodeIfPresent(targetInputSourceId, forKey: .targetInputSourceId)
         try container.encodeIfPresent(description, forKey: .description)
         
@@ -667,6 +698,7 @@ struct WindowTitleRule: Codable, Identifiable {
         textSendingMethod: TextSendingMethod? = nil,
         pasteConfig: PasteConfig? = nil,
         enableForceAccessibility: Bool? = nil,
+        inputMethodPolicy: InputMethodPolicy? = nil,
         targetInputSourceId: String? = nil,
         description: String? = nil
     ) {
@@ -691,6 +723,7 @@ struct WindowTitleRule: Codable, Identifiable {
         self.textSendingMethod = textSendingMethod
         self.pasteConfig = pasteConfig
         self.enableForceAccessibility = enableForceAccessibility
+        self.inputMethodPolicy = inputMethodPolicy
         self.targetInputSourceId = targetInputSourceId
         self.description = description
     }
@@ -761,7 +794,14 @@ class AppBehaviorDetector {
     /// When set, getConfirmedInjectionMethod() returns this instead of detecting every keystroke
     /// This improves performance and avoids AX API timing issues
     private(set) var confirmedInjectionMethod: InjectionMethodInfo?
-    
+
+    /// Confirmed window-title-rule input-method policy (force enable/disable Vietnamese).
+    /// Refreshed alongside confirmedInjectionMethod inside detectInjectionMethod() — i.e. on
+    /// focus/title/app/mouse changes, NOT per keystroke. Lets getInputMethodPolicyOverride()
+    /// answer in the typing hot path without a live window-title AX query.
+    /// nil = not computed yet (falls back to a one-off live computation).
+    private var confirmedInputMethodPolicy: (policy: InputMethodPolicy?, ruleName: String?)?
+
     // MARK: - Address Bar Context Cache
     // When user focuses on a browser address bar (Chromium/Firefox), the injection method
     // and needsEmptyCharPrefix flag are cached. This is needed because autocomplete suggestions
@@ -827,6 +867,7 @@ class AppBehaviorDetector {
     /// Clear confirmed injection method (call when context changes significantly)
     func clearConfirmedInjectionMethod() {
         confirmedInjectionMethod = nil
+        confirmedInputMethodPolicy = nil
         clearAddressBarCache()
         _lastLoggedRuleMatchKey = ""  // Reset to log rule match after context change
     }
@@ -1828,6 +1869,20 @@ class AppBehaviorDetector {
         }
         return (true, targetId, mergedResult.displayName)
     }
+
+    /// Get input method policy override from matching rules (merged cascade)
+    /// - Returns: A tuple (policy: InputMethodPolicy?, ruleName: String?)
+    func getInputMethodPolicyOverride() -> (policy: InputMethodPolicy?, ruleName: String?) {
+        // Fast path: return the value cached at focus/title/app-change time
+        // (in detectInjectionMethod), mirroring confirmedInjectionMethod. Avoids a
+        // live window-title AX query on every keystroke in the typing hot path.
+        if let cached = confirmedInputMethodPolicy {
+            return cached
+        }
+        // Fallback: no detection has run yet (e.g. very first keystroke after launch).
+        let mergedResult = getMergedRuleResult()
+        return (mergedResult.inputMethodPolicy, mergedResult.hasMatches ? mergedResult.displayName : nil)
+    }
     
     /// Get current window title
     /// Note: Name kept for backward compatibility, but no longer uses cache
@@ -2168,6 +2223,7 @@ class AppBehaviorDetector {
         }
         
         guard let bundleId = getCurrentBundleId() else {
+            confirmedInputMethodPolicy = (nil, nil)
             return .defaultFast
         }
 
@@ -2175,6 +2231,17 @@ class AppBehaviorDetector {
         // This avoids redundant AX API calls (~10 calls saved per focus change)
         let focusedInfo = focusedInfo ?? getFocusedElementInfo()
         let currentRole = focusedInfo.role
+
+        // Compute the merged Window Title Rule result ONCE for this context. Reused below at
+        // Priority 0.45 and 1.0 (no duplicate matching). Computing it here — before the
+        // terminal/notion/remote/overlay early returns — also lets us cache the input-method
+        // policy for EVERY context, so getInputMethodPolicyOverride() reads it per keystroke
+        // without a live window-title AX query (overlay suppresses it below).
+        // The call itself is lightweight: string comparisons + Set lookups for bundle/title,
+        // with lazy AX queries only when rules have AX patterns.
+        let mergedResult = getMergedRuleResult(focusedInfo: focusedInfo)
+        confirmedInputMethodPolicy = (mergedResult.inputMethodPolicy,
+                                      mergedResult.hasMatches ? mergedResult.displayName : nil)
 
         // Priority 0.2: Terminal panels in VSCode/Cursor/etc
         // Check directly via AX Description - doesn't go through overlay detection if it's a terminal panel (VSCode/Cursor)
@@ -2255,6 +2322,9 @@ class AppBehaviorDetector {
         // this is immune to that race. injectViaAX falls back to the .autocomplete
         // synthetic path (Forward Delete + backspace) when AX is unavailable.
         if let overlayName = overlayAppNameProvider?() {
+            // Overlay launchers are a separate input surface — the underlying app's
+            // window-title rules (and their policy) must not leak into Spotlight/Raycast/Alfred.
+            confirmedInputMethodPolicy = (nil, nil)
             return InjectionMethodInfo(
                 method: .axDirect,
                 delays: InjectionMethod.axDirect.defaultDelays,
@@ -2263,12 +2333,6 @@ class AppBehaviorDetector {
                 isOverlay: true
             )
         }
-
-        // Pre-compute merged Window Title Rule result ONCE for use at multiple priority levels.
-        // This avoids calling getMergedRuleResult() twice (at 0.45 and 1.0).
-        // The call itself is lightweight: string comparisons + Set lookups for bundle/title,
-        // with lazy AX queries only when rules have AX patterns.
-        let mergedResult = getMergedRuleResult(focusedInfo: focusedInfo)
 
         // Priority 0.45: Passthrough override — checked BEFORE address bar detection
         // Passthrough means "disable Vietnamese input entirely". Unlike other injection methods

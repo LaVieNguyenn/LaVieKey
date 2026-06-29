@@ -297,6 +297,7 @@ struct WindowTitleRulesView: View {
                     injectionDelays: rule.injectionDelays,
                     textSendingMethod: rule.textSendingMethod,
                     enableForceAccessibility: rule.enableForceAccessibility,
+                    inputMethodPolicy: rule.inputMethodPolicy,
                     targetInputSourceId: rule.targetInputSourceId,
                     description: rule.description
                 )
@@ -546,7 +547,7 @@ struct RuleRowView: View {
                     }
                     
                     // Behavior badges - wrap naturally
-                    let hasBadges = rule.hasAXPatterns || rule.enableForceAccessibility == true || rule.useMarkedText == false || rule.injectionMethod != nil || rule.textSendingMethod != nil || (rule.targetInputSourceId != nil && !rule.targetInputSourceId!.isEmpty)
+                    let hasBadges = rule.hasAXPatterns || rule.enableForceAccessibility == true || rule.useMarkedText == false || rule.injectionMethod != nil || rule.textSendingMethod != nil || rule.inputMethodPolicy != nil || (rule.targetInputSourceId != nil && !rule.targetInputSourceId!.isEmpty)
                     
                     if hasBadges {
                         FlowLayoutView(spacing: 4) {
@@ -567,6 +568,9 @@ struct RuleRowView: View {
                             }
                             if let textMethod = rule.textSendingMethod {
                                 BehaviorBadge(text: textMethod == .oneByOne ? "1x1" : "Chunk", color: .cyan)
+                            }
+                            if let policy = rule.inputMethodPolicy {
+                                BehaviorBadge(text: policy == .enable ? "IME On" : "IME Off", color: policy == .enable ? .green : .red)
                             }
                             // Input source badge
                             if let inputSourceId = rule.targetInputSourceId, !inputSourceId.isEmpty {
@@ -763,6 +767,8 @@ struct AddRuleSheet: View {
     @State private var textDelay: String = "1500"
     @State private var textSendingMethod: TextSendingMethod = .chunked
     @State private var enableForceAccessibility: Bool = false
+    @State private var overrideInputMethodPolicy: Bool = false
+    @State private var inputMethodPolicy: InputMethodPolicy = .enable
     @State private var overrideInputSource: Bool = false
     @State private var targetInputSourceId: String = ""
     @State private var availableInputSources: [(id: String, name: String)] = []
@@ -1088,6 +1094,29 @@ struct AddRuleSheet: View {
     private var behaviorTab: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
+                // Input Method Policy
+                GroupBox(label: Label("Trạng thái bộ gõ", systemImage: "power")) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Toggle("Ghi đè trạng thái bộ gõ", isOn: $overrideInputMethodPolicy)
+                        
+                        if overrideInputMethodPolicy {
+                            Picker("Bộ gõ:", selection: $inputMethodPolicy) {
+                                ForEach(InputMethodPolicy.allCases, id: \.self) { policy in
+                                    Text(policy.displayName).tag(policy)
+                                }
+                            }
+                            .frame(width: 180)
+                            .padding(.leading, 20)
+                            
+                            Text(inputMethodPolicy.description)
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .padding(.leading, 20)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+                
                 // Input Source Switching
                 GroupBox(label: Label("Chuyển Input Source", systemImage: "keyboard")) {
                     VStack(alignment: .leading, spacing: 8) {
@@ -1260,6 +1289,10 @@ struct AddRuleSheet: View {
         }
         // Simple toggles: just load the values (default false if nil)
         enableForceAccessibility = rule.enableForceAccessibility ?? false
+        if let policy = rule.inputMethodPolicy {
+            overrideInputMethodPolicy = true
+            inputMethodPolicy = policy
+        }
         
         // Input source override
         if let inputSourceId = rule.targetInputSourceId, !inputSourceId.isEmpty {
@@ -1326,6 +1359,7 @@ struct AddRuleSheet: View {
             injectionDelays: injectionDelaysArray,
             textSendingMethod: overrideInjection ? textSendingMethod : nil,
             enableForceAccessibility: enableForceAccessibility ? true : nil,
+            inputMethodPolicy: overrideInputMethodPolicy ? inputMethodPolicy : nil,
             targetInputSourceId: overrideInputSource && !targetInputSourceId.isEmpty ? targetInputSourceId : nil,
             description: description.isEmpty ? nil : description
         )
