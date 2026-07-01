@@ -1,6 +1,54 @@
 {
   "sourceLanguage": "vi",
   "strings": {
+    "1000": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1000"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1000"
+          }
+        }
+      }
+    },
+    "1500": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1500"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1500"
+          }
+        }
+      }
+    },
+    "3000": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3000"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3000"
+          }
+        }
+      }
+    },
     "": {
       "localizations": {
         "en": {
@@ -270,22 +318,6 @@
         }
       }
     },
-    "1000": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1000"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1000"
-          }
-        }
-      }
-    },
     "1000µs = 1ms. Increase delay if characters are lost.": {
       "localizations": {
         "en": {
@@ -298,38 +330,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "1000µs = 1ms。如果丢字符,请增加延迟。"
-          }
-        }
-      }
-    },
-    "1500": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1500"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1500"
-          }
-        }
-      }
-    },
-    "3000": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3000"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3000"
           }
         }
       }
@@ -9726,6 +9726,102 @@
           "stringUnit": {
             "state": "translated",
             "value": "为此窗口/应用强制禁用越南语处理"
+          }
+        }
+      }
+    },
+    "Empty Char Prefix": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empty Char Prefix"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "空字符前缀"
+          }
+        }
+      }
+    },
+    "Không override": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Do not override"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不覆盖"
+          }
+        }
+      }
+    },
+    "Bật": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启"
+          }
+        }
+      }
+    },
+    "Tắt": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        }
+      }
+    },
+    "Chế độ:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mode:"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模式："
+          }
+        }
+      }
+    },
+    "Gửi U+202F trước khi replace để phá autocomplete, sau đó backspace thêm 1. Chỉ áp dụng cho Fast/Slow.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send U+202F before replacement to break autocomplete, then backspace one extra character. Only applies to Fast/Slow."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在替换前发送 U+202F 以打断自动补全，然后额外退格一次。仅适用于 Fast/Slow。"
           }
         }
       }

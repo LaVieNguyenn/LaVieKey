@@ -547,7 +547,7 @@ struct RuleRowView: View {
                     }
                     
                     // Behavior badges - wrap naturally
-                    let hasBadges = rule.hasAXPatterns || rule.enableForceAccessibility == true || rule.useMarkedText == false || rule.injectionMethod != nil || rule.textSendingMethod != nil || rule.inputMethodPolicy != nil || (rule.targetInputSourceId != nil && !rule.targetInputSourceId!.isEmpty)
+                    let hasBadges = rule.hasAXPatterns || rule.enableForceAccessibility == true || rule.useMarkedText == false || rule.injectionMethod != nil || rule.textSendingMethod != nil || rule.needsEmptyCharPrefix != nil || rule.inputMethodPolicy != nil || (rule.targetInputSourceId != nil && !rule.targetInputSourceId!.isEmpty)
                     
                     if hasBadges {
                         FlowLayoutView(spacing: 4) {
@@ -568,6 +568,9 @@ struct RuleRowView: View {
                             }
                             if let textMethod = rule.textSendingMethod {
                                 BehaviorBadge(text: textMethod == .oneByOne ? "1x1" : "Chunk", color: .cyan)
+                            }
+                            if let needsEmptyCharPrefix = rule.needsEmptyCharPrefix {
+                                BehaviorBadge(text: needsEmptyCharPrefix ? "EmptyChar" : "NoEmptyChar", color: needsEmptyCharPrefix ? .teal : .gray)
                             }
                             if let policy = rule.inputMethodPolicy {
                                 BehaviorBadge(text: policy == .enable ? "IME On" : "IME Off", color: policy == .enable ? .green : .red)
@@ -740,6 +743,37 @@ enum RuleSheetTab: String, CaseIterable {
     }
 }
 
+private enum EmptyCharPrefixOverride: String, CaseIterable {
+    case inherit
+    case enabled
+    case disabled
+    
+    var displayName: String {
+        switch self {
+        case .inherit: return "Không override"
+        case .enabled: return "Bật"
+        case .disabled: return "Tắt"
+        }
+    }
+    
+    var ruleValue: Bool? {
+        switch self {
+        case .inherit: return nil
+        case .enabled: return true
+        case .disabled: return false
+        }
+    }
+    
+    static func fromRuleValue(_ value: Bool?) -> EmptyCharPrefixOverride {
+        switch value {
+        case .some(true): return .enabled
+        case .some(false): return .disabled
+        case .none: return .inherit
+        }
+    }
+
+}
+
 // MARK: - Add/Edit Rule Sheet
 
 @available(macOS 13.0, *)
@@ -772,6 +806,7 @@ struct AddRuleSheet: View {
     @State private var overrideInputSource: Bool = false
     @State private var targetInputSourceId: String = ""
     @State private var availableInputSources: [(id: String, name: String)] = []
+    @State private var emptyCharPrefixOverride: EmptyCharPrefixOverride = .inherit
     @State private var description: String = ""
     
     // AX Matching patterns (Phase 1)
@@ -1232,7 +1267,25 @@ struct AddRuleSheet: View {
                             }
                             .frame(width: 300)
                             .padding(.leading, 20)
+
                         }
+                    }
+                    .padding(.vertical, 4)
+                }
+                
+                // Empty Char Prefix override
+                GroupBox(label: Label("Empty Char Prefix", systemImage: "sparkles")) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Picker("Chế độ:", selection: $emptyCharPrefixOverride) {
+                            ForEach(EmptyCharPrefixOverride.allCases, id: \.self) { option in
+                                Text(LocalizedStringKey(option.displayName)).tag(option)
+                            }
+                        }
+                        .frame(width: 300)
+                        
+                        Text("Gửi U+202F trước khi replace để phá autocomplete, sau đó backspace thêm 1. Chỉ áp dụng cho Fast/Slow.")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
                     }
                     .padding(.vertical, 4)
                 }
@@ -1253,7 +1306,11 @@ struct AddRuleSheet: View {
                 }
             }
             .padding(.vertical, 8)
+            .padding(.leading, 16)
+            .padding(.trailing, 28)
         }
+        .padding(.leading, -16)
+        .padding(.trailing, -28)
     }
     
     private func loadExistingRule(_ rule: WindowTitleRule) {
@@ -1287,6 +1344,7 @@ struct AddRuleSheet: View {
         if let textMethod = rule.textSendingMethod {
             textSendingMethod = textMethod
         }
+        emptyCharPrefixOverride = EmptyCharPrefixOverride.fromRuleValue(rule.needsEmptyCharPrefix)
         // Simple toggles: just load the values (default false if nil)
         enableForceAccessibility = rule.enableForceAccessibility ?? false
         if let policy = rule.inputMethodPolicy {
@@ -1361,6 +1419,7 @@ struct AddRuleSheet: View {
             enableForceAccessibility: enableForceAccessibility ? true : nil,
             inputMethodPolicy: overrideInputMethodPolicy ? inputMethodPolicy : nil,
             targetInputSourceId: overrideInputSource && !targetInputSourceId.isEmpty ? targetInputSourceId : nil,
+            needsEmptyCharPrefix: emptyCharPrefixOverride.ruleValue,
             description: description.isEmpty ? nil : description
         )
         

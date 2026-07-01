@@ -355,6 +355,9 @@ struct MergedRuleResult {
     /// When set, XKey will automatically switch to this input source when the rule matches
     var targetInputSourceId: String?
     
+    /// Override: Send U+202F before backspaces to break autocomplete suggestions (nil = use default)
+    var needsEmptyCharPrefix: Bool?
+    
     /// Combined description from all rules
     var description: String?
     
@@ -383,6 +386,7 @@ struct MergedRuleResult {
         if let value = rule.enableForceAccessibility { enableForceAccessibility = value }
         if let value = rule.inputMethodPolicy { inputMethodPolicy = value }
         if let value = rule.targetInputSourceId { targetInputSourceId = value }
+        if let value = rule.needsEmptyCharPrefix { needsEmptyCharPrefix = value }
         if let value = rule.description { description = value }
     }
 }
@@ -473,6 +477,10 @@ struct WindowTitleRule: Codable, Identifiable {
     /// When set, XKey will automatically switch to this input source when the rule matches
     /// Example: "com.apple.keylayout.ABC" for US English, "com.apple.keylayout.French" for French
     let targetInputSourceId: String?
+    
+    /// Override: Send U+202F before backspaces to break autocomplete suggestions
+    /// nil = use default, true = force enable, false = force disable
+    let needsEmptyCharPrefix: Bool?
     
     /// Description for debugging
     let description: String?
@@ -585,7 +593,7 @@ struct WindowTitleRule: Codable, Identifiable {
         // Behavior overrides
         case useMarkedText, hasMarkedTextIssues, commitDelay
         case injectionMethod, injectionDelays, textSendingMethod, pasteConfig
-        case enableForceAccessibility, inputMethodPolicy, targetInputSourceId, description
+        case enableForceAccessibility, inputMethodPolicy, targetInputSourceId, needsEmptyCharPrefix, description
     }
     
     init(from decoder: Decoder) throws {
@@ -614,6 +622,7 @@ struct WindowTitleRule: Codable, Identifiable {
         enableForceAccessibility = try container.decodeIfPresent(Bool.self, forKey: .enableForceAccessibility)
         inputMethodPolicy = try container.decodeIfPresent(InputMethodPolicy.self, forKey: .inputMethodPolicy)
         targetInputSourceId = try container.decodeIfPresent(String.self, forKey: .targetInputSourceId)
+        needsEmptyCharPrefix = try container.decodeIfPresent(Bool.self, forKey: .needsEmptyCharPrefix)
         description = try container.decodeIfPresent(String.self, forKey: .description)
         
         // Decode injection method from string
@@ -658,6 +667,7 @@ struct WindowTitleRule: Codable, Identifiable {
         try container.encodeIfPresent(enableForceAccessibility, forKey: .enableForceAccessibility)
         try container.encodeIfPresent(inputMethodPolicy, forKey: .inputMethodPolicy)
         try container.encodeIfPresent(targetInputSourceId, forKey: .targetInputSourceId)
+        try container.encodeIfPresent(needsEmptyCharPrefix, forKey: .needsEmptyCharPrefix)
         try container.encodeIfPresent(description, forKey: .description)
         
         // Encode injection method as string
@@ -700,6 +710,7 @@ struct WindowTitleRule: Codable, Identifiable {
         enableForceAccessibility: Bool? = nil,
         inputMethodPolicy: InputMethodPolicy? = nil,
         targetInputSourceId: String? = nil,
+        needsEmptyCharPrefix: Bool? = nil,
         description: String? = nil
     ) {
         self.id = UUID()
@@ -725,6 +736,7 @@ struct WindowTitleRule: Codable, Identifiable {
         self.enableForceAccessibility = enableForceAccessibility
         self.inputMethodPolicy = inputMethodPolicy
         self.targetInputSourceId = targetInputSourceId
+        self.needsEmptyCharPrefix = needsEmptyCharPrefix
         self.description = description
     }
     
@@ -950,7 +962,7 @@ class AppBehaviorDetector {
     /// User-defined custom rules (loaded from preferences)
     private var customRules: [WindowTitleRule] = []
     
-    /// Built-in rules for known problematic web apps
+    /// Built-in rules for known problematic app contexts
     /// These have lower priority than custom rules
     static let builtInWindowTitleRules: [WindowTitleRule] = [
         // ============================================
@@ -961,7 +973,7 @@ class AppBehaviorDetector {
         // Matches: "Google Docs", "Google Tài liệu"
         WindowTitleRule(
             name: "Google Docs",
-            bundleIdPattern: "",  // Match all browsers
+            bundleIdPattern: "",  // Match all apps
             titlePattern: "Google (Docs|Tài liệu)",
             matchMode: .regex,
             useMarkedText: false,
@@ -970,17 +982,18 @@ class AppBehaviorDetector {
             injectionMethod: .slow,
             injectionDelays: [5000, 10000, 8000],
             textSendingMethod: .oneByOne,
-            description: "Google Docs (all browsers) - one-by-one text sending"
+            needsEmptyCharPrefix: true,
+            description: "Google Docs (all browsers) - one-by-one text sending with empty char prefix"
         ),
         
-        // Google Sheets (all browsers, English + Vietnamese UI)
-        // Matches: "Google Sheets", "Google Trang tính"
+        // Google Sheets (all browsers, English + Vietnamese UI, imported Excel files)
+        // Matches: "Google Sheets", "Google Trang tính", or spreadsheet titles containing ".xlsx"
         // Note: Uses fast method with chunked text sending (same as Excel)
-        // Forward Delete is handled in CharacterInjector with AX check (like Excel)
+        // Empty Char Prefix handles browser autocomplete-like replacement races in Sheets
         WindowTitleRule(
             name: "Google Sheets",
-            bundleIdPattern: "",  // Match all browsers
-            titlePattern: "Google (Sheets|Trang tính)",
+            bundleIdPattern: "",  // Match all apps
+            titlePattern: "Google (Sheets|Trang tính)|\\.xlsx",
             matchMode: .regex,
             useMarkedText: false,
             hasMarkedTextIssues: true,
@@ -988,7 +1001,8 @@ class AppBehaviorDetector {
             injectionMethod: .fast,
             injectionDelays: [2000, 5000, 2000],  // Same as Excel
             textSendingMethod: .chunked,          // Same as Excel
-            description: "Google Sheets (all browsers) - fast method like Excel"
+            needsEmptyCharPrefix: true,
+            description: "Google Sheets (all browsers) - fast method like Excel with empty char prefix"
         ),
         
         // ============================================
@@ -1046,7 +1060,8 @@ class AppBehaviorDetector {
             injectionMethod: .slow,
             injectionDelays: [5000, 10000, 8000],
             textSendingMethod: .oneByOne,
-            description: "Word for the web (Word Online) - one-by-one like Google Docs"
+            needsEmptyCharPrefix: true,
+            description: "Word/Docs .docx title fallback - one-by-one with empty char prefix"
         ),
     ]
 
@@ -2470,12 +2485,26 @@ class AppBehaviorDetector {
                 delays: delays,
                 textSendingMethod: textMethod,
                 description: mergedResult.displayName,
+                needsEmptyCharPrefix: mergedResult.needsEmptyCharPrefix ?? false,
                 pasteConfig: paste
             )
         }
 
-        // Priority 2: Fall back to bundle ID based detection
-        return getInjectionMethod(for: bundleId, role: currentRole, info: focusedInfo)
+        // Priority 2: Fall back to bundle ID based detection, then apply rule-level
+        // Empty Char Prefix override if a matching rule explicitly sets it.
+        let fallbackInfo = getInjectionMethod(for: bundleId, role: currentRole, info: focusedInfo)
+        guard let needsEmptyCharPrefix = mergedResult.needsEmptyCharPrefix else {
+            return fallbackInfo
+        }
+        return InjectionMethodInfo(
+            method: fallbackInfo.method,
+            delays: fallbackInfo.delays,
+            textSendingMethod: fallbackInfo.textSendingMethod,
+            description: fallbackInfo.description,
+            needsEmptyCharPrefix: needsEmptyCharPrefix,
+            pasteConfig: fallbackInfo.pasteConfig,
+            isOverlay: fallbackInfo.isOverlay
+        )
     }
     
     /// Get default delays for an injection method
