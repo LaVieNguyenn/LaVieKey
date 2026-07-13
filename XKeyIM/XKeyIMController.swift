@@ -1180,7 +1180,10 @@ class XKeyIMController: IMKInputController {
         currentWordLength = 0
         markedTextStartLocation = NSNotFound
         lastKnownSelectionLocation = NSNotFound  // Reset cursor tracking for new session
-        
+        cursorTrackingVerified = false  // Re-verify once per input session: a good verdict from a
+                                        // previous field must not carry over to a new field whose
+                                        // cursor tracking may be broken (same app, different surface)
+
         // Log version to debug window when XKeyIM is activated
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
