@@ -317,9 +317,11 @@ enum WindowTitleMatchMode: String, Codable, CaseIterable {
     }
 
     /// Cache of compiled regexes keyed by pattern, so repeated window-title matches
-    /// don't recompile the same NSRegularExpression. Guarded by a lock because rule
-    /// evaluation can run off the main thread (injection-detection path).
-    private static var regexCache: [String: NSRegularExpression] = [:]
+    /// don't recompile the same NSRegularExpression. Failed compilations are cached as
+    /// nil so an invalid pattern doesn't re-run the parser on every rule evaluation.
+    /// Guarded by a lock because rule evaluation can run off the main thread
+    /// (injection-detection path).
+    private static var regexCache: [String: NSRegularExpression?] = [:]
     private static let regexCacheLock = NSLock()
 
     private static func compiledRegex(for pattern: String) -> NSRegularExpression? {
@@ -328,9 +330,7 @@ enum WindowTitleMatchMode: String, Codable, CaseIterable {
         if let cached = regexCache[pattern] {
             return cached
         }
-        guard let compiled = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else {
-            return nil
-        }
+        let compiled = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive])
         regexCache[pattern] = compiled
         return compiled
     }
