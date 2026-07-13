@@ -55,7 +55,12 @@ class XKeyIMController: IMKInputController {
     /// we expect it to be markedTextStartLocation + text.length, the client is broken.
     /// Examples: Warp terminal, some terminal emulators
     private var cursorTrackingBroken: Bool = false
-    
+
+    /// Whether the auto-detect check has already run for the current client.
+    /// Without this latch, a "good" client (cursorTrackingBroken stays false forever)
+    /// would pay a selectedRange() IPC round trip on every single keystroke.
+    private var cursorTrackingVerified: Bool = false
+
     // Mirror VNEngine upperCaseStatus for IMKit paths where marked-text/cursor
     // bookkeeping can reset engine state before the next printable letter.
     // 0 = none, 1 = punctuation seen, 2 = newline, 3 = punctuation + space seen
@@ -299,6 +304,7 @@ class XKeyIMController: IMKInputController {
         // Reset cursorTrackingBroken flag when switching to a different app
         if bundleId != lastClientBundleId {
             cursorTrackingBroken = false
+            cursorTrackingVerified = false
             lastClientBundleId = bundleId
             IMKitDebugger.shared.log("App switched to \(bundleId), reset cursorTrackingBroken", category: "CURSOR")
         }
@@ -948,7 +954,8 @@ class XKeyIMController: IMKInputController {
             // If selectedRange().location doesn't match, the client doesn't properly
             // track cursor position through IMKit API.
             // Common in terminal emulators: Warp (always 0), iTerm2 (off-by-1), etc.
-            if !cursorTrackingBroken && expectedCursorPos > 0 {
+            if !cursorTrackingVerified && expectedCursorPos > 0 {
+                cursorTrackingVerified = true
                 let actualAfterMark = client.selectedRange().location
                 if actualAfterMark != expectedCursorPos {
                     cursorTrackingBroken = true
@@ -1173,7 +1180,10 @@ class XKeyIMController: IMKInputController {
         currentWordLength = 0
         markedTextStartLocation = NSNotFound
         lastKnownSelectionLocation = NSNotFound  // Reset cursor tracking for new session
-        
+        cursorTrackingVerified = false  // Re-verify once per input session: a good verdict from a
+                                        // previous field must not carry over to a new field whose
+                                        // cursor tracking may be broken (same app, different surface)
+
         // Log version to debug window when XKeyIM is activated
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"

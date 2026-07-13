@@ -15,12 +15,12 @@ class IMKitDebugger {
     private init() {}
 
     /// Log a message with [XKeyIM] prefix
-    func log(_ message: String) {
-        DebugLogger.shared.info("[XKeyIM] \(message)")
+    func log(_ message: @autoclosure () -> String) {
+        DebugLogger.shared.info("[XKeyIM] \(message())")
     }
 
     /// Log with category
-    func log(_ message: String, category: String) {
-        DebugLogger.shared.info("[XKeyIM] [\(category)] \(message)")
+    func log(_ message: @autoclosure () -> String, category: String) {
+        DebugLogger.shared.info("[XKeyIM] [\(category)] \(message())")
     }
 }

@@ -1176,7 +1176,31 @@ class VNEngineTests: XCTestCase {
         let rawInput = engine.getRawInputStringForEnglishDetection()
         XCTAssertEqual(rawInput, "ly", "getRawInputStringForEnglishDetection() should return 'ly', not 'lyy' (no duplicate keystrokes)")
     }
-    
+
+    // MARK: - keyCodeToChar (canonical map delegation)
+
+    /// keyCodeToChar was refactored from a per-call dictionary literal to a lookup into the
+    /// canonical VietnameseData.keyCodeToCharacterMap. Guard that the observable mapping is
+    /// unchanged and stays in sync with that single source of truth.
+    func testKeyCodeToChar_KnownKeysMapToExpectedCharacters() {
+        XCTAssertEqual(VNEngine.keyCodeToChar(VietnameseData.KEY_A), "a")
+        XCTAssertEqual(VNEngine.keyCodeToChar(VietnameseData.KEY_Z), "z")
+        XCTAssertEqual(VNEngine.keyCodeToChar(VietnameseData.KEY_Y), "y")
+        XCTAssertEqual(VNEngine.keyCodeToChar(VietnameseData.KEY_SPACE), " ")
+        XCTAssertEqual(VNEngine.keyCodeToChar(VietnameseData.KEY_1), "1")
+    }
+
+    func testKeyCodeToChar_MatchesCanonicalMap() {
+        for (keyCode, char) in VietnameseData.keyCodeToCharacterMap {
+            XCTAssertEqual(VNEngine.keyCodeToChar(keyCode), char,
+                           "keyCodeToChar must delegate to the canonical map for 0x\(String(keyCode, radix: 16))")
+        }
+    }
+
+    func testKeyCodeToChar_UnmappedKeyReturnsNil() {
+        XCTAssertNil(VNEngine.keyCodeToChar(0xFF), "Unmapped key code should return nil")
+    }
+
     /// Test similar words that should not be detected as English
     func testTelex_SimpleVietnameseWords_NotEnglishPattern() {
         // Test "mỹ" = m-y-x
@@ -1754,8 +1778,36 @@ class VNEngineTests: XCTestCase {
                        "aa should still produce 'â' — only 2 identical vowels (below threshold)")
     }
 
+    // MARK: - Custom Consonants: cached Character set (perf)
+
+    /// vCustomConsonants is now mirrored into a cached `customConsonantChars` Set via didSet
+    /// (so the per-keystroke English-detection path doesn't rebuild it every key). Verify the
+    /// cache tracks the keycode set, including reassignment (the invalidation path).
+    func testCustomConsonantChars_CacheTracksReassignment() {
+        engine.reset()
+
+        // Default is empty.
+        XCTAssertTrue(engine.customConsonantChars.isEmpty,
+                      "cache should start empty like vCustomConsonants")
+
+        // Assign a set → cache reflects the Character form.
+        engine.vCustomConsonants = [VietnameseData.KEY_Z, VietnameseData.KEY_F]
+        XCTAssertEqual(engine.customConsonantChars, Set<Character>(["z", "f"]),
+                       "cache should reflect assigned keycodes as characters")
+
+        // Reassign a different set → cache must invalidate and reflect the NEW value.
+        engine.vCustomConsonants = [VietnameseData.KEY_W]
+        XCTAssertEqual(engine.customConsonantChars, Set<Character>(["w"]),
+                       "cache must update on reassignment, not keep the previous set")
+
+        // Reassign back to empty → cache clears.
+        engine.vCustomConsonants = []
+        XCTAssertTrue(engine.customConsonantChars.isEmpty,
+                      "cache must clear when vCustomConsonants is emptied")
+    }
+
     // MARK: - Custom Consonants: parseCustomConsonants Utility Tests
-    
+
     /// Test parsing a valid comma-separated string into Set<UInt16>
     func testParseCustomConsonants_ValidString() {
         let result = VietnameseData.parseCustomConsonants("Z,F,W,J,K")

@@ -90,9 +90,10 @@ class DebugLogger {
     ///   - message: The message to log
     ///   - source: The source component (e.g., "VNEngine", "MacroManager")
     ///   - level: Log level (info, warning, error)
-    func log(_ message: String, source: String = "", level: LogLevel = .info) {
+    func log(_ message: @autoclosure () -> String, source: String = "", level: LogLevel = .info) {
         guard isLoggingEnabled else { return }
-        
+
+        let message = message()
         let prefix = level.emoji
         let fullMessage: String
         if prefix.isEmpty {
@@ -119,23 +120,23 @@ class DebugLogger {
     }
 
     /// Log an info message
-    func info(_ message: String, source: String = "") {
-        log(message, source: source, level: .info)
+    func info(_ message: @autoclosure () -> String, source: String = "") {
+        log(message(), source: source, level: .info)
     }
 
     /// Log a warning message
-    func warning(_ message: String, source: String = "") {
-        log(message, source: source, level: .warning)
+    func warning(_ message: @autoclosure () -> String, source: String = "") {
+        log(message(), source: source, level: .warning)
     }
 
     /// Log an error message
-    func error(_ message: String, source: String = "") {
-        log(message, source: source, level: .error)
+    func error(_ message: @autoclosure () -> String, source: String = "") {
+        log(message(), source: source, level: .error)
     }
 
     /// Log a success message
-    func success(_ message: String, source: String = "") {
-        log(message, source: source, level: .success)
+    func success(_ message: @autoclosure () -> String, source: String = "") {
+        log(message(), source: source, level: .success)
     }
 
     /// Log a debug message (only if verbose logging is enabled)

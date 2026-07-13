@@ -34,21 +34,11 @@ class VNEngine {
     // Note: END_CONSONANT_MASK and CONSONANT_ALLOW_MASK are defined in VietnameseData (as UInt16)
     // and are the canonical source used throughout the codebase.
     
-    /// Convert macOS virtual key code to printable character for logging
+    /// Convert macOS virtual key code to printable character for logging.
+    /// Indexes into the canonical static map to avoid rebuilding a dictionary on every call
+    /// (this runs per keystroke, per buffer char via getRawInputString/getCurrentWordString).
     static func keyCodeToChar(_ keyCode: UInt16) -> Character? {
-        // Mapping based on VietnameseData key codes (macOS virtual key codes)
-        let mapping: [UInt16: Character] = [
-            0x00: "a", 0x01: "s", 0x02: "d", 0x03: "f", 0x04: "h", 0x05: "g",
-            0x06: "z", 0x07: "x", 0x08: "c", 0x09: "v", 0x0B: "b", 0x0C: "q",
-            0x0D: "w", 0x0E: "e", 0x0F: "r", 0x10: "y", 0x11: "t",
-            0x12: "1", 0x13: "2", 0x14: "3", 0x15: "4", 0x16: "6", 0x17: "5",
-            0x18: "=", 0x19: "9", 0x1A: "7", 0x1B: "-", 0x1C: "8", 0x1D: "0",
-            0x1E: "]", 0x1F: "o", 0x20: "u", 0x21: "[", 0x22: "i", 0x23: "p",
-            0x25: "l", 0x26: "j", 0x27: "'", 0x28: "k", 0x29: ";",
-            0x2A: "\\", 0x2B: ",", 0x2C: "/", 0x2D: "n", 0x2E: "m", 0x2F: ".",
-            0x32: "`", 0x31: " "  // space
-        ]
-        return mapping[keyCode]
+        return VietnameseData.keyCodeToCharacterMap[keyCode]
     }
     
     // MARK: - Settings (from Engine.h)
@@ -72,7 +62,16 @@ class VNEngine {
     var vUpperCaseRequireSpace = 1 // 0: cap right after . ? ! even with no space; 1: require a space after . ? ! (newline always caps)
     var vTempOffSpelling = 0       // 0: No, 1: Yes (temp off spell check via toolbar)
     var vTempOffEngine = 0         // 0: No, 1: Yes (temp off engine via toolbar)
-    var vCustomConsonants: Set<UInt16> = [] // Custom consonants allowed (e.g., Z, F, W, J, K)
+    var vCustomConsonants: Set<UInt16> = [] { // Custom consonants allowed (e.g., Z, F, W, J, K)
+        didSet {
+            // Cache the Character form so the per-keystroke English-detection path
+            // doesn't rebuild this Set on every key.
+            customConsonantChars = Set(vCustomConsonants.compactMap { VietnameseData.char(for: $0) })
+        }
+    }
+    /// Character form of `vCustomConsonants`, recomputed only when that set changes.
+    /// `private(set)` so tests can verify the cache stays in sync without allowing writes.
+    private(set) var customConsonantChars: Set<Character> = []
     var vQuickStartConsonant = 0   // 0: No, 1: Yes (f->ph, j->gi, w->qu)
     var vQuickEndConsonant = 0     // 0: No, 1: Yes (g->ng, h->nh, k->ch)
     var vTempOffOpenKey = 0        // 0: No, 1: Yes (temp off engine with Option key)
@@ -773,7 +772,6 @@ class VNEngine {
         // NOTE: Use getRawInputStringForEnglishDetection() which EXCLUDES overflow entries
         // to avoid false positives after restoreLastTypingState()
         let rawInput = getRawInputStringForEnglishDetection()
-        let customConsonantChars = Set(vCustomConsonants.compactMap { VietnameseData.char(for: $0) })
         // Adaptive accepts both Telex and VNI in one buffer, so vInputType reflects only
         // the LAST keystroke. Validating the whole raw buffer against that single type would
         // misjudge mixed sequences (e.g. a VNI "d9..." checked against Telex tables). Treat
@@ -3351,6 +3349,24 @@ extension VNEngine {
         return result
     }
     
+    /// Maps a word-break punctuation char to its macOS key code, for building macros
+    /// like "you@" character by character. Constant data — declared static so it is not
+    /// rebuilt on every word break.
+    private static let wordBreakCharToKeyCode: [Character: UInt16] = [
+        "!": 0x12, "@": 0x13, "#": 0x14, "$": 0x15, "%": 0x17,
+        "^": 0x16, "&": 0x1A, "*": 0x1C, "(": 0x19, ")": 0x1D,
+        "~": 0x32, "`": 0x32, "-": 0x1B, "_": 0x1B, "=": 0x18, "+": 0x18,
+        "[": 0x21, "{": 0x21, "]": 0x1E, "}": 0x1E,
+        "\\": 0x2A, "|": 0x2A, ";": 0x29, ":": 0x29,
+        "'": 0x27, "\"": 0x27, ",": 0x2B, "<": 0x2B,
+        ".": 0x2F, ">": 0x2F, "/": 0x2C, "?": 0x2C
+    ]
+    /// Word-break chars that require Shift (used to set CAPS_MASK on the macro key).
+    private static let shiftedWordBreakChars: Set<Character> = [
+        "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "~", "_", "+",
+        "{", "}", "|", ":", "\"", "<", ">", "?"
+    ]
+
     /// Process word break (space, punctuation, etc.)
     /// Returns ProcessResult with macro replacement if found
     func processWordBreak(character: Character) -> ProcessResult {
@@ -3597,19 +3613,9 @@ extension VNEngine {
         // For non-space word break characters, add them to macroKey for building macros
         // This allows macros like "you@" or "!bb" to be built character by character
         if !isSpace && shouldUseMacro() {
-            let wordBreakCharToKeyCode: [Character: UInt16] = [
-                "!": 0x12, "@": 0x13, "#": 0x14, "$": 0x15, "%": 0x17,
-                "^": 0x16, "&": 0x1A, "*": 0x1C, "(": 0x19, ")": 0x1D,
-                "~": 0x32, "`": 0x32, "-": 0x1B, "_": 0x1B, "=": 0x18, "+": 0x18,
-                "[": 0x21, "{": 0x21, "]": 0x1E, "}": 0x1E,
-                "\\": 0x2A, "|": 0x2A, ";": 0x29, ":": 0x29,
-                "'": 0x27, "\"": 0x27, ",": 0x2B, "<": 0x2B,
-                ".": 0x2F, ">": 0x2F, "/": 0x2C, "?": 0x2C
-            ]
-            
-            if let keyCode = wordBreakCharToKeyCode[character], vietnameseData.charKeyCode.contains(keyCode) {
+            if let keyCode = Self.wordBreakCharToKeyCode[character], vietnameseData.charKeyCode.contains(keyCode) {
                 // Check if it's a shifted special character
-                let isShiftedChar = ["!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "~", "_", "+", "{", "}", "|", ":", "\"", "<", ">", "?"].contains(character)
+                let isShiftedChar = Self.shiftedWordBreakChars.contains(character)
                 hookState.macroKey.append(UInt32(keyCode) | (isShiftedChar ? VNEngine.CAPS_MASK : 0))
             }
         }
