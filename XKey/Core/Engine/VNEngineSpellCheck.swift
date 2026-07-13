@@ -108,7 +108,7 @@ extension VNEngine {
         // should be considered valid without dictionary check
         if !vCustomConsonants.isEmpty {
             let lowercaseWord = word.lowercased()
-            let customChars = vCustomConsonants.compactMap { VietnameseData.char(for: $0) }
+            let customChars = customConsonantChars
 
             if let firstChar = lowercaseWord.first, customChars.contains(firstChar) {
                 logCallback?("📖 checkWordSpelling: SKIPPED (customConsonant, starts with '\(firstChar)')")
