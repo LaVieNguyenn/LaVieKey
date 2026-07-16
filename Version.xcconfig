@@ -1,5 +1,5 @@
 // Version.xcconfig
-// Centralized version configuration for XKey and XKeyIM
+// Centralized version configuration for LaVieKey and LaVieKeyIM
 //
 // To update version, modify these values and both targets will use them.
 // MARKETING_VERSION = CFBundleShortVersionString (displayed version like "1.2.20")

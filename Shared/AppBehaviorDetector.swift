@@ -1,9 +1,9 @@
 //
 //  AppBehaviorDetector.swift
-//  XKey
+//  LaVieKey
 //
 //  Shared module for detecting app-specific behaviors
-//  Used by both XKey (CGEvent) and XKeyIM (IMKit) to apply appropriate workarounds
+//  Used by both LaVieKey (CGEvent) and LaVieKeyIM (IMKit) to apply appropriate workarounds
 //
 
 import Cocoa
@@ -108,7 +108,7 @@ enum InjectionMethod: String, Codable, CaseIterable {
         case .selection: return "Shift+Left select + gõ thay thế (Browser address bar)"
         case .autocomplete: return "Forward Delete + backspace + text (Spotlight, Raycast)"
         case .axDirect: return "Dùng Accessibility API trực tiếp (Firefox content area)"
-        case .passthrough: return "Bỏ qua xử lý XKey - chỉ truyền phím thẳng qua"
+        case .passthrough: return "Bỏ qua xử lý LaVieKey - chỉ truyền phím thẳng qua"
         }
     }
 
@@ -370,8 +370,8 @@ struct MergedRuleResult {
     /// Override Vietnamese input processing state (nil = use global state)
     var inputMethodPolicy: InputMethodPolicy?
     
-    /// Target input source ID to switch to when rule matches (nil = use XKey/current)
-    /// When set, XKey will automatically switch to this input source when the rule matches
+    /// Target input source ID to switch to when rule matches (nil = use LaVieKey/current)
+    /// When set, LaVieKey will automatically switch to this input source when the rule matches
     var targetInputSourceId: String?
     
     /// Override: Send U+202F before backspaces to break autocomplete suggestions (nil = use default)
@@ -485,7 +485,7 @@ struct WindowTitleRule: Codable, Identifiable {
     let pasteConfig: PasteConfig?
     
     /// Override: Enable AXManualAccessibility for Electron/Chromium apps
-    /// When enabled, XKey will set AXManualAccessibility = true when this app is focused
+    /// When enabled, LaVieKey will set AXManualAccessibility = true when this app is focused
     /// This helps retrieve more detailed text info from Electron apps (VS Code, Slack, etc.)
     let enableForceAccessibility: Bool?
     
@@ -493,7 +493,7 @@ struct WindowTitleRule: Codable, Identifiable {
     let inputMethodPolicy: InputMethodPolicy?
     
     /// Override: Target input source to switch to when rule matches
-    /// When set, XKey will automatically switch to this input source when the rule matches
+    /// When set, LaVieKey will automatically switch to this input source when the rule matches
     /// Example: "com.apple.keylayout.ABC" for US English, "com.apple.keylayout.French" for French
     let targetInputSourceId: String?
     
@@ -796,14 +796,14 @@ class AppBehaviorDetector {
     
     // MARK: - Dependency Injection
     
-    /// Callback to get visible overlay app name (injected by XKey app)
+    /// Callback to get visible overlay app name (injected by LaVieKey app)
     /// Used to detect Spotlight/Raycast/Alfred without direct dependency on OverlayAppDetector
     /// Returns overlay app name ("Spotlight", "Raycast", "Alfred") or nil if no overlay visible
     var overlayAppNameProvider: (() -> String?)?
 
     /// Returns the user's `remoteDesktopInjectMode` preference.
     /// AppBehaviorDetector lives in the Shared module and cannot import
-    /// SharedSettings directly, so the main XKey target injects this
+    /// SharedSettings directly, so the main LaVieKey target injects this
     /// closure at startup. Default `false` if not wired.
     var remoteDesktopInjectModeProvider: (() -> Bool)?
     
@@ -1029,7 +1029,7 @@ class AppBehaviorDetector {
         // ============================================
         
         // Telegram Web's emoji suggestion popup intercepts keydown events,
-        // causing Vietnamese text loss when XKey sends replacement text via CGEvent.
+        // causing Vietnamese text loss when LaVieKey sends replacement text via CGEvent.
         // Slow + oneByOne bypasses this by giving popup time to process each character.
         WindowTitleRule(
             name: "Telegram Web",
@@ -1066,7 +1066,7 @@ class AppBehaviorDetector {
         // ============================================
         //
         // Word for the web renders into a custom "WAC" editing surface
-        // (DOM class "WACEditing" / "EditingSurfaceBody"). Diacritics that XKey
+        // (DOM class "WACEditing" / "EditingSurfaceBody"). Diacritics that LaVieKey
         // injects via synthetic key events (the default .fast method) are held in
         // a provisional state and DROPPED when the surface loses focus (user clicks
         // a blank area) or autosave normalizes the DOM — the just-typed text
@@ -1709,7 +1709,7 @@ class AppBehaviorDetector {
     // MARK: - Window Title Detection
     
     /// Get current window title using Accessibility API
-    /// Note: Requires Accessibility permission (which XKey already has)
+    /// Note: Requires Accessibility permission (which LaVieKey already has)
     func getCurrentWindowTitle() -> String? {
         guard let app = NSWorkspace.shared.frontmostApplication else {
             return nil
@@ -2120,7 +2120,7 @@ class AppBehaviorDetector {
             return .terminal
         }
         
-        // Priority 1: Check overlay launcher via injected provider (from OverlayAppDetector in XKey)
+        // Priority 1: Check overlay launcher via injected provider (from OverlayAppDetector in LaVieKey)
         // This detects Spotlight/Raycast/Alfred more accurately when user is focused on search field
         if let overlayName = overlayAppNameProvider?() {
             if overlayName == "Spotlight" {

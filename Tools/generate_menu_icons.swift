@@ -55,8 +55,8 @@ func createStarPDF(at path: String, width: CGFloat, height: CGFloat) {
     print("✅ Created \(path) (\(Int(width))×\(Int(height))pt)")
 }
 
-// Create PDF with rounded-rect background + "VI" text cutout
-func createVIPDF(at path: String, width: CGFloat, height: CGFloat) {
+// Create PDF with rounded-rect background + text cutout
+func createTextPDF(at path: String, text textString: String, fontSize: CGFloat, width: CGFloat, height: CGFloat) {
     let url = URL(fileURLWithPath: path)
     var rect = CGRect(x: 0, y: 0, width: width, height: height)
     
@@ -74,9 +74,9 @@ func createVIPDF(at path: String, width: CGFloat, height: CGFloat) {
     let bgRect = CGRect(x: 0, y: 0, width: width, height: height)
     combinedPath.addRoundedRect(in: bgRect, cornerWidth: cornerRadius, cornerHeight: cornerRadius)
     
-    // 2. "VI" text as path for cutout
-    let font = CTFontCreateWithName("SFProText-Bold" as CFString, 12, nil)
-    let text = "VI" as CFString
+    // 2. Text as path for cutout
+    let font = CTFontCreateWithName("SFProText-Bold" as CFString, fontSize, nil)
+    let text = textString as CFString
     let attrString = CFAttributedStringCreateMutable(nil, 0)!
     CFAttributedStringReplaceString(attrString, CFRange(location: 0, length: 0), text)
     CFAttributedStringSetAttribute(attrString, CFRange(location: 0, length: CFStringGetLength(text)), kCTFontAttributeName, font)
@@ -122,22 +122,26 @@ func createVIPDF(at path: String, width: CGFloat, height: CGFloat) {
     print("✅ Created \(path) (\(Int(width))×\(Int(height))pt)")
 }
 
-// Resolve output directory relative to this script's location (Tools/ -> ../XKeyIM/)
+// Resolve output directory relative to this script's location (Tools/ -> ../LaVieKeyIM/)
 let scriptDir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().path
-let outputDir = (scriptDir as NSString).appendingPathComponent("../XKeyIM")
+let outputDir = (scriptDir as NSString).appendingPathComponent("../LaVieKeyIM")
 
 // Generate both icons at 20×16pt
 let width: CGFloat = 20
 let height: CGFloat = 16
 
-createStarPDF(
+createTextPDF(
     at: (outputDir as NSString).appendingPathComponent("MenuIcon.pdf"),
+    text: "LV",
+    fontSize: 11,
     width: width,
     height: height
 )
 
-createVIPDF(
+createTextPDF(
     at: (outputDir as NSString).appendingPathComponent("MenuIconVI.pdf"),
+    text: "VI",
+    fontSize: 12,
     width: width,
     height: height
 )

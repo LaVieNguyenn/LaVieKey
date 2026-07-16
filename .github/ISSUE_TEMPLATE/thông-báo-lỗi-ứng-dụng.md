@@ -26,7 +26,7 @@ Nếu có thể hãy đính kèm hình ảnh để mô tả chi tiết hơn
 **Desktop (please complete the following information):**
  - OS: phiên bản macOS (ví dụ Tahoe 26.2)
  - App: tên app [ví dụ chrome, safari]
- - Xkey: phiên bản đang sử dụng [ví dụ 1.0.5]
+ - LaVieKey: phiên bản đang sử dụng [ví dụ 1.0.5]
  - Kiểu gõ: ví dụ Telex/VNI
  - Bảng mã: Unicode,...
 

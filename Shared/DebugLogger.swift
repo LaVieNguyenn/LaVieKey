@@ -1,14 +1,14 @@
 //
 //  DebugLogger.swift
-//  XKey / XKeyIM
+//  LaVieKey / LaVieKeyIM
 //
-//  Centralized logging utility that works in both XKey and XKeyIM
+//  Centralized logging utility that works in both LaVieKey and LaVieKeyIM
 //  Optimized for high-frequency logging without blocking the caller
 //
 
 import Foundation
 
-// Forward declaration for DebugWindowController (only available in XKey)
+// Forward declaration for DebugWindowController (only available in LaVieKey)
 // This protocol allows us to reference the debug window without importing AppKit
 protocol DebugWindowControllerProtocol: AnyObject {
     var isLoggingEnabled: Bool { get }
@@ -16,7 +16,7 @@ protocol DebugWindowControllerProtocol: AnyObject {
     func logEvent(_ message: String)
 }
 
-/// Centralized debug logger that works in both XKey and XKeyIM
+/// Centralized debug logger that works in both LaVieKey and LaVieKeyIM
 /// Optimized for high-frequency logging without blocking
 /// Uses fire-and-forget file writing for zero-blocking logging
 class DebugLogger {
@@ -27,7 +27,7 @@ class DebugLogger {
     /// Log file URL (shared with DebugViewModel)
     private let logFileURL: URL
     
-    /// Reference to debug window controller (set by AppDelegate in XKey)
+    /// Reference to debug window controller (set by AppDelegate in LaVieKey)
     /// Using protocol to avoid dependency on AppKit/UI code
     weak var debugWindowController: DebugWindowControllerProtocol? {
         didSet {
@@ -36,7 +36,7 @@ class DebugLogger {
                 isLoggingEnabled = controller.isLoggingEnabled
                 isVerboseLogging = controller.isVerboseLogging
             } else {
-                // Debug window disconnected - disable file logging in XKey app
+                // Debug window disconnected - disable file logging in LaVieKey app
                 isLoggingEnabled = false
                 isVerboseLogging = false
             }
@@ -46,11 +46,11 @@ class DebugLogger {
     /// Whether verbose logging is enabled
     var isVerboseLogging: Bool = true
     
-    /// Whether logging is enabled (default: false, explicitly enabled by XKey/XKeyIM based on debugModeEnabled setting)
+    /// Whether logging is enabled (default: false, explicitly enabled by LaVieKey/LaVieKeyIM based on debugModeEnabled setting)
     var isLoggingEnabled: Bool = false
     
     /// Background queue for async file writing
-    private let logQueue = DispatchQueue(label: "com.xkey.logger", qos: .utility)
+    private let logQueue = DispatchQueue(label: "com.laviekey.logger", qos: .utility)
     
     /// Lock for thread-safe file writes
     private let writeLock = NSLock()
@@ -58,7 +58,7 @@ class DebugLogger {
     private init() {
         // Use same log file as DebugViewModel
         let homeDirectory = FileManager.default.homeDirectoryForCurrentUser
-        logFileURL = homeDirectory.appendingPathComponent("XKey_Debug.log")
+        logFileURL = homeDirectory.appendingPathComponent("LaVieKey_Debug.log")
     }
     
     /// Write to file asynchronously (fire-and-forget)

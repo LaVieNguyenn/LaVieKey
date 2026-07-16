@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Build Release version of XKey with Developer ID code signing
-# Output will be copied to ./Release/XKey.app and ./Release/XKey.dmg
+# Build Release version of LaVieKey with Developer ID code signing
+# Output will be copied to ./Release/LaVieKey.app and ./Release/LaVieKey.dmg
 
 set -e  # Exit on error
 
@@ -15,10 +15,10 @@ fi
 ENABLE_CODESIGN=${ENABLE_CODESIGN:-true}  # Set to false to disable code signing
 ENABLE_NOTARIZE=${ENABLE_NOTARIZE:-false}  # Set to true to enable notarization
 ENABLE_DMG=${ENABLE_DMG:-true}  # Set to false to skip DMG creation
-ENABLE_XKEYIM=${ENABLE_XKEYIM:-true}  # Set to false to skip XKeyIM build
-ENABLE_XKEYIM_BUNDLE=${ENABLE_XKEYIM_BUNDLE:-true}  # Set to false to skip bundling XKeyIM inside XKey.app
+ENABLE_LAVIEKEYIM=${ENABLE_LAVIEKEYIM:-true}  # Set to false to skip LaVieKeyIM build
+ENABLE_LAVIEKEYIM_BUNDLE=${ENABLE_LAVIEKEYIM_BUNDLE:-true}  # Set to false to skip bundling LaVieKeyIM inside LaVieKey.app
 ENABLE_PROFILE_EMBED=${ENABLE_PROFILE_EMBED:-true}  # Set to false to skip embedding Developer ID provisioning profile
-ENABLE_ICLOUD_ENTITLEMENT=${ENABLE_ICLOUD_ENTITLEMENT:-true}  # Trusts XKeyRelease.entitlements by default (declares iCloud KVS: com.apple.developer.ubiquity-kvstore-identifier). iCloud sync IS valid on a notarized Developer ID build, provided the signing cert is the one listed in the embedded Developer ID profile's DeveloperCertificates (otherwise amfid rejects with -413 "No matching profile found" → SIGKILL). Set false only to strip the KVS entitlement from the /tmp expanded copy for a sync-disabled control build.
+ENABLE_ICLOUD_ENTITLEMENT=${ENABLE_ICLOUD_ENTITLEMENT:-true}  # Trusts LaVieKeyRelease.entitlements by default (declares iCloud KVS: com.apple.developer.ubiquity-kvstore-identifier). iCloud sync IS valid on a notarized Developer ID build, provided the signing cert is the one listed in the embedded Developer ID profile's DeveloperCertificates (otherwise amfid rejects with -413 "No matching profile found" → SIGKILL). Set false only to strip the KVS entitlement from the /tmp expanded copy for a sync-disabled control build.
 
 # Smart defaults: If notarizing, assume it's a full release
 if [ "$ENABLE_NOTARIZE" = true ]; then
@@ -32,12 +32,12 @@ else
     ENABLE_GITHUB_RELEASE=${ENABLE_GITHUB_RELEASE:-false}
 fi
 
-BUNDLE_ID="com.codetay.XKey"
-XKEYIM_BUNDLE_ID="com.codetay.inputmethod.XKey"
-APP_NAME="XKey"
-DMG_NAME="XKey.dmg"
-DMG_VOLUME_NAME="XKey"
-REPO_URL="https://github.com/xmannv/xkey"
+BUNDLE_ID="lavie.nguyen.LaVieKey"
+LAVIEKEYIM_BUNDLE_ID="lavie.nguyen.inputmethod.LaVieKey"
+APP_NAME="LaVieKey"
+DMG_NAME="LaVieKey.dmg"
+DMG_VOLUME_NAME="LaVieKey"
+REPO_URL="https://github.com/LaVieNguyenn/LaVieKey"
 SPARKLE_BIN="/tmp/Sparkle-2.9.0/bin"
 
 # Read version from Version.xcconfig (centralized version management)
@@ -51,7 +51,7 @@ else
 fi
 
 
-echo "🚀 Building XKey (Release configuration)..."
+echo "🚀 Building LaVieKey (Release configuration)..."
 
 # Show build mode
 if [ "$ENABLE_NOTARIZE" = true ]; then
@@ -59,13 +59,13 @@ if [ "$ENABLE_NOTARIZE" = true ]; then
     echo "   ✅ Code signing"
     echo "   ✅ Notarization"
     echo "   ✅ Sparkle signing"
-    echo "   ✅ XKeyIM bundled in XKey.app"
+    echo "   ✅ LaVieKeyIM bundled in LaVieKey.app"
     [ "$ENABLE_GITHUB_RELEASE" = true ] && echo "   ✅ GitHub Release (auto-create)"
 else
     echo "🔨 Development Build Mode"
     [ "$ENABLE_CODESIGN" = true ] && echo "   ✅ Code signing" || echo "   ⚠️  Code signing disabled"
     [ "$ENABLE_SPARKLE_SIGN" = true ] && echo "   ✅ Sparkle signing" || echo "   ⚠️  Sparkle signing disabled"
-    [ "$ENABLE_XKEYIM_BUNDLE" = true ] && echo "   ✅ XKeyIM bundled in XKey.app" || echo "   ⏭️  XKeyIM separate build"
+    [ "$ENABLE_LAVIEKEYIM_BUNDLE" = true ] && echo "   ✅ LaVieKeyIM bundled in LaVieKey.app" || echo "   ⏭️  LaVieKeyIM separate build"
     [ "$ENABLE_GITHUB_RELEASE" = true ] && echo "   ✅ GitHub Release (auto-create)" || echo "   ⏭️  Manual release"
 fi
 echo ""
@@ -75,7 +75,7 @@ mkdir -p Release
 
 # Provisioning profile resolution + signing-identity derivation helpers.
 PROFILE_DIR="$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
-DEVID_PROFILE_NAME="XKey Developer ID Distribution"
+DEVID_PROFILE_NAME="LaVieKey Developer ID Distribution"
 
 # Newest installed provisioning profile whose Name matches DEVID_PROFILE_NAME.
 # Xcode's "Download Manual Profiles" saves UUID-named files and an older pretty-named
@@ -127,8 +127,8 @@ if [ "$ENABLE_CODESIGN" = true ]; then
     #   1. CODESIGN_IDENTITY_SHA env override (manual escape hatch)
     #   2. cert derived from the embedded profile ∩ keychain identities (guarantees match)
     #   3. hardcoded fallback (last known-good cert, valid until Dec 2030)
-    XKEY_DEVID_PROFILE="$(resolve_devid_profile)"
-    DERIVED_SHA="$(signing_sha_from_profile "$XKEY_DEVID_PROFILE")"
+    LAVIEKEY_DEVID_PROFILE="$(resolve_devid_profile)"
+    DERIVED_SHA="$(signing_sha_from_profile "$LAVIEKEY_DEVID_PROFILE")"
     CODESIGN_IDENTITY_SHA=${CODESIGN_IDENTITY_SHA:-${DERIVED_SHA:-76E8032F7A72F9CD503461F7D395B829149742B5}}
     [ -n "$DERIVED_SHA" ] && echo "🔎 Signing cert derived from embedded profile" || echo "🔎 Using fallback/override signing cert (profile derivation unavailable)"
 
@@ -155,7 +155,7 @@ fi
 
 # Clean previous build
 echo "🧹 Cleaning previous build..."
-xcodebuild -project XKey.xcodeproj -scheme XKey -configuration Release -derivedDataPath ./build clean
+xcodebuild -project LaVieKey.xcodeproj -scheme LaVieKey -configuration Release -derivedDataPath ./build clean
 
 # Build with or without code signing
 echo "🔨 Building Universal Binary (Intel + Apple Silicon)..."
@@ -163,15 +163,15 @@ echo "🔨 Building Universal Binary (Intel + Apple Silicon)..."
 if [ "$ENABLE_CODESIGN" = true ]; then
     echo "🔐 Code signing enabled with: $DEVELOPER_ID"
     # Build with AD-HOC signing (no provisioning validation), then re-sign below with
-    # the Developer ID cert + embedded Developer ID profile (XKEY_DEVID_PROFILE).
-    # We CANNOT use automatic signing here: XKeyRelease.entitlements declares the
+    # the Developer ID cert + embedded Developer ID profile (LAVIEKEY_DEVID_PROFILE).
+    # We CANNOT use automatic signing here: LaVieKeyRelease.entitlements declares the
     # restricted iCloud KVS entitlement (com.apple.developer.ubiquity-kvstore-identifier),
     # and Xcode's auto-managed "Mac Team Provisioning Profile" is not authorized for it,
     # so the automatic-signing pre-check fails. Ad-hoc signing applies the entitlements
     # without any profile check; the real Developer ID signature + the authorized
     # Developer ID profile are applied in the re-sign step further below.
-    xcodebuild -project XKey.xcodeproj \
-      -scheme XKey \
+    xcodebuild -project LaVieKey.xcodeproj \
+      -scheme LaVieKey \
       -configuration Release \
       -derivedDataPath ./build \
       -arch x86_64 -arch arm64 \
@@ -186,8 +186,8 @@ if [ "$ENABLE_CODESIGN" = true ]; then
       build
 else
     echo "⚠️  Code signing disabled"
-    xcodebuild -project XKey.xcodeproj \
-      -scheme XKey \
+    xcodebuild -project LaVieKey.xcodeproj \
+      -scheme LaVieKey \
       -configuration Release \
       -derivedDataPath ./build \
       -arch x86_64 -arch arm64 \
@@ -201,34 +201,34 @@ else
 fi
 
 # Copy to Release directory
-echo "📦 Copying to ./Release/XKey.app..."
-rm -rf Release/XKey.app
-cp -R "./build/Build/Products/Release/XKey.app" Release/
+echo "📦 Copying to ./Release/LaVieKey.app..."
+rm -rf Release/LaVieKey.app
+cp -R "./build/Build/Products/Release/LaVieKey.app" Release/
 
 # Expand Xcode build variables in entitlements files for codesign re-sign steps.
 # codesign does NOT expand $(TeamIdentifierPrefix) or $(CFBundleIdentifier) —
 # passing raw .entitlements files with these placeholders produces a literal-string
 # entitlement that macOS validates and rejects (SIGKILL / Code Signature Invalid).
-XKEY_ENTITLEMENTS_EXPANDED="/tmp/xkey-release-expanded.entitlements"
-XKEYIM_ENTITLEMENTS_EXPANDED="/tmp/xkeyim-release-expanded.entitlements"
+LAVIEKEY_ENTITLEMENTS_EXPANDED="/tmp/laviekey-release-expanded.entitlements"
+LAVIEKEYIM_ENTITLEMENTS_EXPANDED="/tmp/laviekeyim-release-expanded.entitlements"
 sed "s/\$(TeamIdentifierPrefix)/${TEAM_ID}./g; s/\$(CFBundleIdentifier)/${BUNDLE_ID}/g" \
-    "XKey/XKeyRelease.entitlements" > "$XKEY_ENTITLEMENTS_EXPANDED"
-sed "s/\$(TeamIdentifierPrefix)/${TEAM_ID}./g; s/\$(CFBundleIdentifier)/com.codetay.inputmethod.XKey/g" \
-    "XKeyIM/XKeyIMRelease.entitlements" > "$XKEYIM_ENTITLEMENTS_EXPANDED" 2>/dev/null || \
-    cp "XKeyIM/XKeyIMRelease.entitlements" "$XKEYIM_ENTITLEMENTS_EXPANDED" 2>/dev/null || true
+    "LaVieKey/LaVieKeyRelease.entitlements" > "$LAVIEKEY_ENTITLEMENTS_EXPANDED"
+sed "s/\$(TeamIdentifierPrefix)/${TEAM_ID}./g; s/\$(CFBundleIdentifier)/lavie.nguyen.inputmethod.LaVieKey/g" \
+    "LaVieKeyIM/LaVieKeyIMRelease.entitlements" > "$LAVIEKEYIM_ENTITLEMENTS_EXPANDED" 2>/dev/null || \
+    cp "LaVieKeyIM/LaVieKeyIMRelease.entitlements" "$LAVIEKEYIM_ENTITLEMENTS_EXPANDED" 2>/dev/null || true
 
-# Optionally strip the iCloud KVS entitlement from XKey entitlements (sync-disabled control build)
+# Optionally strip the iCloud KVS entitlement from LaVieKey entitlements (sync-disabled control build)
 if [ "$ENABLE_ICLOUD_ENTITLEMENT" = false ]; then
     echo "⏭️  Stripping iCloud KVS entitlement from release entitlements (sync-disabled build)"
     # Primary key in use. The others are deleted defensively in case they were re-added.
-    /usr/libexec/PlistBuddy -c "Delete :com.apple.developer.ubiquity-kvstore-identifier" "$XKEY_ENTITLEMENTS_EXPANDED" 2>/dev/null || true
-    /usr/libexec/PlistBuddy -c "Delete :com.apple.developer.icloud-services" "$XKEY_ENTITLEMENTS_EXPANDED" 2>/dev/null || true
-    /usr/libexec/PlistBuddy -c "Delete :com.apple.developer.icloud-container-identifiers" "$XKEY_ENTITLEMENTS_EXPANDED" 2>/dev/null || true
-    /usr/libexec/PlistBuddy -c "Delete :com.apple.developer.ubiquity-container-identifiers" "$XKEY_ENTITLEMENTS_EXPANDED" 2>/dev/null || true
+    /usr/libexec/PlistBuddy -c "Delete :com.apple.developer.ubiquity-kvstore-identifier" "$LAVIEKEY_ENTITLEMENTS_EXPANDED" 2>/dev/null || true
+    /usr/libexec/PlistBuddy -c "Delete :com.apple.developer.icloud-services" "$LAVIEKEY_ENTITLEMENTS_EXPANDED" 2>/dev/null || true
+    /usr/libexec/PlistBuddy -c "Delete :com.apple.developer.icloud-container-identifiers" "$LAVIEKEY_ENTITLEMENTS_EXPANDED" 2>/dev/null || true
+    /usr/libexec/PlistBuddy -c "Delete :com.apple.developer.ubiquity-container-identifiers" "$LAVIEKEY_ENTITLEMENTS_EXPANDED" 2>/dev/null || true
 fi
 
 # Embed the Developer ID Distribution provisioning profile (REQUIRED for iCloud KVS).
-# XKeyRelease.entitlements declares the restricted entitlement
+# LaVieKeyRelease.entitlements declares the restricted entitlement
 # com.apple.developer.ubiquity-kvstore-identifier. amfid validates restricted
 # com.apple.developer.* entitlements at runtime against the embedded provisioning profile.
 # The profile must satisfy BOTH conditions or the app is SIGKILLed at launch
@@ -240,31 +240,31 @@ fi
 # That is why the signing identity is pinned by SHA-1 above to the cert this profile carries.
 # This is the supported path for iCloud sync OUTSIDE the Mac App Store — NOT the old
 # (disproven) "macOS 26 bans iCloud on Developer ID" theory.
-# (XKEY_DEVID_PROFILE was already resolved during cert detection above.)
+# (LAVIEKEY_DEVID_PROFILE was already resolved during cert detection above.)
 if [ "$ENABLE_CODESIGN" = true ] && [ "$ENABLE_PROFILE_EMBED" = true ]; then
-    if [ -n "$XKEY_DEVID_PROFILE" ] && [ -f "$XKEY_DEVID_PROFILE" ]; then
+    if [ -n "$LAVIEKEY_DEVID_PROFILE" ] && [ -f "$LAVIEKEY_DEVID_PROFILE" ]; then
         echo "🔐 Embedding Developer ID Distribution provisioning profile..."
-        cp "$XKEY_DEVID_PROFILE" "Release/XKey.app/Contents/embedded.provisionprofile"
+        cp "$LAVIEKEY_DEVID_PROFILE" "Release/LaVieKey.app/Contents/embedded.provisionprofile"
         echo "✅ Developer ID profile embedded"
     else
         echo "⚠️  WARNING: Developer ID Distribution profile not found!"
         echo "   Notarized builds without this profile will be rejected by amfid."
         echo "   Create it at: developer.apple.com/account/resources/profiles/add"
-        echo "   Name it 'XKey Developer ID Distribution' and install via Xcode."
+        echo "   Name it 'LaVieKey Developer ID Distribution' and install via Xcode."
         # Remove dev profile to avoid cert-type mismatch (dev profile + Dev ID cert)
-        rm -f "Release/XKey.app/Contents/embedded.provisionprofile"
+        rm -f "Release/LaVieKey.app/Contents/embedded.provisionprofile"
     fi
 elif [ "$ENABLE_CODESIGN" = true ]; then
     echo "⏭️  Skipping profile embedding (ENABLE_PROFILE_EMBED=false)"
     # Still strip any profile xcodebuild may have inserted to avoid cert-type mismatch
-    rm -f "Release/XKey.app/Contents/embedded.provisionprofile"
+    rm -f "Release/LaVieKey.app/Contents/embedded.provisionprofile"
 fi
 
 # Sign Sparkle framework's nested components (IMPORTANT: must be done before signing main app)
 if [ "$ENABLE_CODESIGN" = true ] && [ "$ENABLE_SPARKLE_SIGN" = true ]; then
     echo "🔐 Signing Sparkle framework components..."
 
-    SPARKLE_FW="Release/XKey.app/Contents/Frameworks/Sparkle.framework/Versions/B"
+    SPARKLE_FW="Release/LaVieKey.app/Contents/Frameworks/Sparkle.framework/Versions/B"
     
     # Sign XPC Services first (deepest level)
     if [ -d "$SPARKLE_FW/XPCServices/Installer.xpc" ]; then
@@ -306,64 +306,81 @@ if [ "$ENABLE_CODESIGN" = true ] && [ "$ENABLE_SPARKLE_SIGN" = true ]; then
     fi
     
     # Finally, sign the entire Sparkle.framework
-    if [ -d "Release/XKey.app/Contents/Frameworks/Sparkle.framework" ]; then
+    if [ -d "Release/LaVieKey.app/Contents/Frameworks/Sparkle.framework" ]; then
         echo "   Signing Sparkle.framework..."
         codesign --force --sign "$DEVELOPER_ID" \
             --timestamp \
             --options=runtime \
-            "Release/XKey.app/Contents/Frameworks/Sparkle.framework"
+            "Release/LaVieKey.app/Contents/Frameworks/Sparkle.framework"
         echo "   ✅ Sparkle.framework signed"
     fi
     
     echo "✅ Sparkle framework components signed"
 fi
 
-# Re-sign XKey.app after modifying nested frameworks
+# Re-sign LaVieKey.app after modifying nested frameworks
 if [ "$ENABLE_CODESIGN" = true ]; then
-    echo "🔐 Re-signing XKey.app after framework modifications..."
+    echo "🔐 Re-signing LaVieKey.app after framework modifications..."
     codesign --force --sign "$DEVELOPER_ID" \
         --timestamp \
         --options=runtime \
-        --entitlements "$XKEY_ENTITLEMENTS_EXPANDED" \
-        Release/XKey.app
-    echo "✅ XKey.app re-signed"
+        --entitlements "$LAVIEKEY_ENTITLEMENTS_EXPANDED" \
+        Release/LaVieKey.app
+    echo "✅ LaVieKey.app re-signed"
 else
-    # Ad-hoc sign with correct identifier (required for Accessibility permissions)
-    # IMPORTANT: Include entitlements to preserve App Group for data sharing
-    echo "🔐 Ad-hoc signing with correct bundle identifier..."
-    codesign --force --sign - --identifier "$BUNDLE_ID" --entitlements "$XKEY_ENTITLEMENTS_EXPANDED" Release/XKey.app
-    echo "✅ Ad-hoc signed with identifier: $BUNDLE_ID"
+    # Local signing (ENABLE_CODESIGN=false): prefer the Apple Development cert.
+    # Ad-hoc ("-") produces a DIFFERENT signature on every build, so macOS TCC
+    # silently drops the Accessibility grant after each rebuild (the event tap
+    # then fails and Telex stops working). An Apple Development identity is
+    # stable across rebuilds, so the permission sticks. Falls back to ad-hoc
+    # when no such cert exists in the keychain.
+    LOCAL_SIGN_ID=$(security find-identity -v -p codesigning | grep "Apple Development" | head -1 | awk '{print $2}')
+    LOCAL_SIGN_ID=${LOCAL_SIGN_ID:--}
+    if [ "$LOCAL_SIGN_ID" = "-" ]; then
+        echo "🔐 Ad-hoc signing (no Apple Development cert found — Accessibility must be re-granted after every build)..."
+    else
+        echo "🔐 Signing with Apple Development cert: $LOCAL_SIGN_ID"
+        # Nested Sparkle components must be signed before the outer app
+        SPARKLE_FW="Release/LaVieKey.app/Contents/Frameworks/Sparkle.framework/Versions/B"
+        for NESTED in "$SPARKLE_FW/XPCServices/Installer.xpc" "$SPARKLE_FW/XPCServices/Downloader.xpc" "$SPARKLE_FW/Updater.app" "$SPARKLE_FW/Autoupdate"; do
+            [ -e "$NESTED" ] && codesign --force --sign "$LOCAL_SIGN_ID" "$NESTED"
+        done
+        [ -d "Release/LaVieKey.app/Contents/Frameworks/Sparkle.framework" ] && \
+            codesign --force --sign "$LOCAL_SIGN_ID" "Release/LaVieKey.app/Contents/Frameworks/Sparkle.framework"
+    fi
+    codesign --force --sign "$LOCAL_SIGN_ID" --identifier "$BUNDLE_ID" --entitlements "$LAVIEKEY_ENTITLEMENTS_EXPANDED" Release/LaVieKey.app
+    echo "✅ Signed with identifier: $BUNDLE_ID"
 fi
 
 # Verify code signature
 echo "🔍 Verifying code signature..."
-codesign -vvv --strict Release/XKey.app
+codesign -vvv --strict Release/LaVieKey.app
 echo "✅ Code signature verified"
 
 # Display signature info
 echo ""
 echo "📝 Signature details:"
-codesign -dvvv Release/XKey.app 2>&1 | grep -E "(Authority|Identifier|TeamIdentifier|Timestamp)"
+codesign -dvvv Release/LaVieKey.app 2>&1 | grep -E "(Authority|Identifier|TeamIdentifier|Timestamp)"
 
 
 # ============================================
-# Build XKeyIM (Input Method Kit)
+# Build LaVieKeyIM (Input Method Kit)
 # ============================================
-if [ "$ENABLE_XKEYIM" = true ]; then
+if [ "$ENABLE_LAVIEKEYIM" = true ]; then
     echo ""
-    echo "🔨 Building XKeyIM (Input Method)..."
+    echo "🔨 Building LaVieKeyIM (Input Method)..."
     
-    # Check if XKeyIM scheme exists
-    if xcodebuild -project XKey.xcodeproj -list 2>/dev/null | grep -q "XKeyIM"; then
+    # Check if LaVieKeyIM scheme exists
+    if xcodebuild -project LaVieKey.xcodeproj -list 2>/dev/null | grep -q "LaVieKeyIM"; then
         
         if [ "$ENABLE_CODESIGN" = true ]; then
-            xcodebuild -project XKey.xcodeproj \
-              -scheme XKeyIM \
+            xcodebuild -project LaVieKey.xcodeproj \
+              -scheme LaVieKeyIM \
               -configuration Release \
               -derivedDataPath ./build \
               -arch x86_64 -arch arm64 \
               ONLY_ACTIVE_ARCH=NO \
-              PRODUCT_BUNDLE_IDENTIFIER="$XKEYIM_BUNDLE_ID" \
+              PRODUCT_BUNDLE_IDENTIFIER="$LAVIEKEYIM_BUNDLE_ID" \
               CODE_SIGN_STYLE=Automatic \
               DEVELOPMENT_TEAM="$TEAM_ID" \
               CODE_SIGNING_REQUIRED=YES \
@@ -371,109 +388,109 @@ if [ "$ENABLE_XKEYIM" = true ]; then
               OTHER_CODE_SIGN_FLAGS="--timestamp --options=runtime" \
               build
         else
-            xcodebuild -project XKey.xcodeproj \
-              -scheme XKeyIM \
+            xcodebuild -project LaVieKey.xcodeproj \
+              -scheme LaVieKeyIM \
               -configuration Release \
               -derivedDataPath ./build \
               -arch x86_64 -arch arm64 \
               ONLY_ACTIVE_ARCH=NO \
-              PRODUCT_BUNDLE_IDENTIFIER="$XKEYIM_BUNDLE_ID" \
+              PRODUCT_BUNDLE_IDENTIFIER="$LAVIEKEYIM_BUNDLE_ID" \
               CODE_SIGN_STYLE=Manual \
               CODE_SIGN_IDENTITY="-" \
               CODE_SIGNING_REQUIRED=NO \
               CODE_SIGNING_ALLOWED=NO \
-              CODE_SIGN_ENTITLEMENTS="XKeyIM/XKeyIMRelease.entitlements" \
+              CODE_SIGN_ENTITLEMENTS="LaVieKeyIM/LaVieKeyIMRelease.entitlements" \
               PROVISIONING_PROFILE_SPECIFIER="" \
               build
         fi
         
-        # Kill running XKeyIM process if it exists
-        echo "🔍 Checking for running XKeyIM process..."
-        if pgrep -x "XKeyIM" > /dev/null; then
-            echo "⚠️  XKeyIM is currently running, killing process..."
-            killall XKeyIM 2>/dev/null || true
-            echo "✅ XKeyIM process killed"
+        # Kill running LaVieKeyIM process if it exists
+        echo "🔍 Checking for running LaVieKeyIM process..."
+        if pgrep -x "LaVieKeyIM" > /dev/null; then
+            echo "⚠️  LaVieKeyIM is currently running, killing process..."
+            killall LaVieKeyIM 2>/dev/null || true
+            echo "✅ LaVieKeyIM process killed"
             # Wait a bit to ensure process is fully terminated
             sleep 1
         else
-            echo "✅ No running XKeyIM process found"
+            echo "✅ No running LaVieKeyIM process found"
         fi
         
-        # Copy XKeyIM to Release directory
-        echo "📦 Copying XKeyIM.app to Release..."
-        rm -rf Release/XKeyIM.app
-        cp -R "./build/Build/Products/Release/XKeyIM.app" Release/
+        # Copy LaVieKeyIM to Release directory
+        echo "📦 Copying LaVieKeyIM.app to Release..."
+        rm -rf Release/LaVieKeyIM.app
+        cp -R "./build/Build/Products/Release/LaVieKeyIM.app" Release/
 
         # Ensure menu icon is present
-        if [ -f "XKeyIM/MenuIcon.pdf" ]; then
-            echo "📎 Adding MenuIcon.pdf to XKeyIM..."
-            cp "XKeyIM/MenuIcon.pdf" "Release/XKeyIM.app/Contents/Resources/"
+        if [ -f "LaVieKeyIM/MenuIcon.pdf" ]; then
+            echo "📎 Adding MenuIcon.pdf to LaVieKeyIM..."
+            cp "LaVieKeyIM/MenuIcon.pdf" "Release/LaVieKeyIM.app/Contents/Resources/"
         fi
 
-        # Update display name to "XKey"
-        echo "📝 Updating XKeyIM display name..."
-        /usr/libexec/PlistBuddy -c "Set :CFBundleName XKey" "Release/XKeyIM.app/Contents/Info.plist" 2>/dev/null || true
-        /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName XKey" "Release/XKeyIM.app/Contents/Info.plist" 2>/dev/null || true
+        # Update display name to "LaVieKey"
+        echo "📝 Updating LaVieKeyIM display name..."
+        /usr/libexec/PlistBuddy -c "Set :CFBundleName LaVieKey" "Release/LaVieKeyIM.app/Contents/Info.plist" 2>/dev/null || true
+        /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName LaVieKey" "Release/LaVieKeyIM.app/Contents/Info.plist" 2>/dev/null || true
         
         # Re-sign after modifying Info.plist
         if [ "$ENABLE_CODESIGN" = true ]; then
-            echo "🔐 Re-signing XKeyIM after Info.plist update..."
-            codesign --force --sign "$DEVELOPER_ID" --timestamp --options=runtime --entitlements "$XKEYIM_ENTITLEMENTS_EXPANDED" "Release/XKeyIM.app"
+            echo "🔐 Re-signing LaVieKeyIM after Info.plist update..."
+            codesign --force --sign "$DEVELOPER_ID" --timestamp --options=runtime --entitlements "$LAVIEKEYIM_ENTITLEMENTS_EXPANDED" "Release/LaVieKeyIM.app"
         else
-            echo "🔐 Ad-hoc signing XKeyIM with entitlements..."
-            codesign --force --sign - --identifier "$XKEYIM_BUNDLE_ID" --entitlements "$XKEYIM_ENTITLEMENTS_EXPANDED" Release/XKeyIM.app
+            echo "🔐 Signing LaVieKeyIM with entitlements (local cert or ad-hoc)..."
+            codesign --force --sign "${LOCAL_SIGN_ID:--}" --identifier "$LAVIEKEYIM_BUNDLE_ID" --entitlements "$LAVIEKEYIM_ENTITLEMENTS_EXPANDED" Release/LaVieKeyIM.app
         fi
         
         # Verify signature
-        codesign -vvv --strict Release/XKeyIM.app
-        echo "✅ XKeyIM built successfully"
+        codesign -vvv --strict Release/LaVieKeyIM.app
+        echo "✅ LaVieKeyIM built successfully"
         
-        # Embed XKeyIM inside XKey.app for easy installation (optional)
-        if [ "$ENABLE_XKEYIM_BUNDLE" = true ]; then
-            echo "📦 Embedding XKeyIM.app inside XKey.app/Contents/Resources..."
-            mkdir -p "Release/XKey.app/Contents/Resources"
-            rm -rf "Release/XKey.app/Contents/Resources/XKeyIM.app"
-            cp -R "Release/XKeyIM.app" "Release/XKey.app/Contents/Resources/"
-            echo "✅ XKeyIM embedded in XKey.app"
+        # Embed LaVieKeyIM inside LaVieKey.app for easy installation (optional)
+        if [ "$ENABLE_LAVIEKEYIM_BUNDLE" = true ]; then
+            echo "📦 Embedding LaVieKeyIM.app inside LaVieKey.app/Contents/Resources..."
+            mkdir -p "Release/LaVieKey.app/Contents/Resources"
+            rm -rf "Release/LaVieKey.app/Contents/Resources/LaVieKeyIM.app"
+            cp -R "Release/LaVieKeyIM.app" "Release/LaVieKey.app/Contents/Resources/"
+            echo "✅ LaVieKeyIM embedded in LaVieKey.app"
 
-            # Re-sign XKey.app after embedding XKeyIM (IMPORTANT: embedding modifies sealed resources)
+            # Re-sign LaVieKey.app after embedding LaVieKeyIM (IMPORTANT: embedding modifies sealed resources)
             # IMPORTANT: Must include --entitlements to preserve App Group for data sharing
-            echo "🔐 Re-signing XKey.app after embedding XKeyIM..."
+            echo "🔐 Re-signing LaVieKey.app after embedding LaVieKeyIM..."
             if [ "$ENABLE_CODESIGN" = true ]; then
-                codesign --force --sign "$DEVELOPER_ID" --timestamp --options=runtime --entitlements "$XKEY_ENTITLEMENTS_EXPANDED" "Release/XKey.app"
+                codesign --force --sign "$DEVELOPER_ID" --timestamp --options=runtime --entitlements "$LAVIEKEY_ENTITLEMENTS_EXPANDED" "Release/LaVieKey.app"
             else
-                codesign --force --sign - --identifier "$BUNDLE_ID" --entitlements "$XKEY_ENTITLEMENTS_EXPANDED" "Release/XKey.app"
+                codesign --force --sign "${LOCAL_SIGN_ID:--}" --identifier "$BUNDLE_ID" --entitlements "$LAVIEKEY_ENTITLEMENTS_EXPANDED" "Release/LaVieKey.app"
             fi
 
-            # Verify XKey.app signature after re-signing
-            echo "🔍 Verifying XKey.app signature after embedding..."
-            codesign -vvv --strict Release/XKey.app
-            echo "✅ XKey.app signature verified"
+            # Verify LaVieKey.app signature after re-signing
+            echo "🔍 Verifying LaVieKey.app signature after embedding..."
+            codesign -vvv --strict Release/LaVieKey.app
+            echo "✅ LaVieKey.app signature verified"
         else
-            echo "⏭️  Skipping XKeyIM embedding (ENABLE_XKEYIM_BUNDLE=false)"
+            echo "⏭️  Skipping LaVieKeyIM embedding (ENABLE_LAVIEKEYIM_BUNDLE=false)"
         fi
 
         
-        # Auto-install XKeyIM to user's Input Methods
+        # Auto-install LaVieKeyIM to user's Input Methods
         echo ""
-        echo "📲 Installing XKeyIM to ~/Library/Input Methods/..."
+        echo "📲 Installing LaVieKeyIM to ~/Library/Input Methods/..."
         mkdir -p ~/Library/Input\ Methods/
         
-        # Kill XKeyIM process again before installing (in case it was restarted)
-        if pgrep -x "XKeyIM" > /dev/null; then
-            echo "🔄 Killing XKeyIM process before installation..."
-            killall XKeyIM 2>/dev/null || true
+        # Kill LaVieKeyIM process again before installing (in case it was restarted)
+        if pgrep -x "LaVieKeyIM" > /dev/null; then
+            echo "🔄 Killing LaVieKeyIM process before installation..."
+            killall LaVieKeyIM 2>/dev/null || true
             sleep 1
         fi
         
         # Copy to Input Methods
-        rm -rf ~/Library/Input\ Methods/XKeyIM.app
-        cp -R "Release/XKeyIM.app" ~/Library/Input\ Methods/
-        echo "✅ XKeyIM installed to ~/Library/Input Methods/"
+        rm -rf ~/Library/Input\ Methods/LaVieKeyIM.app
+        cp -R "Release/LaVieKeyIM.app" ~/Library/Input\ Methods/
+        echo "✅ LaVieKeyIM installed to ~/Library/Input Methods/"
         echo "   New version will load automatically on next use"
 
     else
-        echo "⚠️  XKeyIM target not found in Xcode project, skipping..."
+        echo "⚠️  LaVieKeyIM target not found in Xcode project, skipping..."
     fi
 fi
 
@@ -481,11 +498,11 @@ fi
 # Cleanup build folder
 # ============================================
 # IMPORTANT: Remove built apps from build folder to prevent LaunchServices
-# from finding duplicate versions when opening XKey from XKeyIM menu
+# from finding duplicate versions when opening LaVieKey from LaVieKeyIM menu
 echo ""
 echo "🧹 Cleaning up build folder..."
-rm -rf "./build/Build/Products/Release/XKey.app"
-rm -rf "./build/Build/Products/Release/XKeyIM.app"
+rm -rf "./build/Build/Products/Release/LaVieKey.app"
+rm -rf "./build/Build/Products/Release/LaVieKeyIM.app"
 echo "✅ Build folder cleaned (prevents duplicate app versions)"
 
 
@@ -502,7 +519,7 @@ if [ "$ENABLE_DMG" = true ]; then
     mkdir -p "$DMG_SOURCE_DIR"
     
     # Copy app to temp directory
-    cp -R "Release/XKey.app" "$DMG_SOURCE_DIR/"
+    cp -R "Release/LaVieKey.app" "$DMG_SOURCE_DIR/"
     
     # Create symbolic link to Applications folder
     ln -s /Applications "$DMG_SOURCE_DIR/Applications"
@@ -533,13 +550,13 @@ if [ "$ENABLE_DMG" = true ]; then
 fi
 
 # ============================================
-# Cleanup XKeyIM.app after bundling
+# Cleanup LaVieKeyIM.app after bundling
 # ============================================
-if [ "$ENABLE_XKEYIM" = true ] && [ "$ENABLE_XKEYIM_BUNDLE" = true ] && [ -d "Release/XKeyIM.app" ]; then
+if [ "$ENABLE_LAVIEKEYIM" = true ] && [ "$ENABLE_LAVIEKEYIM_BUNDLE" = true ] && [ -d "Release/LaVieKeyIM.app" ]; then
     echo ""
-    echo "🧹 Cleaning up XKeyIM.app (already bundled in XKey.app)..."
-    rm -rf "Release/XKeyIM.app"
-    echo "✅ XKeyIM.app removed"
+    echo "🧹 Cleaning up LaVieKeyIM.app (already bundled in LaVieKey.app)..."
+    rm -rf "Release/LaVieKeyIM.app"
+    echo "✅ LaVieKeyIM.app removed"
 fi
 
 # ============================================
@@ -568,8 +585,8 @@ if [ "$ENABLE_NOTARIZE" = true ] && [ "$ENABLE_CODESIGN" = true ]; then
     else
         # Create a zip for notarization if DMG is not available
         echo "📦 Creating zip for notarization..."
-        NOTARIZE_TARGET="Release/XKey.zip"
-        ditto -c -k --keepParent "Release/XKey.app" "$NOTARIZE_TARGET"
+        NOTARIZE_TARGET="Release/LaVieKey.zip"
+        ditto -c -k --keepParent "Release/LaVieKey.app" "$NOTARIZE_TARGET"
     fi
     
     # Submit for notarization and capture output
@@ -617,18 +634,18 @@ if [ "$ENABLE_NOTARIZE" = true ] && [ "$ENABLE_CODESIGN" = true ]; then
         fi
         
         # Also staple the app
-        xcrun stapler staple "Release/XKey.app"
+        xcrun stapler staple "Release/LaVieKey.app"
         echo "✅ App notarized and stapled"
         
         # Clean up zip if we created one
-        if [ -f "Release/XKey.zip" ]; then
-            rm -f "Release/XKey.zip"
+        if [ -f "Release/LaVieKey.zip" ]; then
+            rm -f "Release/LaVieKey.zip"
         fi
         
         # Verify notarization
         echo ""
         echo "🔍 Verifying notarization..."
-        spctl -a -vvv -t install "Release/XKey.app"
+        spctl -a -vvv -t install "Release/LaVieKey.app"
         if [ "$ENABLE_DMG" = true ] && [ -f "Release/$DMG_NAME" ]; then
             spctl -a -vvv -t install "Release/$DMG_NAME"
         fi
@@ -762,7 +779,7 @@ if [ "$ENABLE_SPARKLE_SIGN" = true ] && [ "$ENABLE_DMG" = true ] && [ -f "Releas
     # Save signature to file for GitHub release upload
     echo "$SPARKLE_SIGNATURE" > "Release/signature.txt"
     echo "✅ Signature saved to: Release/signature.txt"
-    echo "   ⚠️  IMPORTANT: Upload this file to GitHub Release along with XKey.dmg"
+    echo "   ⚠️  IMPORTANT: Upload this file to GitHub Release along with LaVieKey.dmg"
     
     # Export signature for reference
     export SPARKLE_SIGNATURE
@@ -878,7 +895,7 @@ EOF
 
     # Create release
     gh release create "$RELEASE_TAG" $UPLOAD_FILES \
-        --title "XKey v$CURRENT_VERSION (Build $BUILD_NUMBER)" \
+        --title "LaVieKey v$CURRENT_VERSION (Build $BUILD_NUMBER)" \
         --notes-file "$RELEASE_NOTES_FILE" \
         --repo "$REPO_URL"
 
@@ -913,12 +930,12 @@ echo "✅ Build successful!"
 
 echo ""
 echo "✅ Done! Release build is ready at:"
-echo "   $(pwd)/Release/XKey.app"
-if [ "$ENABLE_XKEYIM" = true ]; then
-    if [ "$ENABLE_XKEYIM_BUNDLE" = true ]; then
-        echo "   └── XKeyIM.app embedded in XKey.app/Contents/Resources/"
-    elif [ -f "Release/XKeyIM.app" ]; then
-        echo "   $(pwd)/Release/XKeyIM.app"
+echo "   $(pwd)/Release/LaVieKey.app"
+if [ "$ENABLE_LAVIEKEYIM" = true ]; then
+    if [ "$ENABLE_LAVIEKEYIM_BUNDLE" = true ]; then
+        echo "   └── LaVieKeyIM.app embedded in LaVieKey.app/Contents/Resources/"
+    elif [ -f "Release/LaVieKeyIM.app" ]; then
+        echo "   $(pwd)/Release/LaVieKeyIM.app"
     fi
 fi
 if [ "$ENABLE_DMG" = true ]; then
@@ -927,9 +944,9 @@ fi
 
 echo ""
 echo "📊 App size:"
-du -sh Release/XKey.app
-if [ "$ENABLE_XKEYIM" = true ] && [ "$ENABLE_XKEYIM_BUNDLE" = false ] && [ -f "Release/XKeyIM.app" ]; then
-    du -sh Release/XKeyIM.app
+du -sh Release/LaVieKey.app
+if [ "$ENABLE_LAVIEKEYIM" = true ] && [ "$ENABLE_LAVIEKEYIM_BUNDLE" = false ] && [ -f "Release/LaVieKeyIM.app" ]; then
+    du -sh Release/LaVieKeyIM.app
 fi
 if [ "$ENABLE_DMG" = true ] && [ -f "Release/$DMG_NAME" ]; then
     echo ""
@@ -939,7 +956,7 @@ fi
 
 echo ""
 echo "🏗️  Architecture:"
-lipo -info Release/XKey.app/Contents/MacOS/XKey
+lipo -info Release/LaVieKey.app/Contents/MacOS/LaVieKey
 echo ""
 
 if [ "$ENABLE_CODESIGN" = true ]; then
@@ -971,8 +988,8 @@ echo "💡 Usage:"
 echo "   Default (with code signing + DMG):    ./build_release.sh"
 echo "   Without code signing:                 ENABLE_CODESIGN=false ./build_release.sh"
 echo "   Without DMG:                          ENABLE_DMG=false ./build_release.sh"
-echo "   Without XKeyIM:                       ENABLE_XKEYIM=false ./build_release.sh"
-echo "   Separate XKeyIM build:                ENABLE_XKEYIM_BUNDLE=false ./build_release.sh"
+echo "   Without LaVieKeyIM:                       ENABLE_LAVIEKEYIM=false ./build_release.sh"
+echo "   Separate LaVieKeyIM build:                ENABLE_LAVIEKEYIM_BUNDLE=false ./build_release.sh"
 echo "   With notarization (full release):     ENABLE_NOTARIZE=true ./build_release.sh"
 echo "   Without Sparkle signing:              ENABLE_SPARKLE_SIGN=false ./build_release.sh"
 echo "   With GitHub release:                  ENABLE_GITHUB_RELEASE=true ./build_release.sh"
@@ -992,8 +1009,8 @@ if [ "$ENABLE_GITHUB_RELEASE" != true ]; then
     echo "      # Create version.json first:"
     echo "      echo '{\"version\": \"$CURRENT_VERSION\", \"build\": \"$BUILD_NUMBER\"}' > Release/version.json"
     echo ""
-    echo "      gh release create v$CURRENT_VERSION-$BUILD_NUMBER Release/XKey.dmg Release/version.json Release/signature.txt \\"
-    echo "         --title \"XKey v$CURRENT_VERSION (Build $BUILD_NUMBER)\" \\"
+    echo "      gh release create v$CURRENT_VERSION-$BUILD_NUMBER Release/LaVieKey.dmg Release/version.json Release/signature.txt \\"
+    echo "         --title \"LaVieKey v$CURRENT_VERSION (Build $BUILD_NUMBER)\" \\"
     echo "         --notes \"Your release notes here\""
     echo ""
     echo "   2. Or enable automatic release:"

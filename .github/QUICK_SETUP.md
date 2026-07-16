@@ -66,7 +66,7 @@ Kiểm tra:
 
 Script giữ nguyên signature từ file cũ. Để thêm signature cho release mới:
 
-1. Sign DMG: `./sparkle_tools.sh sign Release/XKey.dmg`
+1. Sign DMG: `./sparkle_tools.sh sign Release/LaVieKey.dmg`
 2. Copy signature
 3. Sau khi workflow chạy, update `appcast.json` trên `gh-pages` branch thủ công (hoặc tích hợp vào build script)
 

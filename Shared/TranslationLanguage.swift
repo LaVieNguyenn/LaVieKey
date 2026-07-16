@@ -1,6 +1,6 @@
 //
 //  TranslationLanguage.swift
-//  XKey
+//  LaVieKey
 //
 //  Flexible Translation Language Model
 //  Supports unlimited languages via ISO 639-1 codes

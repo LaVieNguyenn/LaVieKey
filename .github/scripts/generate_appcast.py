@@ -20,7 +20,7 @@ def fetch_github_releases(repo: str, token: Optional[str] = None) -> List[Dict]:
     url = f"https://api.github.com/repos/{repo}/releases"
     headers = {
         'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'XKey-Appcast-Generator'
+        'User-Agent': 'LaVieKey-Appcast-Generator'
     }
     
     if token:
@@ -97,9 +97,9 @@ def markdown_to_html(markdown: str) -> str:
 
 def find_dmg_asset(assets: List[Dict]) -> Optional[Dict]:
     """Find the main DMG file in release assets"""
-    # Look for XKey.dmg first
+    # Look for LaVieKey.dmg first
     for asset in assets:
-        if asset['name'] == 'XKey.dmg':
+        if asset['name'] == 'LaVieKey.dmg':
             return asset
     
     # Fallback to any .dmg file
@@ -123,7 +123,7 @@ def fetch_signature(signature_asset: Dict, token: Optional[str] = None) -> Optio
     
     url = signature_asset['browser_download_url']
     headers = {
-        'User-Agent': 'XKey-Appcast-Generator'
+        'User-Agent': 'LaVieKey-Appcast-Generator'
     }
     
     if token:
@@ -161,7 +161,7 @@ def fetch_version_info(version_asset: Dict, token: Optional[str] = None) -> Opti
     
     url = version_asset['browser_download_url']
     headers = {
-        'User-Agent': 'XKey-Appcast-Generator'
+        'User-Agent': 'LaVieKey-Appcast-Generator'
     }
     
     if token:
@@ -194,9 +194,9 @@ def generate_appcast_xml(repo: str, token: Optional[str] = None) -> str:
         '<?xml version="1.0" encoding="utf-8"?>',
         '<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">',
         '  <channel>',
-        '    <title>XKey Updates</title>',
+        '    <title>LaVieKey Updates</title>',
         f'    <link>https://{repo_owner}.github.io/{repo_name}/appcast.xml</link>',
-        '    <description>XKey - Vietnamese Input Method for macOS</description>',
+        '    <description>LaVieKey - Vietnamese Input Method for macOS</description>',
         '    <language>vi</language>',
     ]
     

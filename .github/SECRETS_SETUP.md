@@ -1,4 +1,4 @@
-# 🔐 GitHub Secrets Setup for XKey Build & Release
+# 🔐 GitHub Secrets Setup for LaVieKey Build & Release
 
 Để sử dụng GitHub Actions workflow `build-release.yml`, bạn cần thiết lập các secrets sau trong repository settings.
 
@@ -35,7 +35,7 @@ App-specific password.
 1. Đăng nhập https://appleid.apple.com/
 2. Vào **Sign-In and Security** → **App-Specific Passwords**
 3. Click **Generate an app-specific password**
-4. Đặt tên: `GitHub Actions` hoặc `XKey CI`
+4. Đặt tên: `GitHub Actions` hoặc `LaVieKey CI`
 5. Copy password (format: `xxxx-xxxx-xxxx-xxxx`)
 
 #### `APPLE_TEAM_ID`
@@ -88,7 +88,7 @@ security find-generic-password -s "https://sparkle-project.org" -a "ed25519" -w
 Sau khi thiết lập secrets, bạn có thể chạy workflow:
 
 1. Vào **Actions** tab
-2. Chọn workflow **Build and Release XKey**
+2. Chọn workflow **Build and Release LaVieKey**
 3. Click **Run workflow**
 4. Chọn các options:
    - **Enable Apple Notarization**: `true` để notarize (khuyến nghị cho release)

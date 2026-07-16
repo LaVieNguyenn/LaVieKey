@@ -1,6 +1,6 @@
 //
 //  AXHelper.swift
-//  XKey
+//  LaVieKey
 //
 //  Centralized helper for safe Accessibility API queries.
 //  Wraps raw AXUIElementCopyAttributeValue calls with:
@@ -170,7 +170,7 @@ enum AXHelper {
     /// specific element (AXUIElementSetMessagingTimeout on that element)
     /// still overrides it for that element.
     ///
-    /// XKey issues AX queries on the event-tap thread on every keystroke; the
+    /// LaVieKey issues AX queries on the event-tap thread on every keystroke; the
     /// system default (~6s) is long enough for a hung focused app to get the
     /// event tap disabled by kCGEventTapDisabledByTimeout. All AX call sites
     /// already degrade gracefully on nil/failure, so a short global cap is

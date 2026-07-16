@@ -1,7 +1,7 @@
 # Báo cáo: Hỗ trợ QWERTZ / AZERTY Keyboard Layout
 
 **Ngày:** 18/12/2025
-**Vấn đề:** XKey không hoạt động với layout bàn phím Đức/Thụy sỹ (QWERTZ)
+**Vấn đề:** LaVieKey không hoạt động với layout bàn phím Đức/Thụy sỹ (QWERTZ)
 
 ## 🔍 Phân tích Log
 
@@ -19,7 +19,7 @@ KEY: 's' code=1   → PASS THROUGH
 - Nhưng trên QWERTZ, phím này hiển thị 'y'
 
 ### Vấn đề cốt lõi:
-XKey sử dụng `event.charactersIgnoringModifiers` để lấy ký tự, nhưng giá trị này **ĐÃ ÁP DỤNG LAYOUT HIỆN TẠI**:
+LaVieKey sử dụng `event.charactersIgnoringModifiers` để lấy ký tự, nhưng giá trị này **ĐÃ ÁP DỤNG LAYOUT HIỆN TẠI**:
 - QWERTY: keyCode 6 → 'z'
 - QWERTZ: keyCode 6 → 'y'  ❌
 
@@ -28,7 +28,7 @@ XKey sử dụng `event.charactersIgnoringModifiers` để lấy ký tự, nhưn
 ## ✅ Giải pháp
 
 ### 1. Tạo KeyCodeToCharacter.swift
-File mới: `/XKey/EventHandling/KeyCodeToCharacter.swift`
+File mới: `/LaVieKey/EventHandling/KeyCodeToCharacter.swift`
 
 Map vị trí phím vật lý (keyCode) → ký tự QWERTY chuẩn, bất kể layout hiện tại:
 
@@ -69,7 +69,7 @@ Người dùng có thể gõ "lý" bằng cách nhấn: **l-y-s** (đúng vị t
 
 ## 🎯 Layout được hỗ trợ
 
-Giờ XKey hoạt động với TẤT CẢ các layout keyboard:
+Giờ LaVieKey hoạt động với TẤT CẢ các layout keyboard:
 - ✅ QWERTY (US/UK/International)
 - ✅ QWERTZ (Đức, Thụy Sỹ, Áo)
 - ✅ AZERTY (Pháp, Bỉ)
@@ -77,15 +77,15 @@ Giờ XKey hoạt động với TẤT CẢ các layout keyboard:
 
 ## 📝 Lưu ý cho người dùng
 
-Khi sử dụng XKey với layout QWERTZ/AZERTY:
+Khi sử dụng LaVieKey với layout QWERTZ/AZERTY:
 1. **Vị trí phím** quan trọng hơn ký tự hiển thị
 2. Gõ theo **vị trí QWERTY**, không theo ký tự trên keycap
 3. Ví dụ: Để gõ 'y', nhấn phím ở **vị trí Y trên QWERTY** (kể cả nếu keycap hiển thị ký tự khác)
 
 ## 🔧 Build & Test
 ```bash
-cd /Volumes/SSD1TB/PROJECTS/OpenKey/XKey
-xcodebuild -project XKey.xcodeproj -scheme XKey -configuration Debug
+cd /Volumes/SSD1TB/PROJECTS/OpenKey/LaVieKey
+xcodebuild -project LaVieKey.xcodeproj -scheme LaVieKey -configuration Debug
 # ✅ BUILD SUCCEEDED
 ```
 
@@ -110,8 +110,8 @@ Trên QWERTY: keyCode 10 là 'Y', keyCode 06 là 'Z'
 
 ## ✨ Kết luận
 
-XKey giờ đã **hoàn toàn hỗ trợ QWERTZ & AZERTY** keyboard layouts bằng cách chuyển đổi từ physical keyCode sang QWERTY character trước khi xử lý Vietnamese.
+LaVieKey giờ đã **hoàn toàn hỗ trợ QWERTZ & AZERTY** keyboard layouts bằng cách chuyển đổi từ physical keyCode sang QWERTY character trước khi xử lý Vietnamese.
 
 ---
 **Updated:** 18/12/2025  
-**Version:** XKey 1.0+ (with QWERTZ/AZERTY support)
+**Version:** LaVieKey 1.0+ (with QWERTZ/AZERTY support)
