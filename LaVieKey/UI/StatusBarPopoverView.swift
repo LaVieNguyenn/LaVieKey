@@ -3,6 +3,7 @@ import SwiftUI
 // MARK: - Glass Design Menu Bar Popover (macOS 12+)
 
 struct StatusBarPopoverView: View {
+    @ObservedObject private var theme = ThemeManager.shared
     @ObservedObject var viewModel: StatusBarViewModel
     var onCheckForUpdates: (() -> Void)?
     var onDismiss: (() -> Void)?
@@ -19,6 +20,9 @@ struct StatusBarPopoverView: View {
         VStack(spacing: 4) {
             // MARK: - Toggle Vietnamese
             toggleSection
+
+            // MARK: - Typing language (VN / EN / JA)
+            languageSection
 
             // MARK: - Remote Desktop Target (shown only when remote desktop app is running)
             if viewModel.isRemoteDesktopRunning {
@@ -45,6 +49,7 @@ struct StatusBarPopoverView: View {
         }
         .padding(.vertical, 6)
         .frame(width: 300)
+        .tint(theme.accent)
     }
 
     // MARK: - Toggle Section
@@ -64,6 +69,33 @@ struct StatusBarPopoverView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 4)
         .menuCardStyle()
+    }
+
+    // MARK: - Language Section (VN / EN / JA)
+    private var languageSection: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text("Ngôn ngữ gõ")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.secondary)
+                    .textCase(.uppercase)
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 4)
+
+            VStack(spacing: 1) {
+                ForEach(TypingLanguage.allCases, id: \.self) { language in
+                    MenuRow(
+                        title: LocalizedStringKey(language.displayName),
+                        isSelected: language == viewModel.typingLanguage
+                    ) {
+                        viewModel.selectTypingLanguage(language)
+                    }
+                }
+            }
+            .menuCardStyle()
+        }
     }
 
     // MARK: - Remote Desktop Target Section
@@ -267,7 +299,7 @@ private struct MenuRow: View {
             HStack(spacing: 8) {
                 Image(systemName: isSelected ? "checkmark" : "")
                     .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(.accentColor)
+                    .foregroundColor(.appAccent)
                     .frame(width: 16)
                 Text(title)
                     .font(.system(size: 13, weight: .medium))
@@ -278,7 +310,7 @@ private struct MenuRow: View {
             .padding(.vertical, 6)
             .background(
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(isHovered ? Color.accentColor.opacity(0.12) : Color.clear)
+                    .fill(isHovered ? Color.appAccent.opacity(0.12) : Color.clear)
             )
             .contentShape(Rectangle())
         }
@@ -321,7 +353,7 @@ private struct ActionRow: View {
             .padding(.vertical, 6)
             .background(
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(isHovered ? Color.accentColor : Color.clear)
+                    .fill(isHovered ? Color.appAccent : Color.clear)
             )
             .contentShape(Rectangle())
         }

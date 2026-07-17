@@ -607,22 +607,6 @@
         }
       }
     },
-    "Buy me a coffee": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Buy me a coffee"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "请我喝杯咖啡"
-          }
-        }
-      }
-    },
     "Báo lỗi": {
       "localizations": {
         "en": {
@@ -3693,22 +3677,6 @@
         }
       }
     },
-    "Kiểm tra phiên bản mới": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check for new version"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "检查新版本"
-          }
-        }
-      }
-    },
     "Kiểu gõ": {
       "localizations": {
         "en": {
@@ -4077,22 +4045,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "宏\"%@\"已存在"
-          }
-        }
-      }
-    },
-    "Made with ❤️ & ☕": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Made with ❤️ & ☕"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Made with ❤️ & ☕"
           }
         }
       }
@@ -7183,22 +7135,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "详细"
-          }
-        }
-      }
-    },
-    "Vietnamese Input Method for macOS": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vietnamese Input Method for macOS"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "macOS越南语输入法"
           }
         }
       }

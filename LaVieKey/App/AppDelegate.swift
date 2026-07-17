@@ -584,6 +584,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     private func applyPreferences(_ preferences: Preferences) {
+        // Apply theme (accent color + light/dark) — runs at launch and on every save
+        ThemeManager.shared.apply(preferences)
+
+        // Japanese engine options
+        keyboardHandler?.japaneseEngine.script = preferences.kanaScript
+        keyboardHandler?.japaneseEngine.japanesePunctuation = preferences.japanesePunctuation
+
         // Apply all engine settings at once (batch update - only 1 log message instead of 16+)
         keyboardHandler?.applyAllSettings(
             inputMethod: preferences.inputMethod,

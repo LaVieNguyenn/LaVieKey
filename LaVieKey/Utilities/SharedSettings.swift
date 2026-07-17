@@ -76,6 +76,10 @@ enum SharedSettingsKey: String {
     case showDockIcon = "LaVieKey.showDockIcon"
     case startAtLogin = "LaVieKey.startAtLogin"
     case menuBarIconStyle = "LaVieKey.menuBarIconStyle"
+    case appearanceMode = "LaVieKey.appearanceMode"
+    case accentTheme = "LaVieKey.accentTheme"
+    case kanaScript = "LaVieKey.kanaScript"
+    case japanesePunctuation = "LaVieKey.japanesePunctuation"
     case appLanguage = "LaVieKey.appLanguage"
     case autoCheckForUpdates = "LaVieKey.autoCheckForUpdates"
 
@@ -729,6 +733,26 @@ class SharedSettings {
         set { writeString(newValue, forKey: SharedSettingsKey.menuBarIconStyle.rawValue) }
     }
 
+    var appearanceMode: String {
+        get { readString(forKey: SharedSettingsKey.appearanceMode.rawValue) ?? "system" }
+        set { writeString(newValue, forKey: SharedSettingsKey.appearanceMode.rawValue) }
+    }
+
+    var accentTheme: String {
+        get { readString(forKey: SharedSettingsKey.accentTheme.rawValue) ?? "blue" }
+        set { writeString(newValue, forKey: SharedSettingsKey.accentTheme.rawValue) }
+    }
+
+    var kanaScript: String {
+        get { readString(forKey: SharedSettingsKey.kanaScript.rawValue) ?? "hiragana" }
+        set { writeString(newValue, forKey: SharedSettingsKey.kanaScript.rawValue) }
+    }
+
+    var japanesePunctuation: Bool {
+        get { readBool(forKey: SharedSettingsKey.japanesePunctuation.rawValue) ?? true }
+        set { writeBool(newValue, forKey: SharedSettingsKey.japanesePunctuation.rawValue) }
+    }
+
     var appLanguage: String {
         // Default to Vietnamese on first launch — matches Preferences.appLanguage default
         // so loadPreferences() from an empty plist yields the same value as a fresh
@@ -1352,6 +1376,16 @@ class SharedSettings {
         if let lang = AppLanguage(rawValue: appLanguage) {
             prefs.appLanguage = lang
         }
+        if let mode = AppAppearanceMode(rawValue: appearanceMode) {
+            prefs.appearanceMode = mode
+        }
+        if let accent = AccentTheme(rawValue: accentTheme) {
+            prefs.accentTheme = accent
+        }
+        if let kana = KanaScript(rawValue: kanaScript) {
+            prefs.kanaScript = kana
+        }
+        prefs.japanesePunctuation = japanesePunctuation
         prefs.autoCheckForUpdates = autoCheckForUpdates
 
         // Excluded apps
@@ -1513,6 +1547,10 @@ class SharedSettings {
         startAtLogin = prefs.startAtLogin
         menuBarIconStyle = prefs.menuBarIconStyle.rawValue
         appLanguage = prefs.appLanguage.rawValue
+        appearanceMode = prefs.appearanceMode.rawValue
+        accentTheme = prefs.accentTheme.rawValue
+        kanaScript = prefs.kanaScript.rawValue
+        japanesePunctuation = prefs.japanesePunctuation
         autoCheckForUpdates = prefs.autoCheckForUpdates
 
         // Excluded apps

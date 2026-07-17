@@ -23,12 +23,13 @@ class SettingsWindowController: NSWindowController, NSWindowDelegate {
         // Create window with modern style
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 750, height: 550),
-            styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
+            styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
 
         window.title = String(localized: "Cài đặt LaVieKey")
+        window.minSize = NSSize(width: 750, height: 550)
         window.titlebarAppearsTransparent = false
         // Allow window to be released when closed to free memory
         window.isReleasedWhenClosed = true

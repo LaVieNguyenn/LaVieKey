@@ -337,7 +337,7 @@ struct RestartCountdownView: View {
             HStack(spacing: 4) {
                 Text("\(seconds)")
                     .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundColor(.accentColor)
+                    .foregroundColor(.appAccent)
                     .frame(width: 30)
                 Text("giây")
                     .font(.subheadline)

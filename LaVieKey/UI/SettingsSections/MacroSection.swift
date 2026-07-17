@@ -234,7 +234,7 @@ struct MacroSection: View {
                                     }
                                     .buttonStyle(.plain)
                                     .font(.caption)
-                                    .foregroundColor(.accentColor)
+                                    .foregroundColor(.appAccent)
                                     
                                     Text("·")
                                         .foregroundColor(.secondary)
@@ -435,10 +435,10 @@ struct MacroRowView: View {
             Text(macro.text)
                 .font(.system(.body, design: .monospaced))
                 .fontWeight(.semibold)
-                .foregroundColor(macro.isEnabled ? .accentColor : .secondary)
+                .foregroundColor(macro.isEnabled ? .appAccent : .secondary)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
-                .background(macro.isEnabled ? Color.accentColor.opacity(0.1) : Color.gray.opacity(0.1))
+                .background(macro.isEnabled ? Color.appAccent.opacity(0.1) : Color.gray.opacity(0.1))
                 .cornerRadius(4)
                 .frame(minWidth: 80, alignment: .leading)
             
@@ -485,7 +485,7 @@ struct MacroRowView: View {
                 Button(action: onEdit) {
                     Image(systemName: "pencil")
                         .font(.system(size: 12))
-                        .foregroundColor(isHovered ? .accentColor : .secondary)
+                        .foregroundColor(isHovered ? .appAccent : .secondary)
                 }
                 .buttonStyle(.plain)
                 .opacity(isHovered ? 1 : 0.5)
@@ -801,8 +801,8 @@ struct TextReplacementsGuideSheet: View {
                 .font(.system(.body, design: .rounded))
                 .fontWeight(.bold)
                 .frame(width: 26, height: 26)
-                .background(Circle().fill(Color.accentColor.opacity(0.15)))
-                .foregroundColor(.accentColor)
+                .background(Circle().fill(Color.appAccent.opacity(0.15)))
+                .foregroundColor(.appAccent)
             VStack(alignment: .leading, spacing: 6) {
                 Text(title)
                     .fontWeight(.medium)

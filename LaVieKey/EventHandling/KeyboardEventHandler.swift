@@ -16,6 +16,12 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     private let injector: CharacterInjector
     private var isVietnameseEnabled = true
 
+    // Japanese mode (phase 1: romaji → kana). Mutually exclusive with
+    // Vietnamese — callers (StatusBarViewModel/AppDelegate) enforce that
+    // setJapanese(true) is paired with setVietnamese(false).
+    let japaneseEngine = JapaneseEngine()
+    private var isJapaneseEnabled = false
+
     // Debug logging callback
     var debugLogCallback: ((String) -> Void)?
     
@@ -236,6 +242,16 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
         }
     }
 
+    func setJapanese(_ enabled: Bool) {
+        isJapaneseEnabled = enabled
+        japaneseEngine.reset()
+        if enabled {
+            engine.reset()
+        }
+    }
+
+    var japaneseEnabled: Bool { isJapaneseEnabled }
+
     /// Effective Vietnamese state for the current context: a window-title rule may force
     /// enable/disable (InputMethodPolicy), otherwise fall back to the global toggle.
     /// The policy lookup is O(1) (cached in AppBehaviorDetector, refreshed on focus/title/app
@@ -364,8 +380,9 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
         // Check if we should process in English mode (for macro support)
         let shouldProcessInEnglishMode = !effectiveVietnameseEnabled && macroEnabled && macroInEnglishMode
 
-        // Only process key down events when Vietnamese is enabled OR macro in English mode is enabled
-        guard effectiveVietnameseEnabled || shouldProcessInEnglishMode else {
+        // Only process key down events when Vietnamese is enabled OR macro in English mode
+        // is enabled OR Japanese mode is on (its own branch in processKeyEvent)
+        guard effectiveVietnameseEnabled || shouldProcessInEnglishMode || isJapaneseEnabled else {
             return false
         }
 
@@ -416,6 +433,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
                     engine.reset()
                     injector.markNewSession(preserveMidSentence: true)
                 }
+                japaneseEngine.reset()
                 return false
             }
         }
@@ -491,6 +509,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
             }
             debugLogCallback?("[\(getTimestamp())] \(keyName) Arrow/Nav key received (keyCode=0x\(String(format: "%02X", keyCode)))")
             engine.resetWithCursorMoved()  // Use new method that sets cursor moved flag
+            japaneseEngine.reset()
             injector.markNewSession(cursorMoved: true)  // Mark that cursor was moved
             return event
         }
@@ -503,6 +522,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
         // but we can't distinguish that from regular Tab, so preserve state to be safe.
         if keyCode == VietnameseData.KEY_TAB { // Tab
             engine.reset()
+            japaneseEngine.reset()
             injector.markNewSession(preserveMidSentence: true)  // Preserve mid-sentence state
             return event
         }
@@ -514,6 +534,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
         // Handle Forward Delete (Fn+Delete)
         if keyCode == VietnameseData.KEY_FORWARD_DELETE { // Forward Delete
             engine.reset()
+            japaneseEngine.reset()
             injector.markNewSession(preserveMidSentence: true)  // Preserve mid-sentence state after Forward Delete
             return event  // Pass through
         }
@@ -558,6 +579,11 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
         } else {
             // Fallback to physical keyCode if character not found in mapping
             engineKeyCode = keyCode
+        }
+
+        // Japanese mode: its own romaji→kana path, before all Vietnamese logic
+        if isJapaneseEnabled {
+            return processJapaneseKey(character: character, keyCode: keyCode, event: event, proxy: proxy)
         }
 
         // Check if we're in English mode with macro support
@@ -699,7 +725,52 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     
     // MARK: - Special Key Handling
 
+    /// Japanese (romaji → kana) key path. Letters and Japanese punctuation go
+    /// through the converter and are injected as display diffs; word-break keys
+    /// first resolve the pending tail (trailing "n" → ん) then pass through.
+    private func processJapaneseKey(character: Character, keyCode: CGKeyCode, event: CGEvent, proxy: CGEventTapProxy) -> CGEvent? {
+        // Characters the romaji converter understands (letters + mapped punctuation)
+        let isConvertible = (character.isLetter && character.isASCII)
+            || "',.?!-[]".contains(character)
+
+        guard isConvertible else {
+            // Anything else (space, enter, digits, symbols) ends the segment:
+            // resolve the pending tail first, then let the key through.
+            injector.waitForInjectionComplete()
+            let flush = japaneseEngine.endSegment()
+            if !flush.isNoOp {
+                injector.injectSync(
+                    backspaceCount: flush.backspaceCount,
+                    characters: flush.insert.map { VNCharacter(character: $0) },
+                    codeTable: .unicode,
+                    proxy: proxy
+                )
+            }
+            return event
+        }
+
+        injector.waitForInjectionComplete()
+        let result = japaneseEngine.processCharacter(character)
+        guard !result.isNoOp else {
+            return nil  // consumed, nothing visible changed
+        }
+        injector.injectSync(
+            backspaceCount: result.backspaceCount,
+            characters: result.insert.map { VNCharacter(character: $0) },
+            codeTable: .unicode,
+            proxy: proxy
+        )
+        return nil  // consume the original key
+    }
+
     private func handleBackspace(event: CGEvent, proxy: CGEventTapProxy) -> CGEvent? {
+        // Japanese mode: the app deletes one displayed character on its own;
+        // we only keep the converter's segment state in sync.
+        if isJapaneseEnabled {
+            japaneseEngine.noteBackspace()
+            return event  // pass through
+        }
+
         // In English mode with macro, only update macro buffer
         let vietnameseEnabledForContext = effectiveVietnameseEnabled()
         let isEnglishModeWithMacro = !vietnameseEnabledForContext && macroEnabled && macroInEnglishMode
@@ -853,6 +924,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     
     func reset() {
         engine.reset()
+        japaneseEngine.reset()
         injector.markNewSession(preserveMidSentence: true)  // Preserve mid-sentence state to avoid Forward Delete in wrong context
         injector.clearMethodCache()  // Clear injection method cache
     }
@@ -862,6 +934,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     /// Also sets engine flag to skip restore logic (user may be editing mid-word)
     func resetWithCursorMoved() {
         engine.resetWithCursorMoved()  // Use new method that sets cursor moved flag
+        japaneseEngine.reset()
         injector.markNewSession(cursorMoved: true)  // Mark that cursor was moved
         injector.clearMethodCache()  // Clear injection method cache
     }
@@ -871,6 +944,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     /// This prevents Forward Delete from deleting text on the right of cursor
     func resetForAppSwitch() {
         engine.resetWithCursorMoved()  // Use new method that sets cursor moved flag
+        japaneseEngine.reset()
         injector.markNewSession(cursorMoved: true)  // Assume typing mid-sentence after app switch
         injector.clearMethodCache()
     }
@@ -881,6 +955,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     /// clean slate when the user returns to this session.
     func sessionDidBecomeActive() {
         engine.resetWithCursorMoved()
+        japaneseEngine.reset()
         injector.markNewSession(cursorMoved: true)
         injector.clearMethodCache()
         debugLogCallback?("🖥️ Session active — engine/injector reset for clean Vietnamese input")

@@ -62,6 +62,13 @@ class StatusBarManager: ObservableObject {
                 self?.updateStatusIcon()
             }
             .store(in: &cancellables)
+
+        viewModel.$isJapaneseEnabled
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateStatusIcon()
+            }
+            .store(in: &cancellables)
         
         viewModel.$currentInputMethod
             .receive(on: DispatchQueue.main)
@@ -179,7 +186,9 @@ class StatusBarManager: ObservableObject {
         
         if menuBarIconStyle == .emoji {
             // Emoji flags render in natural color, no template image needed
-            let iconText = viewModel.isVietnameseEnabled ? "🇻🇳" : "🇬🇧"
+            let iconText = viewModel.isJapaneseEnabled
+                ? "🇯🇵"
+                : (viewModel.isVietnameseEnabled ? "🇻🇳" : "🇬🇧")
             button.image = nil
             button.imagePosition = .noImage
             button.title = ""
@@ -190,10 +199,16 @@ class StatusBarManager: ObservableObject {
             return
         }
         
-        // Letter style (LV brand or V) — render as template image with border
-        let iconText = menuBarIconStyle == .x
-            ? (viewModel.isVietnameseEnabled ? "LV" : "E")
-            : (viewModel.isVietnameseEnabled ? "V" : "E")
+        // Letter style (LV brand or V) — render as template image with border.
+        // Japanese mode shows あ regardless of letter style.
+        let iconText: String
+        if viewModel.isJapaneseEnabled {
+            iconText = "あ"
+        } else if menuBarIconStyle == .x {
+            iconText = viewModel.isVietnameseEnabled ? "LV" : "E"
+        } else {
+            iconText = viewModel.isVietnameseEnabled ? "V" : "E"
+        }
 
         // Two-letter "LV" needs a smaller font to fit the 20×20 bordered box
         let fontSize: CGFloat = iconText.count > 1 ? 9.5 : 14

@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct AboutSection: View {
-    @State private var showDonationDialog = false
-
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -23,51 +21,46 @@ struct AboutSection: View {
                 } else {
                     Image(systemName: "keyboard.badge.ellipsis")
                         .font(.system(size: 50))
-                        .foregroundColor(.accentColor)
+                        .foregroundColor(.appAccent)
                         .padding(.top, 20)
                 }
-                
+
                 // App Name & Version
                 VStack(spacing: 4) {
                     Text("LaVieKey")
                         .font(.system(size: 24, weight: .bold))
-                    
-                    Text("Vietnamese Input Method for macOS")
+
+                    Text("Bộ gõ tiếng Việt mã nguồn mở cho macOS")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    
+
                     Text("\(AppVersion.fullVersion)")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                         .padding(.top, 2)
                 }
-                
+
                 Divider()
                     .padding(.horizontal, 80)
-                
-                // Credits & Donation
+
+                // Open Source
                 VStack(spacing: 8) {
-                    Text("Made with ❤️ & ☕")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    Button(action: {
-                        showDonationDialog = true
-                    }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "cup.and.saucer.fill")
-                            Text("Buy me a coffee")
-                        }
-                        .font(.system(size: 12, weight: .medium))
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 6)
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left.forwardslash.chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(.appAccent)
+                        Text("Phần mềm mã nguồn mở — giấy phép MIT")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
-                    .buttonStyle(.borderedProminent)
+
+                    Text("Phát triển dựa trên XKey (xmannv), lấy cảm hứng từ OpenKey & Unikey.")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
                 }
-                
-                Divider()
-                    .padding(.horizontal, 80)
-                
+
                 // GitHub Links
                 HStack(spacing: 20) {
                     Button(action: {
@@ -80,13 +73,13 @@ struct AboutSection: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 14, height: 14)
-                            Text("GitHub")
+                            Text("Mã nguồn")
                         }
                         .font(.system(size: 12, weight: .medium))
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
-                    
+
                     Button(action: {
                         if let url = URL(string: "https://github.com/LaVieNguyenn/LaVieKey/issues/new/choose") {
                             NSWorkspace.shared.open(url)
@@ -103,57 +96,27 @@ struct AboutSection: View {
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
-                }
-                .padding(.vertical, 8)
-                
-                Divider()
-                    .padding(.horizontal, 80)
 
-                // Update Check Section - Using Sparkle
-                VStack(spacing: 10) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "arrow.down.circle")
-                            .font(.system(size: 16))
-                            .foregroundColor(.blue)
-                        Text("Kiểm tra phiên bản mới")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-
-                    Button("Kiểm tra cập nhật") {
-                        // Temporarily lower the Settings window level so Sparkle dialog appears on top
-                        if let settingsWindow = NSApp.keyWindow {
-                            settingsWindow.level = .normal
+                    Button(action: {
+                        if let url = URL(string: "https://github.com/LaVieNguyenn/LaVieKey/releases") {
+                            NSWorkspace.shared.open(url)
                         }
-                        
-                        // Use AppDelegate.shared for reliable access
-                        if let appDelegate = AppDelegate.shared {
-                            appDelegate.checkForUpdatesFromUI()
-                        } else if let delegate = NSApplication.shared.delegate as? AppDelegate {
-                            delegate.checkForUpdatesFromUI()
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "arrow.down.circle")
+                                .font(.system(size: 12))
+                            Text("Bản phát hành")
                         }
+                        .font(.system(size: 12, weight: .medium))
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
                 }
-                .padding(.vertical, 10)
-                .padding(.horizontal, 16)
-                .background(Color.gray.opacity(0.05))
-                .cornerRadius(10)
-                .padding(.horizontal, 30)
-                
+                .padding(.vertical, 8)
+
                 Spacer()
-                
-                // Copyright
-                Text("Inspired by Openkey & Unikey.")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                    .padding(.bottom, 16)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-        .sheet(isPresented: $showDonationDialog) {
-            DonationView()
         }
     }
 }

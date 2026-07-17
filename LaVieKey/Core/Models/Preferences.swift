@@ -54,6 +54,77 @@ enum AppLanguage: String, Codable, CaseIterable {
     }
 }
 
+/// Typing language mode (phase 1 of multi-language support)
+enum TypingLanguage: String, Codable, CaseIterable {
+    case vietnamese
+    case english
+    case japanese
+
+    /// Raw label (UI wraps with LocalizedStringKey where applicable)
+    var displayName: String {
+        switch self {
+        case .vietnamese: return "Tiếng Việt"
+        case .english: return "English"
+        case .japanese: return "日本語 (Kana)"
+        }
+    }
+}
+
+/// Kana output script for Japanese mode
+enum KanaScript: String, Codable, CaseIterable {
+    case hiragana
+    case katakana
+
+    var displayName: String {
+        switch self {
+        case .hiragana: return "Hiragana (あ)"
+        case .katakana: return "Katakana (ア)"
+        }
+    }
+}
+
+enum AppAppearanceMode: String, Codable, CaseIterable {
+    case system
+    case light
+    case dark
+
+    /// Raw Vietnamese label (UI wraps with LocalizedStringKey)
+    var displayName: String {
+        switch self {
+        case .system: return "Theo hệ thống"
+        case .light: return "Sáng"
+        case .dark: return "Tối"
+        }
+    }
+}
+
+enum AccentTheme: String, Codable, CaseIterable {
+    case blue
+    case indigo
+    case purple
+    case pink
+    case red
+    case orange
+    case green
+    case teal
+    case graphite
+
+    /// Raw Vietnamese label (UI wraps with LocalizedStringKey)
+    var displayName: String {
+        switch self {
+        case .blue: return "Xanh dương"
+        case .indigo: return "Chàm"
+        case .purple: return "Tím"
+        case .pink: return "Hồng"
+        case .red: return "Đỏ"
+        case .orange: return "Cam"
+        case .green: return "Xanh lá"
+        case .teal: return "Xanh ngọc"
+        case .graphite: return "Xám"
+        }
+    }
+}
+
 enum MenuBarIconStyle: String, Codable, CaseIterable {
     case x = "X"
     case v = "V"
@@ -136,7 +207,13 @@ struct Preferences: Codable {
     var startAtLogin: Bool = false
     var menuBarIconStyle: MenuBarIconStyle = .x  // Icon style for menubar
     var appLanguage: AppLanguage = .vi
+    var appearanceMode: AppAppearanceMode = .system  // Light/dark override
+    var accentTheme: AccentTheme = .blue             // App accent color
     var autoCheckForUpdates: Bool = true
+
+    // Japanese input (phase 1: romaji → kana)
+    var kanaScript: KanaScript = .hiragana
+    var japanesePunctuation: Bool = true             // . , ? ! → 。、？！
     
     // Excluded apps - apps where Vietnamese input is disabled
     var excludedApps: [ExcludedApp] = []

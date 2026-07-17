@@ -11,6 +11,7 @@ import Cocoa
 
 class StatusBarViewModel: ObservableObject {
     @Published var isVietnameseEnabled = true
+    @Published var isJapaneseEnabled = false
     @Published var currentInputMethod: InputMethod = .telex
     @Published var currentCodeTable: CodeTable = .unicode
     @Published var hotkeyDisplay = "⌘⇧V"
@@ -94,7 +95,51 @@ class StatusBarViewModel: ObservableObject {
         log("Remote desktop target mode: \(enabled ? "ON" : "OFF")")
     }
     
+    /// Current typing language derived from the two flags
+    var typingLanguage: TypingLanguage {
+        if isJapaneseEnabled { return .japanese }
+        return isVietnameseEnabled ? .vietnamese : .english
+    }
+
+    /// Switch typing language (VN / EN / JA). Japanese and Vietnamese are
+    /// mutually exclusive at the handler level.
+    func selectTypingLanguage(_ language: TypingLanguage) {
+        guard language != typingLanguage else { return }
+        switch language {
+        case .vietnamese:
+            isJapaneseEnabled = false
+            keyboardHandler?.setJapanese(false)
+            isVietnameseEnabled = true
+            keyboardHandler?.setVietnamese(true)
+        case .english:
+            isJapaneseEnabled = false
+            keyboardHandler?.setJapanese(false)
+            isVietnameseEnabled = false
+            keyboardHandler?.setVietnamese(false)
+        case .japanese:
+            isVietnameseEnabled = false
+            keyboardHandler?.setVietnamese(false)
+            isJapaneseEnabled = true
+            keyboardHandler?.setJapanese(true)
+        }
+        log("Typing language → \(language.displayName)")
+
+        let prefs = SharedSettings.shared.loadPreferences()
+        if prefs.beepOnToggle {
+            AudioManager.shared.playBeep()
+        }
+        // Smart Switch stays VN/EN-only in phase 1: don't record Japanese
+        if language != .japanese {
+            saveLanguageForCurrentApp()
+        }
+    }
+
     func toggleVietnamese() {
+        // Toggle hotkey always leaves Japanese mode first (VN ⇄ EN axis)
+        if isJapaneseEnabled {
+            selectTypingLanguage(.vietnamese)
+            return
+        }
         isVietnameseEnabled.toggle()
         keyboardHandler?.setVietnamese(isVietnameseEnabled)
         log("Vietnamese toggled: \(isVietnameseEnabled ? "ON" : "OFF")")

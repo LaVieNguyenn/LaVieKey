@@ -62,3 +62,6 @@ appcast.xml
 .playwright-mcp/
 .codegraph/
 .cursor/
+
+# Internal planning docs (not shipped)
+docs/

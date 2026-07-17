@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TempOffToolbarView: View {
+    @ObservedObject private var theme = ThemeManager.shared
     @ObservedObject var viewModel: TempOffToolbarViewModel
 
     var body: some View {
@@ -29,6 +30,7 @@ struct TempOffToolbarView: View {
             }
         }
         .floatingToolbarStyle()
+        .tint(theme.accent)
     }
 }
 

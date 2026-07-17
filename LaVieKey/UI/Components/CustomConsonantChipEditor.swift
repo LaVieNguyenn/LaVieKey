@@ -173,11 +173,11 @@ struct ChipView: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(Color.accentColor.opacity(0.1))
+        .background(Color.appAccent.opacity(0.1))
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.accentColor.opacity(0.3), lineWidth: 1)
+                .stroke(Color.appAccent.opacity(0.3), lineWidth: 1)
         )
     }
 }

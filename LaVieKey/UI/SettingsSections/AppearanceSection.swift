@@ -14,6 +14,64 @@ struct AppearanceSection: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                SettingsGroup(title: "Chủ đề") {
+                    VStack(alignment: .leading, spacing: 14) {
+                        // Light/dark mode
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Chế độ hiển thị:")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Picker("", selection: $viewModel.preferences.appearanceMode) {
+                                ForEach(AppAppearanceMode.allCases, id: \.self) { mode in
+                                    Text(LocalizedStringKey(mode.displayName)).tag(mode)
+                                }
+                            }
+                            .labelsHidden()
+                            .pickerStyle(.segmented)
+                            .frame(maxWidth: 320)
+                        }
+
+                        // Accent color swatches
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Màu nhấn:")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            HStack(spacing: 10) {
+                                ForEach(AccentTheme.allCases, id: \.self) { theme in
+                                    Button {
+                                        viewModel.preferences.accentTheme = theme
+                                    } label: {
+                                        ZStack {
+                                            Circle()
+                                                .fill(theme.color)
+                                                .frame(width: 22, height: 22)
+                                            if viewModel.preferences.accentTheme == theme {
+                                                Image(systemName: "checkmark")
+                                                    .font(.system(size: 10, weight: .bold))
+                                                    .foregroundColor(.white)
+                                            }
+                                        }
+                                        .overlay(
+                                            Circle()
+                                                .strokeBorder(
+                                                    viewModel.preferences.accentTheme == theme
+                                                        ? Color.primary.opacity(0.6) : .clear,
+                                                    lineWidth: 1.5
+                                                )
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                    .help(LocalizedStringKey(theme.displayName))
+                                }
+                            }
+                        }
+
+                        Text("Màu nhấn áp dụng cho cửa sổ cài đặt, menu và các thanh công cụ của LaVieKey.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
                 SettingsGroup(title: "Thanh menu") {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Biểu tượng menubar:")

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TranslationToolbarView: View {
+    @ObservedObject private var theme = ThemeManager.shared
     @ObservedObject var viewModel: TranslationToolbarViewModel
     
     var body: some View {
@@ -47,6 +48,7 @@ struct TranslationToolbarView: View {
             )
         }
         .floatingToolbarStyle()
+        .tint(theme.accent)
     }
 }
 
@@ -193,7 +195,7 @@ private struct LanguageRow: View {
                 if isSelected {
                     Image(systemName: "checkmark")
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.accentColor)
+                        .foregroundColor(.appAccent)
                 }
             }
             .padding(.horizontal, 10)
@@ -211,7 +213,7 @@ private struct LanguageRow: View {
     
     private var rowBackgroundColor: Color {
         if isSelected {
-            return Color.accentColor.opacity(0.15)
+            return Color.appAccent.opacity(0.15)
         } else if isHovered {
             return Color(nsColor: .quaternaryLabelColor)
         } else {
