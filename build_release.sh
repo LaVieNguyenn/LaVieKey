@@ -328,26 +328,28 @@ if [ "$ENABLE_CODESIGN" = true ]; then
         Release/LaVieKey.app
     echo "✅ LaVieKey.app re-signed"
 else
-    # Local signing (ENABLE_CODESIGN=false): prefer the Apple Development cert.
-    # Ad-hoc ("-") produces a DIFFERENT signature on every build, so macOS TCC
-    # silently drops the Accessibility grant after each rebuild (the event tap
-    # then fails and Telex stops working). An Apple Development identity is
-    # stable across rebuilds, so the permission sticks. Falls back to ad-hoc
-    # when no such cert exists in the keychain.
-    LOCAL_SIGN_ID=$(security find-identity -v -p codesigning | grep "Apple Development" | head -1 | awk '{print $2}')
-    LOCAL_SIGN_ID=${LOCAL_SIGN_ID:--}
+    # Local signing (ENABLE_CODESIGN=false): AD-HOC by default — needs NO Apple
+    # account of any kind, which keeps the project fully open-source/buildable by
+    # anyone. The App Group container still resolves under ad-hoc because the app
+    # is non-sandboxed (verified), so settings persistence is unaffected.
+    #
+    # Trade-off: an ad-hoc signature changes on every build, so macOS TCC drops
+    # the Accessibility grant after each rebuild/update — the user must re-enable
+    # LaVieKey in System Settings once per new build. (A stable Apple Development
+    # identity avoids this; set LOCAL_SIGN_ID to its SHA-1 to opt in.)
+    LOCAL_SIGN_ID="${LOCAL_SIGN_ID:--}"
     if [ "$LOCAL_SIGN_ID" = "-" ]; then
-        echo "🔐 Ad-hoc signing (no Apple Development cert found — Accessibility must be re-granted after every build)..."
+        echo "🔐 Ad-hoc signing (no Apple account needed; re-grant Accessibility after each update)..."
     else
-        echo "🔐 Signing with Apple Development cert: $LOCAL_SIGN_ID"
-        # Nested Sparkle components must be signed before the outer app
-        SPARKLE_FW="Release/LaVieKey.app/Contents/Frameworks/Sparkle.framework/Versions/B"
-        for NESTED in "$SPARKLE_FW/XPCServices/Installer.xpc" "$SPARKLE_FW/XPCServices/Downloader.xpc" "$SPARKLE_FW/Updater.app" "$SPARKLE_FW/Autoupdate"; do
-            [ -e "$NESTED" ] && codesign --force --sign "$LOCAL_SIGN_ID" "$NESTED"
-        done
-        [ -d "Release/LaVieKey.app/Contents/Frameworks/Sparkle.framework" ] && \
-            codesign --force --sign "$LOCAL_SIGN_ID" "Release/LaVieKey.app/Contents/Frameworks/Sparkle.framework"
+        echo "🔐 Signing with provided identity: $LOCAL_SIGN_ID"
     fi
+    # Nested Sparkle components must be signed before the outer app
+    SPARKLE_FW="Release/LaVieKey.app/Contents/Frameworks/Sparkle.framework/Versions/B"
+    for NESTED in "$SPARKLE_FW/XPCServices/Installer.xpc" "$SPARKLE_FW/XPCServices/Downloader.xpc" "$SPARKLE_FW/Updater.app" "$SPARKLE_FW/Autoupdate"; do
+        [ -e "$NESTED" ] && codesign --force --sign "$LOCAL_SIGN_ID" "$NESTED"
+    done
+    [ -d "Release/LaVieKey.app/Contents/Frameworks/Sparkle.framework" ] && \
+        codesign --force --sign "$LOCAL_SIGN_ID" "Release/LaVieKey.app/Contents/Frameworks/Sparkle.framework"
     codesign --force --sign "$LOCAL_SIGN_ID" --identifier "$BUNDLE_ID" --entitlements "$LAVIEKEY_ENTITLEMENTS_EXPANDED" Release/LaVieKey.app
     echo "✅ Signed with identifier: $BUNDLE_ID"
 fi

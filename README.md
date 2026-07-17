@@ -37,15 +37,30 @@ Dự án bắt đầu từ việc tự viết một bộ gõ riêng (LVKey) bằ
 
 ## 🚀 Cài đặt
 
+### Cách nhanh nhất — một dòng lệnh (khuyên dùng)
+
+Không cần clone, không cần Xcode, không cần tài khoản Apple. Mở Terminal và chạy:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/LaVieNguyenn/LaVieKey/main/install.sh | bash
+```
+
+Lệnh này tải bản mới nhất từ [Releases](https://github.com/LaVieNguyenn/LaVieKey/releases), cài vào `/Applications`, gỡ cờ chặn của macOS và mở app. Sau đó chỉ cần làm 2 bước thủ công (macOS bắt buộc): **cấp quyền Accessibility** và **đặt bàn phím về ABC** — script sẽ mở sẵn trang cài đặt cho bạn.
+
+> Cập nhật lên bản mới: chạy lại đúng lệnh trên.
+
+---
+
+### Cách tự build (dành cho nhà phát triển)
+
 ### Yêu cầu
 
 | Thứ cần có | Ghi chú |
 |---|---|
 | **macOS 12.0** trở lên | Đã test trên macOS 26 (Tahoe) |
-| **Xcode 15+** | Cần `xcodebuild` và chứng chỉ ký. Cài từ App Store. |
-| **Apple ID** đăng nhập trong Xcode | Xcode → Settings → Accounts → thêm Apple ID. Xcode tự tạo chứng chỉ **Apple Development** miễn phí — **không cần** tài khoản Developer trả phí ($99/năm). |
+| **Xcode 15+** | Cần `xcodebuild`. Cài từ App Store. **Không cần** đăng nhập Apple ID, **không cần** tài khoản Developer. |
 
-> **Vì sao cần đăng nhập Apple ID?** Script ký app bằng chứng chỉ *Apple Development* thay vì ad-hoc. Chữ ký ad-hoc đổi sau mỗi lần build khiến macOS **thu hồi quyền Accessibility** → bộ gõ ngừng nhận phím. Chứng chỉ Apple Development ổn định qua các lần build nên cấp quyền một lần là xong.
+> Build mặc định ký **ad-hoc** (`codesign -`) nên hoàn toàn không đụng tới tài khoản Apple. Đánh đổi: chữ ký ad-hoc đổi mỗi lần build, nên **sau mỗi lần cập nhật phải bật lại quyền Accessibility** một lần. (Muốn tránh: đặt biến `LOCAL_SIGN_ID` = SHA-1 của một chứng chỉ Apple Development trước khi chạy script.)
 
 ### Các bước
 
@@ -64,7 +79,7 @@ ENABLE_CODESIGN=false ENABLE_SPARKLE_SIGN=false ENABLE_DMG=false ./build_release
 
 Script sẽ tự động:
 - Build universal binary (Intel + Apple Silicon)
-- Ký bằng chứng chỉ Apple Development trong Keychain (tự dò; nếu không có sẽ tự chuyển ad-hoc kèm cảnh báo)
+- Ký ad-hoc (không cần tài khoản Apple)
 - Tạo `Release/LaVieKey.app` (đã nhúng sẵn bộ gõ `LaVieKeyIM.app`)
 - Cài bộ gõ vào `~/Library/Input Methods/`
 
@@ -137,7 +152,7 @@ Quyền Accessibility giữ nguyên qua các lần build (nhờ ký Apple Develo
 |---|---|
 | **Không gõ được tiếng Việt/Nhật** | Kiểm tra quyền Accessibility (bước 4). Thử tắt/bật lại công tắc LaVieKey. |
 | **Gõ ra chữ đúp** (vd `wwindow`) | Đang bật cả Vietnamese IM của Apple. Chuyển input source về **ABC** (bước 5). |
-| **`xcodebuild` báo lỗi ký / no signing certificate** | Mở Xcode → Settings → Accounts → thêm Apple ID. Chứng chỉ Apple Development sẽ tự tạo. |
+| **Sau khi cập nhật, gõ không ăn nữa** | Chữ ký ad-hoc đổi mỗi bản build → cấp lại quyền Accessibility (xoá LaVieKey khỏi danh sách rồi bật lại). |
 | **App không mở được sau khi build** | Chạy `open /Applications/LaVieKey.app` từ Terminal để xem lỗi, hoặc kiểm tra `~/LaVieKey_Debug.log`. |
 | **Cửa sổ Cài đặt không lên** | Bấm icon menu bar → "Mở cài đặt". |
 
