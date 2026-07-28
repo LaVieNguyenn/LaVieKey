@@ -169,13 +169,34 @@ struct Preferences: Codable {
     var customConsonantEnabled: Bool = false         // Whether custom consonants feature is enabled
     var customConsonants: String = "Z,F,W,J"         // Custom consonants list (always stored, even when disabled)
     
+    /// GenZ spelling: allow `z` as an initial consonant so "zậy", "zị", "zui",
+    /// "zô" can be typed without the engine dropping tone marks or auto-restoring
+    /// them back. Independent of `customConsonantEnabled` — it unlocks only `z`,
+    /// not f/w/j.
+    var genZMode: Bool = false
+
+    /// English inline suggestion: show a floating pill with the best English
+    /// word for the raw keys typed so far ("origi" → origin), Tab to accept.
+    var englishSuggestionEnabled: Bool = false
+
     /// Default custom consonants when feature is reset
     static let defaultCustomConsonants = "Z,F,W,J"
-    
+
     /// Computed: get individual consonant list from the comma-separated string
     var customConsonantList: [String] {
         guard !customConsonants.isEmpty else { return [] }
         return customConsonants.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces).uppercased() }
+    }
+
+    /// Consonant list actually handed to the engine: the custom-consonant list
+    /// (only when that feature is on) plus "Z" when GenZ spelling is on.
+    /// Single source of truth so the app and LaVieKeyIM stay in sync.
+    var effectiveCustomConsonants: String {
+        var list = customConsonantEnabled ? customConsonantList : []
+        if genZMode && !list.contains("Z") {
+            list.append("Z")
+        }
+        return list.joined(separator: ",")
     }
 
     var tempOffToolbarEnabled: Bool = false      // Show floating toolbar for temp off controls

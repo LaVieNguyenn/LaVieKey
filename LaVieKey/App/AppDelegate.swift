@@ -587,6 +587,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Apply theme (accent color + light/dark) — runs at launch and on every save
         ThemeManager.shared.apply(preferences)
 
+        // English suggestion
+        keyboardHandler?.englishSuggestionEnabled = preferences.englishSuggestionEnabled
+
         // Japanese engine options
         keyboardHandler?.japaneseEngine.script = preferences.kanaScript
         keyboardHandler?.japaneseEngine.japanesePunctuation = preferences.japanesePunctuation
@@ -604,7 +607,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             capitalizeOnlyAfterSpace: preferences.capitalizeOnlyAfterSpace,
             restoreIfWrongSpelling: preferences.restoreIfWrongSpelling,
             skipRestoreForUppercaseVietnameseAbbreviations: preferences.skipRestoreForUppercaseVietnameseAbbreviations,
-            customConsonants: preferences.customConsonantEnabled ? preferences.customConsonants : "",
+            customConsonants: preferences.effectiveCustomConsonants,
             macroEnabled: preferences.macroEnabled,
             macroInEnglishMode: preferences.macroInEnglishMode,
             autoCapsMacro: preferences.autoCapsMacro,

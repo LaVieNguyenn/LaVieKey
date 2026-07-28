@@ -79,6 +79,10 @@
 		5A61FAA58A29AD3225DD649C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803B94EF161FE79A022FF806 /* SettingsView.swift */; };
 		1A7EA11E2F0100010000AB01 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA11E2F0100020000AB02 /* ThemeManager.swift */; };
 		1A7EA22E2F0200030000AB13 /* RomajiKanaConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA22E2F0200020000AB12 /* RomajiKanaConverter.swift */; };
+		1A7EA33E2F0300030000AC03 /* EnglishWordList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA33E2F0300020000AC02 /* EnglishWordList.swift */; };
+		1A7EA33E2F0300050000AC05 /* SuggestionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA33E2F0300040000AC04 /* SuggestionEngine.swift */; };
+		1A7EA33E2F0300070000AC07 /* SuggestionPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA33E2F0300060000AC06 /* SuggestionPanelController.swift */; };
+		1A7EA33E2F0300090000AC09 /* english-words.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1A7EA33E2F0300080000AC08 /* english-words.txt */; };
 		1A7EA22E2F0200050000AB15 /* JapaneseEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA22E2F0200040000AB14 /* JapaneseEngine.swift */; };
 		1A7EA22E2F0200070000AB17 /* JapaneseSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA22E2F0200060000AB16 /* JapaneseSection.swift */; };
 		1A7EA22E2F0200090000AB19 /* RomajiKanaConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA22E2F0200080000AB18 /* RomajiKanaConverterTests.swift */; };
@@ -217,6 +221,10 @@
 		803B94EF161FE79A022FF806 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		1A7EA11E2F0100020000AB02 /* ThemeManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		1A7EA22E2F0200020000AB12 /* RomajiKanaConverter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RomajiKanaConverter.swift; sourceTree = "<group>"; };
+		1A7EA33E2F0300020000AC02 /* EnglishWordList.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EnglishWordList.swift; sourceTree = "<group>"; };
+		1A7EA33E2F0300040000AC04 /* SuggestionEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SuggestionEngine.swift; sourceTree = "<group>"; };
+		1A7EA33E2F0300060000AC06 /* SuggestionPanelController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SuggestionPanelController.swift; sourceTree = "<group>"; };
+		1A7EA33E2F0300080000AC08 /* english-words.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = "english-words.txt"; path = "Resources/english-words.txt"; sourceTree = "<group>"; };
 		1A7EA22E2F0200040000AB14 /* JapaneseEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = JapaneseEngine.swift; sourceTree = "<group>"; };
 		1A7EA22E2F0200060000AB16 /* JapaneseSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = JapaneseSection.swift; sourceTree = "<group>"; };
 		1A7EA22E2F0200080000AB18 /* RomajiKanaConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RomajiKanaConverterTests.swift; sourceTree = "<group>"; };
@@ -423,6 +431,7 @@
 				101A444A2ED419E9003F9D05 /* Utilities */,
 				A5000004 /* App */,
 				A5000005 /* Core */,
+				1A7EA33E2F0300080000AC08 /* english-words.txt */,
 				A5000006 /* EventHandling */,
 				A5000007 /* UI */,
 				A3000001 /* Info.plist */,
@@ -458,9 +467,19 @@
 				A5000008 /* Models */,
 				A5000009 /* Engine */,
 				1A7EA22E2F0200010000AB11 /* Japanese */,
+				1A7EA33E2F0300010000AC01 /* Suggestion */,
 				102986B12F252F5700B4DEEE /* Translation */,
 			);
 			path = Core;
+			sourceTree = "<group>";
+		};
+		1A7EA33E2F0300010000AC01 /* Suggestion */ = {
+			isa = PBXGroup;
+			children = (
+				1A7EA33E2F0300020000AC02 /* EnglishWordList.swift */,
+				1A7EA33E2F0300040000AC04 /* SuggestionEngine.swift */,
+			);
+			path = Suggestion;
 			sourceTree = "<group>";
 		};
 		1A7EA22E2F0200010000AB11 /* Japanese */ = {
@@ -500,6 +519,7 @@
 				1084A5442ED41EB200EA2D2A /* PreferencesViewModel.swift */,
 				803B94EF161FE79A022FF806 /* SettingsView.swift */,
 				1A7EA11E2F0100020000AB02 /* ThemeManager.swift */,
+				1A7EA33E2F0300060000AC06 /* SuggestionPanelController.swift */,
 				8EAA0ED7079ABD1980FBFFAE /* SettingsWindowController.swift */,
 				STATUSBARVM002 /* StatusBarViewModel.swift */,
 				DEBUGVM002 /* DebugViewModel.swift */,
@@ -702,6 +722,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A7EA33E2F0300090000AC09 /* english-words.txt in Resources */,
 				10133E5C2EF04B0C00BBE6AE /* Assets.xcassets in Resources */,
 				L10N00001 /* Localizable.xcstrings in Resources */,
 			);
@@ -795,6 +816,9 @@
 				5A61FAA58A29AD3225DD649C /* SettingsView.swift in Sources */,
 				1A7EA11E2F0100010000AB01 /* ThemeManager.swift in Sources */,
 				1A7EA22E2F0200030000AB13 /* RomajiKanaConverter.swift in Sources */,
+				1A7EA33E2F0300030000AC03 /* EnglishWordList.swift in Sources */,
+				1A7EA33E2F0300050000AC05 /* SuggestionEngine.swift in Sources */,
+				1A7EA33E2F0300070000AC07 /* SuggestionPanelController.swift in Sources */,
 				1A7EA22E2F0200050000AB15 /* JapaneseEngine.swift in Sources */,
 				1A7EA22E2F0200070000AB17 /* JapaneseSection.swift in Sources */,
 				107602EE2EF4E3BA00ADC084 /* InputSourceManager.swift in Sources */,

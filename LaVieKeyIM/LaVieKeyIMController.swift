@@ -147,8 +147,15 @@ class LaVieKeyIMController: IMKInputController {
         engineSettings.restoreIfWrongSpelling = settings.restoreIfWrongSpelling
         
         // Parse custom consonants string into Set<UInt16> for engine.
-        // Match the main app: only enable custom consonants when the option is on.
-        let customConsonantsStr = settings.customConsonantEnabled ? settings.customConsonants : ""
+        // Match the main app: custom consonants only when that option is on,
+        // plus "Z" when GenZ spelling is on (zậy, zị…).
+        var consonantList = settings.customConsonantEnabled
+            ? settings.customConsonants.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces).uppercased() }
+            : []
+        if settings.genZMode && !consonantList.contains("Z") {
+            consonantList.append("Z")
+        }
+        let customConsonantsStr = consonantList.joined(separator: ",")
         engineSettings.customConsonants = VietnameseData.parseCustomConsonants(customConsonantsStr)
         
         engine.updateSettings(engineSettings)
@@ -1405,6 +1412,7 @@ class LaVieKeyIMSettings {
     var capitalizeOnlyAfterSpace: Bool = true
     var customConsonantEnabled: Bool = false
     var customConsonants: String = LaVieKeyIMSettings.defaultCustomConsonants
+    var genZMode: Bool = false  // Allow `z` as an initial consonant (zậy, zị…)
     var useMarkedText: Bool = true  // Default to true - standard IMKit behavior
     var debugModeEnabled: Bool = false  // Controls whether LaVieKeyIM writes to ~/LaVieKey_Debug.log
     
@@ -1441,6 +1449,7 @@ class LaVieKeyIMSettings {
         capitalizeOnlyAfterSpace = readBool(forKey: "LaVieKey.capitalizeOnlyAfterSpace", defaultValue: true)
         customConsonantEnabled = readBool(forKey: "LaVieKey.customConsonantEnabled")
         customConsonants = readString(forKey: "LaVieKey.customConsonants") ?? LaVieKeyIMSettings.defaultCustomConsonants
+        genZMode = readBool(forKey: "LaVieKey.genZMode")
         
         // Use Marked Text
         let oldUseMarkedText = useMarkedText

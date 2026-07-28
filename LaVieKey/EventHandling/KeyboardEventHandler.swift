@@ -22,6 +22,24 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     let japaneseEngine = JapaneseEngine()
     private var isJapaneseEnabled = false
 
+    // English inline suggestion (VS Code-style rescue: raw "origi" displayed
+    // as "ỏigi" → suggest "origin" → Tab accepts). VN mode only.
+    let suggestionEngine = SuggestionEngine()
+    var englishSuggestionEnabled = false {
+        didSet { if !englishSuggestionEnabled { clearSuggestion() } }
+    }
+    /// Candidates currently shown in the floating panel (read on the tap
+    /// thread by the Tab/arrow branches; written only on the tap thread)
+    private var activeSuggestions: SuggestionSet?
+    /// Whether the engine transformed anything in the current word
+    private var suggestionWordTransformed = false
+
+    /// On-screen length of the current word lives in SuggestionEngine (kept in
+    /// step with the raw prefix there). Not read from `engine.index`: the
+    /// Vietnamese engine gives up on a word it decides cannot be Vietnamese
+    /// (e.g. "Ỏiginal") and empties its buffer, which killed the panel mid-word.
+    private var suggestionDisplayedCount: Int { suggestionEngine.displayedCount }
+
     // Debug logging callback
     var debugLogCallback: ((String) -> Void)?
     
@@ -242,6 +260,47 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
         }
     }
 
+    // MARK: - English suggestion helpers
+
+    /// Hide the pill and forget the current word's suggestion state
+    private func clearSuggestion() {
+        activeSuggestions = nil
+        suggestionWordTransformed = false
+        suggestionEngine.reset()
+        SuggestionPanelController.shared.hide()
+    }
+
+    /// Recompute after a keystroke and show/hide the pill accordingly
+    private func refreshSuggestion() {
+        let candidateSet = englishSuggestionEnabled
+            ? suggestionEngine.currentSuggestions(wordWasTransformed: suggestionWordTransformed)
+            : nil
+        // Kept permanently: only formats a string when the debug window is open,
+        // and this pipeline is easy to desynchronise (raw keys vs on-screen text).
+        debugLogCallback?("[SUGGEST] raw='\(suggestionEngine.debugRawWord)' shown=\(suggestionDisplayedCount) transformed=\(suggestionWordTransformed) cands=\(candidateSet?.candidates.map(\.word) ?? [])")
+
+        guard englishSuggestionEnabled, suggestionDisplayedCount > 0,
+              let set = candidateSet
+        else {
+            if activeSuggestions != nil {
+                activeSuggestions = nil
+                SuggestionPanelController.shared.hide()
+            }
+            return
+        }
+        activeSuggestions = set
+        SuggestionPanelController.shared.show(set)
+    }
+
+    /// Move the highlight and redraw. Called from the Up/Down arrow branch.
+    private func moveSuggestionSelection(by delta: Int) {
+        guard let set = activeSuggestions, set.candidates.count > 1 else { return }
+        suggestionEngine.moveSelection(by: delta, candidateCount: set.candidates.count)
+        guard let updated = suggestionEngine.currentSuggestions(wordWasTransformed: suggestionWordTransformed) else { return }
+        activeSuggestions = updated
+        SuggestionPanelController.shared.show(updated)
+    }
+
     func setJapanese(_ enabled: Bool) {
         isJapaneseEnabled = enabled
         japaneseEngine.reset()
@@ -434,6 +493,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
                     injector.markNewSession(preserveMidSentence: true)
                 }
                 japaneseEngine.reset()
+                clearSuggestion()
                 return false
             }
         }
@@ -493,6 +553,16 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
             return handleBackspace(event: event, proxy: proxy)
         }
 
+        // English suggestion: ↑/↓ move the highlight while the panel is open.
+        // Checked BEFORE the cursor-movement reset below, and only when the
+        // panel actually has more than one candidate — plain arrow navigation
+        // must keep working everywhere else.
+        if (keyCode == VietnameseData.KEY_UP || keyCode == VietnameseData.KEY_DOWN),
+           let set = activeSuggestions, set.candidates.count > 1 {
+            moveSuggestionSelection(by: keyCode == VietnameseData.KEY_DOWN ? 1 : -1)
+            return nil  // consume: do not move the app's caret
+        }
+
         // Handle cursor movement keys - reset engine as focus might have changed
         if VietnameseData.cursorMovementKeys.contains(keyCode) {
             let keyName: String
@@ -510,6 +580,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
             debugLogCallback?("[\(getTimestamp())] \(keyName) Arrow/Nav key received (keyCode=0x\(String(format: "%02X", keyCode)))")
             engine.resetWithCursorMoved()  // Use new method that sets cursor moved flag
             japaneseEngine.reset()
+            clearSuggestion()
             injector.markNewSession(cursorMoved: true)  // Mark that cursor was moved
             return event
         }
@@ -521,8 +592,28 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
         // NOTE: Only real field switches (like Tab in a form) should reset mid-sentence,
         // but we can't distinguish that from regular Tab, so preserve state to be safe.
         if keyCode == VietnameseData.KEY_TAB { // Tab
+            // English suggestion: Tab accepts the pill instead of indenting.
+            // Only when a suggestion is actually on screen, so plain Tab keeps
+            // working everywhere else.
+            if let suggestion = activeSuggestions?.selected {
+                injector.waitForInjectionComplete()
+                let displayedCount = suggestionDisplayedCount   // characters currently shown
+                injector.injectSync(
+                    backspaceCount: displayedCount,
+                    characters: suggestion.displayWord.map { VNCharacter(character: $0) },
+                    codeTable: codeTable,
+                    proxy: proxy
+                )
+                debugLogCallback?("[\(getTimestamp())] ⇥ Suggestion accepted: '\(suggestion.displayWord)' (replaced \(displayedCount) chars)")
+                engine.reset()
+                clearSuggestion()
+                injector.markNewSession(preserveMidSentence: true)
+                return nil  // consume Tab
+            }
+
             engine.reset()
             japaneseEngine.reset()
+            clearSuggestion()
             injector.markNewSession(preserveMidSentence: true)  // Preserve mid-sentence state
             return event
         }
@@ -535,6 +626,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
         if keyCode == VietnameseData.KEY_FORWARD_DELETE { // Forward Delete
             engine.reset()
             japaneseEngine.reset()
+            clearSuggestion()
             injector.markNewSession(preserveMidSentence: true)  // Preserve mid-sentence state after Forward Delete
             return event  // Pass through
         }
@@ -591,6 +683,12 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
         let isEnglishModeWithMacro = !vietnameseEnabledForContext && macroEnabled && macroInEnglishMode
 
         if isWordBreakKey(character) {
+            // End the suggestion word FIRST: this block has several early
+            // returns, and missing one of them let the raw buffer run on
+            // across spaces ("Tôi là mảk" → one 30-char pseudo-word), which
+            // silently killed suggestions for every word after the first.
+            clearSuggestion()
+
             // Wait for any pending injection to complete before processing word break
             // This prevents race conditions where injection operations overlap.
             injector.waitForInjectionComplete()
@@ -701,6 +799,24 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
             isUppercase: isUppercase
         )
 
+        // Feed the suggestion engine the RAW key (what the user pressed),
+        // regardless of what Telex turned it into on screen.
+        if englishSuggestionEnabled {
+            if character.isLetter && character.isASCII {
+                // Net change in visible characters: the engine may rewrite the
+                // tail (backspace + insert), or pass the key through untouched.
+                let delta = result.shouldConsume
+                    ? result.newCharacters.count - result.backspaceCount
+                    : 1
+                suggestionEngine.noteLetter(character, isUppercase: isUppercase, displayedDelta: delta)
+                if result.shouldConsume { suggestionWordTransformed = true }
+            } else {
+                // Digits/symbols end the word (e.g. the "2." of a numbered list)
+                suggestionEngine.reset()
+                suggestionWordTransformed = false
+            }
+        }
+
         if result.shouldConsume {
             // Use synchronized injection (backspace + text in one atomic operation)
             // This prevents race conditions in terminals where next keystroke arrives
@@ -712,10 +828,13 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
                 proxy: proxy
             )
 
+            refreshSuggestion()
+
             // Consume original event
             return nil
         }
 
+        refreshSuggestion()
 
         // Pass through - engine may have buffered this character
         // If editor autocompletes it (e.g., \":d\" → emoji), the word break handler
@@ -764,6 +883,10 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     }
 
     private func handleBackspace(event: CGEvent, proxy: CGEventTapProxy) -> CGEvent? {
+        if englishSuggestionEnabled {
+            suggestionEngine.noteBackspace()
+        }
+
         // Japanese mode: the app deletes one displayed character on its own;
         // we only keep the converter's segment state in sync.
         if isJapaneseEnabled {
@@ -800,9 +923,11 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
                 proxy: proxy
             )
 
+            refreshSuggestion()
             return nil
         }
 
+        refreshSuggestion()
         return event
     }
     
@@ -925,6 +1050,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     func reset() {
         engine.reset()
         japaneseEngine.reset()
+        clearSuggestion()
         injector.markNewSession(preserveMidSentence: true)  // Preserve mid-sentence state to avoid Forward Delete in wrong context
         injector.clearMethodCache()  // Clear injection method cache
     }
@@ -935,6 +1061,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     func resetWithCursorMoved() {
         engine.resetWithCursorMoved()  // Use new method that sets cursor moved flag
         japaneseEngine.reset()
+        clearSuggestion()
         injector.markNewSession(cursorMoved: true)  // Mark that cursor was moved
         injector.clearMethodCache()  // Clear injection method cache
     }
@@ -945,6 +1072,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     func resetForAppSwitch() {
         engine.resetWithCursorMoved()  // Use new method that sets cursor moved flag
         japaneseEngine.reset()
+        clearSuggestion()
         injector.markNewSession(cursorMoved: true)  // Assume typing mid-sentence after app switch
         injector.clearMethodCache()
     }
@@ -956,6 +1084,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     func sessionDidBecomeActive() {
         engine.resetWithCursorMoved()
         japaneseEngine.reset()
+        clearSuggestion()
         injector.markNewSession(cursorMoved: true)
         injector.clearMethodCache()
         debugLogCallback?("🖥️ Session active — engine/injector reset for clean Vietnamese input")

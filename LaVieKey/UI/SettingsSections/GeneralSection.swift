@@ -123,8 +123,24 @@ struct GeneralSection: View {
                 SettingsGroup(title: "Tùy chọn") {
                     VStack(alignment: .leading, spacing: 10) {
                         Toggle("Kiểu gõ hiện đại (oà/uý)", isOn: $viewModel.preferences.modernStyle)
+
+                        Divider()
+
+                        Toggle("Cho phép gõ kiểu GenZ (zậy, zị, zui…)", isOn: $viewModel.preferences.genZMode)
+                        Text("Mở khoá chữ \"z\" làm phụ âm đầu, để bộ gõ không bỏ dấu hoặc tự sửa ngược các từ như zậy, zị, zui, zô.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Divider()
+
+                        Toggle("Gợi ý từ tiếng Anh (Tab để chấp nhận)", isOn: $viewModel.preferences.englishSuggestionEnabled)
+                        Text("Khi gõ tiếng Việt mà chữ hiện ra sai vì Telex (vd \"origi\" → \"ỏigi\"), một ô gợi ý nhỏ hiện dưới con trỏ đề xuất từ tiếng Anh đúng — bấm Tab để thay.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                }                
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()

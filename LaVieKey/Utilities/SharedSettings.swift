@@ -42,6 +42,8 @@ enum SharedSettingsKey: String {
 
     case customConsonantEnabled = "LaVieKey.customConsonantEnabled"
     case customConsonants = "LaVieKey.customConsonants"
+    case genZMode = "LaVieKey.genZMode"
+    case englishSuggestionEnabled = "LaVieKey.englishSuggestionEnabled"
     case tempOffToolbarEnabled = "LaVieKey.tempOffToolbarEnabled"
     case tempOffToolbarHotkeyCode = "LaVieKey.tempOffToolbarHotkeyCode"
     case tempOffToolbarHotkeyModifiers = "LaVieKey.tempOffToolbarHotkeyModifiers"
@@ -534,6 +536,16 @@ class SharedSettings {
             writeString(newValue, forKey: SharedSettingsKey.customConsonants.rawValue)
             notifySettingsChanged()
         }
+    }
+
+    var genZMode: Bool {
+        get { readBool(forKey: SharedSettingsKey.genZMode.rawValue) ?? false }
+        set { writeBool(newValue, forKey: SharedSettingsKey.genZMode.rawValue) }
+    }
+
+    var englishSuggestionEnabled: Bool {
+        get { readBool(forKey: SharedSettingsKey.englishSuggestionEnabled.rawValue) ?? false }
+        set { writeBool(newValue, forKey: SharedSettingsKey.englishSuggestionEnabled.rawValue) }
     }
     
     var tempOffToolbarEnabled: Bool {
@@ -1319,6 +1331,8 @@ class SharedSettings {
         // Custom consonants (2-prop: enabled + list)
         prefs.customConsonantEnabled = customConsonantEnabled
         prefs.customConsonants = customConsonants
+        prefs.genZMode = genZMode
+        prefs.englishSuggestionEnabled = englishSuggestionEnabled
         prefs.tempOffToolbarEnabled = tempOffToolbarEnabled
 
         // Temp off toolbar hotkey
@@ -1508,6 +1522,8 @@ class SharedSettings {
 
         customConsonantEnabled = prefs.customConsonantEnabled
         customConsonants = prefs.customConsonants
+        genZMode = prefs.genZMode
+        englishSuggestionEnabled = prefs.englishSuggestionEnabled
         tempOffToolbarEnabled = prefs.tempOffToolbarEnabled
         tempOffToolbarHotkeyCode = prefs.tempOffToolbarHotkey.keyCode
         tempOffToolbarHotkeyModifiers = prefs.tempOffToolbarHotkey.modifiers.rawValue
