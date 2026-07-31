@@ -78,6 +78,7 @@
 		564995EF131811377C4F3FF6 /* VNEngineAdvanced.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F6BDFF6F99DC1B577BA425 /* VNEngineAdvanced.swift */; };
 		5A61FAA58A29AD3225DD649C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803B94EF161FE79A022FF806 /* SettingsView.swift */; };
 		1A7EA11E2F0100010000AB01 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA11E2F0100020000AB02 /* ThemeManager.swift */; };
+		1A7EA33E2F0300010000CD01 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA33E2F0300020000CD02 /* UpdateChecker.swift */; };
 		1A7EA22E2F0200030000AB13 /* RomajiKanaConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA22E2F0200020000AB12 /* RomajiKanaConverter.swift */; };
 		1A7EA33E2F0300030000AC03 /* EnglishWordList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA33E2F0300020000AC02 /* EnglishWordList.swift */; };
 		1A7EA33E2F0300050000AC05 /* SuggestionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA33E2F0300040000AC04 /* SuggestionEngine.swift */; };
@@ -220,6 +221,7 @@
 		69901F64AACBE0FBAC7C0E0F /* BackupRestoreSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackupRestoreSection.swift; sourceTree = "<group>"; };
 		803B94EF161FE79A022FF806 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		1A7EA11E2F0100020000AB02 /* ThemeManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
+		1A7EA33E2F0300020000CD02 /* UpdateChecker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		1A7EA22E2F0200020000AB12 /* RomajiKanaConverter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RomajiKanaConverter.swift; sourceTree = "<group>"; };
 		1A7EA33E2F0300020000AC02 /* EnglishWordList.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EnglishWordList.swift; sourceTree = "<group>"; };
 		1A7EA33E2F0300040000AC04 /* SuggestionEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SuggestionEngine.swift; sourceTree = "<group>"; };
@@ -454,6 +456,7 @@
 			isa = PBXGroup;
 			children = (
 				10FA30B62EFA65B100C41BF8 /* SparkleUpdateDelegate.swift */,
+				1A7EA33E2F0300020000CD02 /* UpdateChecker.swift */,
 				A2000001 /* LaVieKeyApp.swift */,
 				A2000002 /* AppDelegate.swift */,
 				608CA8088C2F70FEC4ABA340 /* LaVieKeyIMUpdateManager.swift */,
@@ -815,6 +818,7 @@
 				1045F4282EF91CBA00F735BE /* VNEngineEnglishDetection.swift in Sources */,
 				5A61FAA58A29AD3225DD649C /* SettingsView.swift in Sources */,
 				1A7EA11E2F0100010000AB01 /* ThemeManager.swift in Sources */,
+				1A7EA33E2F0300010000CD01 /* UpdateChecker.swift in Sources */,
 				1A7EA22E2F0200030000AB13 /* RomajiKanaConverter.swift in Sources */,
 				1A7EA33E2F0300030000AC03 /* EnglishWordList.swift in Sources */,
 				1A7EA33E2F0300050000AC05 /* SuggestionEngine.swift in Sources */,

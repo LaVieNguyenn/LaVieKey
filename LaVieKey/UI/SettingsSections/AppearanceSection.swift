@@ -31,38 +31,43 @@ struct AppearanceSection: View {
                             .frame(maxWidth: 320)
                         }
 
-                        // Accent color swatches
-                        VStack(alignment: .leading, spacing: 6) {
+                        // Accent color swatches + free colour picker
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("Màu nhấn:")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                             HStack(spacing: 10) {
-                                ForEach(AccentTheme.allCases, id: \.self) { theme in
+                                ForEach(AccentTheme.presets, id: \.self) { theme in
                                     Button {
                                         viewModel.preferences.accentTheme = theme
                                     } label: {
-                                        ZStack {
-                                            Circle()
-                                                .fill(theme.color)
-                                                .frame(width: 22, height: 22)
-                                            if viewModel.preferences.accentTheme == theme {
-                                                Image(systemName: "checkmark")
-                                                    .font(.system(size: 10, weight: .bold))
-                                                    .foregroundColor(.white)
-                                            }
-                                        }
-                                        .overlay(
-                                            Circle()
-                                                .strokeBorder(
-                                                    viewModel.preferences.accentTheme == theme
-                                                        ? Color.primary.opacity(0.6) : .clear,
-                                                    lineWidth: 1.5
-                                                )
-                                        )
+                                        swatch(theme.color, isSelected: viewModel.preferences.accentTheme == theme)
                                     }
                                     .buttonStyle(.plain)
                                     .help(LocalizedStringKey(theme.displayName))
                                 }
+
+                                Divider().frame(height: 20)
+
+                                // Free choice — click the well to open the macOS colour picker
+                                ColorPicker("", selection: Binding(
+                                    get: { Color(hex: viewModel.preferences.accentCustomHex) ?? .blue },
+                                    set: { newColor in
+                                        viewModel.preferences.accentCustomHex = newColor.hexString
+                                        viewModel.preferences.accentTheme = .custom
+                                    }
+                                ), supportsOpacity: false)
+                                .labelsHidden()
+                                .frame(width: 26, height: 22)
+                                .help(LocalizedStringKey("Tuỳ chỉnh"))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 5)
+                                        .strokeBorder(
+                                            viewModel.preferences.accentTheme == .custom
+                                                ? Color.primary.opacity(0.6) : .clear,
+                                            lineWidth: 1.5
+                                        )
+                                )
                             }
                         }
 
@@ -138,6 +143,22 @@ struct AppearanceSection: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
         }
+    }
+
+    private func swatch(_ color: Color, isSelected: Bool) -> some View {
+        ZStack {
+            Circle()
+                .fill(color)
+                .frame(width: 22, height: 22)
+            if isSelected {
+                Image(systemName: "checkmark")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.white)
+            }
+        }
+        .overlay(
+            Circle().strokeBorder(isSelected ? Color.primary.opacity(0.6) : .clear, lineWidth: 1.5)
+        )
     }
 
     private func restartApp() {

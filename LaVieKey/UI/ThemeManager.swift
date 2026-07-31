@@ -26,6 +26,8 @@ extension AppAppearanceMode {
 }
 
 extension AccentTheme {
+    /// Preset colour. `.custom` has no fixed colour — resolve it with
+    /// `color(customHex:)`, which falls back here for the presets.
     var color: Color {
         switch self {
         case .blue: return .blue
@@ -37,7 +39,36 @@ extension AccentTheme {
         case .green: return .green
         case .teal: return Color(red: 0x30/255.0, green: 0xB0/255.0, blue: 0xC7/255.0)
         case .graphite: return Color(white: 0.45)
+        case .custom: return .blue     // placeholder; see color(customHex:)
         }
+    }
+
+    func color(customHex: String) -> Color {
+        guard self == .custom else { return color }
+        return Color(hex: customHex) ?? .blue
+    }
+}
+
+extension Color {
+    /// Parse "#RRGGBB" / "RRGGBB". Returns nil for anything else.
+    init?(hex: String) {
+        var value = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        if value.hasPrefix("#") { value.removeFirst() }
+        guard value.count == 6, let rgb = UInt32(value, radix: 16) else { return nil }
+        self.init(
+            red: Double((rgb >> 16) & 0xFF) / 255.0,
+            green: Double((rgb >> 8) & 0xFF) / 255.0,
+            blue: Double(rgb & 0xFF) / 255.0
+        )
+    }
+
+    /// "#RRGGBB" for storage. Uses the sRGB conversion NSColor provides.
+    var hexString: String {
+        let ns = NSColor(self).usingColorSpace(.sRGB) ?? .systemBlue
+        return String(format: "#%02X%02X%02X",
+                      Int(round(ns.redComponent * 255)),
+                      Int(round(ns.greenComponent * 255)),
+                      Int(round(ns.blueComponent * 255)))
     }
 }
 
@@ -54,7 +85,7 @@ final class ThemeManager: ObservableObject {
     /// Apply theme from preferences: updates published accent (root views
     /// re-render) and the app-wide light/dark appearance.
     func apply(_ preferences: Preferences) {
-        let newAccent = preferences.accentTheme.color
+        let newAccent = preferences.accentTheme.color(customHex: preferences.accentCustomHex)
         let newMode = preferences.appearanceMode
 
         let update = {

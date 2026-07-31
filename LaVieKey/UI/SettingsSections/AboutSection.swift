@@ -114,6 +114,34 @@ struct AboutSection: View {
                 }
                 .padding(.vertical, 8)
 
+                Divider()
+                    .padding(.horizontal, 80)
+
+                // Updates
+                VStack(spacing: 8) {
+                    Button {
+                        AppDelegate.shared?.checkForUpdatesFromUI()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                                .font(.system(size: 12))
+                            Text("Kiểm tra cập nhật")
+                        }
+                        .font(.system(size: 12, weight: .medium))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 3)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+
+                    Text("Sau khi cập nhật cần bật lại quyền Trợ năng (Accessibility) — bản build ký ad-hoc nên macOS coi mỗi bản là ứng dụng mới.")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal, 40)
+                }
+
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

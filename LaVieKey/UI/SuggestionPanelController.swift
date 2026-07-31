@@ -18,11 +18,21 @@
 import AppKit
 import SwiftUI
 
+/// Holds what the panel renders so the SwiftUI view can be updated in place
+/// instead of rebuilding the hosting view on every keystroke.
+private final class SuggestionPanelModel: ObservableObject {
+    @Published var set: SuggestionSet = SuggestionSet(candidates: [], selectedIndex: 0)
+}
+
 final class SuggestionPanelController {
 
     static let shared = SuggestionPanelController()
 
     private var panel: NSPanel?
+    /// Built once and reused — a fresh NSHostingView per keystroke churns the
+    /// whole SwiftUI view graph on the typing hot path.
+    private var hostingView: NSHostingView<SuggestionListView>?
+    private let model = SuggestionPanelModel()
 
     /// Gap between the caret and the panel edge
     private let caretGap: CGFloat = 4
@@ -47,11 +57,19 @@ final class SuggestionPanelController {
 
     private func render(_ set: SuggestionSet) {
         let panel = ensurePanel()
+        model.set = set
 
-        let hosting = NSHostingView(rootView: SuggestionListView(set: set))
-        panel.contentView = hosting
-        // Force layout before measuring: fittingSize on a freshly attached
-        // hosting view can still be zero, which produced a mis-placed (often
+        let hosting: NSHostingView<SuggestionListView>
+        if let existing = hostingView {
+            hosting = existing
+        } else {
+            hosting = NSHostingView(rootView: SuggestionListView(model: model))
+            hostingView = hosting
+            panel.contentView = hosting
+        }
+
+        // Force layout before measuring: fittingSize can still be zero right
+        // after a content change, which produced a mis-placed (often
         // half-off-screen) panel.
         hosting.layoutSubtreeIfNeeded()
         var size = hosting.fittingSize
@@ -169,8 +187,10 @@ final class SuggestionPanelController {
 
 // MARK: - List view
 
-private struct SuggestionListView: View {
-    let set: SuggestionSet
+struct SuggestionListView: View {
+    @ObservedObject fileprivate var model: SuggestionPanelModel
+
+    private var set: SuggestionSet { model.set }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {

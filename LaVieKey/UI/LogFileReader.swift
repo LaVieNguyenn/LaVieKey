@@ -122,8 +122,16 @@ class LogFileReader {
             // Seek to last read position
             try handle.seek(toOffset: lastReadPosition)
             
-            // Read new data
-            let newDataLength = fileSize - lastReadPosition
+            // Read new data, but never more than a bounded chunk: the log
+            // grows unbounded while the debug window is closed, and slurping a
+            // multi-megabyte delta into one String spiked memory badly.
+            let pending = fileSize - lastReadPosition
+            let maxChunk: UInt64 = 1_048_576   // 1 MB
+            if pending > maxChunk {
+                lastReadPosition = fileSize - maxChunk   // skip the old middle
+                try handle.seek(toOffset: lastReadPosition)
+            }
+            let newDataLength = min(pending, maxChunk)
             guard let data = try handle.read(upToCount: Int(newDataLength)),
                   let content = String(data: data, encoding: .utf8) else {
                 return []

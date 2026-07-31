@@ -77,6 +77,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var focusObserverPID: pid_t = 0
     private var lastFocusedElement: AXUIElement?
     private var updaterController: SPUStandardUpdaterController?
+
+    /// Daily background update check (UpdateChecker, not Sparkle)
+    private var updateCheckTimer: Timer?
     private var sparkleUpdateDelegate: SparkleUpdateDelegate?
     
     /// Store the input source ID BEFORE a Window Title Rule switched it
@@ -1860,31 +1863,105 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Sparkle Auto-Update
 
     private func checkForUpdates() {
-        debugWindowController?.logEvent("Manually checking for updates...")
-        // Activate app to bring update dialog to front
-        NSApp.activate(ignoringOtherApps: true)
-        updaterController?.updater.checkForUpdates()
+        checkForUpdatesFromUI()
     }
-    
-    /// Check for updates from SwiftUI views (activates app to bring dialog to front)
+
+    /// Manual check: always reports the outcome, including "already newest".
     func checkForUpdatesFromUI() {
-        debugWindowController?.logEvent("[UI] Manually checking for updates...")
-        
-        // Must be called on main thread
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            // Activate app to bring update dialog to front
-            NSApp.activate(ignoringOtherApps: true)
-            
-            // Use the same method as menu bar - updater.checkForUpdates()
-            if let updater = self.updaterController?.updater {
-                self.debugWindowController?.logEvent("[UI] Calling updater.checkForUpdates()")
-                updater.checkForUpdates()
-            } else {
-                self.debugWindowController?.logEvent("[UI] updaterController or updater is nil!")
+        debugWindowController?.logEvent("Đang kiểm tra bản cập nhật...")
+        NSApp.activate(ignoringOtherApps: true)
+        runUpdateCheck(silentWhenUpToDate: false)
+    }
+
+    /// Background check (launch + daily): stays quiet unless something is new.
+    private func checkForUpdatesInBackground() {
+        runUpdateCheck(silentWhenUpToDate: true)
+    }
+
+    private func runUpdateCheck(silentWhenUpToDate: Bool) {
+        UpdateChecker.shared.check { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .upToDate:
+                self.debugWindowController?.logEvent("Đã là bản mới nhất (v\(UpdateChecker.shared.currentVersion))")
+                if !silentWhenUpToDate {
+                    let alert = NSAlert()
+                    alert.messageText = String(localized: "Bạn đang dùng bản mới nhất")
+                    alert.informativeText = "LaVieKey v\(UpdateChecker.shared.currentVersion)"
+                    alert.addButton(withTitle: String(localized: "OK"))
+                    alert.runModal()
+                }
+            case .failed(let message):
+                self.debugWindowController?.logEvent("Kiểm tra cập nhật thất bại: \(message)")
+                if !silentWhenUpToDate {
+                    let alert = NSAlert()
+                    alert.alertStyle = .warning
+                    alert.messageText = String(localized: "Không kiểm tra được bản cập nhật")
+                    alert.informativeText = message
+                    alert.addButton(withTitle: String(localized: "OK"))
+                    alert.runModal()
+                }
+            case .available(let release):
+                self.debugWindowController?.logEvent("Có bản mới: v\(release.version)")
+                NSApp.activate(ignoringOtherApps: true)
+                self.presentUpdateAvailable(release)
             }
         }
+    }
+
+    private func presentUpdateAvailable(_ release: ReleaseInfo) {
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Đã có LaVieKey v\(release.version)")
+        // Release notes are markdown; show a trimmed plain-text preview.
+        let notes = release.notes
+            .replacingOccurrences(of: "#", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        alert.informativeText = notes.isEmpty
+            ? String(localized: "Bạn đang dùng v\(UpdateChecker.shared.currentVersion).")
+            : String(notes.prefix(600))
+        alert.addButton(withTitle: String(localized: "Cập nhật ngay"))
+        alert.addButton(withTitle: String(localized: "Xem chi tiết"))
+        alert.addButton(withTitle: String(localized: "Để sau"))
+
+        switch alert.runModal() {
+        case .alertFirstButtonReturn:
+            startUpdateDownload(release)
+        case .alertSecondButtonReturn:
+            NSWorkspace.shared.open(release.pageURL)
+        default:
+            break
+        }
+    }
+
+    private func startUpdateDownload(_ release: ReleaseInfo) {
+        let progressAlert = NSAlert()
+        progressAlert.messageText = String(localized: "Đang tải LaVieKey v\(release.version)…")
+        progressAlert.informativeText = String(localized: "Ứng dụng sẽ tự khởi động lại khi cài xong.")
+        let bar = NSProgressIndicator(frame: NSRect(x: 0, y: 0, width: 260, height: 16))
+        bar.isIndeterminate = false
+        bar.minValue = 0
+        bar.maxValue = 1
+        progressAlert.accessoryView = bar
+
+        // Ad-hoc signing means macOS sees each build as a different app, so the
+        // Accessibility grant does NOT survive the swap. Say so up front rather
+        // than leaving the user with a silently dead keyboard.
+        let window = progressAlert.window
+        window.makeKeyAndOrderFront(nil)
+
+        UpdateChecker.shared.downloadAndInstall(
+            release,
+            progress: { fraction in bar.doubleValue = fraction },
+            failure: { message in
+                window.orderOut(nil)
+                let fail = NSAlert()
+                fail.alertStyle = .warning
+                fail.messageText = String(localized: "Cập nhật thất bại")
+                fail.informativeText = message
+                fail.addButton(withTitle: String(localized: "OK"))
+                fail.runModal()
+            }
+        )
     }
 
 
@@ -1916,25 +1993,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // Apply auto-check setting from preferences
         let autoCheckEnabled = SharedSettings.shared.autoCheckForUpdates
-        updaterController?.updater.automaticallyChecksForUpdates = autoCheckEnabled
+        updaterController?.updater.automaticallyChecksForUpdates = false  // updates go through UpdateChecker
         debugWindowController?.logEvent("   Auto-check (user setting): \(autoCheckEnabled)")
-        
-        // Check for updates immediately on app launch (silently in background)
-        // Only if auto-check is enabled
-        if autoCheckEnabled {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
-                guard let updater = self?.updaterController?.updater else { return }
-                
-                // Use background check - won't show UI if no update available
-                if updater.canCheckForUpdates {
-                    self?.debugWindowController?.logEvent("Checking for updates in background (startup check)...")
-                    updater.checkForUpdatesInBackground()
-                } else {
-                    self?.debugWindowController?.logEvent("Skipping startup update check (already checking or in progress)")
-                }
-            }
-        } else {
-            debugWindowController?.logEvent("Skipping startup update check (auto-check disabled by user)")
+
+        guard autoCheckEnabled else {
+            debugWindowController?.logEvent("Bỏ qua kiểm tra cập nhật (người dùng đã tắt)")
+            return
+        }
+
+        // One quiet check shortly after launch...
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
+            self?.debugWindowController?.logEvent("Kiểm tra cập nhật nền (lúc khởi động)...")
+            self?.checkForUpdatesInBackground()
+        }
+
+        // ...then once a day while the app stays running.
+        updateCheckTimer?.invalidate()
+        updateCheckTimer = Timer.scheduledTimer(withTimeInterval: 86_400, repeats: true) { [weak self] _ in
+            self?.debugWindowController?.logEvent("Kiểm tra cập nhật nền (định kỳ)...")
+            self?.checkForUpdatesInBackground()
         }
     }
 

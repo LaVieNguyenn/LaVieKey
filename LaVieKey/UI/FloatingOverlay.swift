@@ -67,12 +67,16 @@ class FloatingOverlay {
         autoHideWorkItem?.cancel()
         autoHideWorkItem = nil
         
-        // Dismiss existing overlay first
+        // Dismiss existing overlay first (close, not just orderOut — see hide())
         if isShowing {
             isShowing = false
             let oldWindow = window
             window = nil
-            oldWindow?.orderOut(nil)
+            onMainThread {
+                oldWindow?.orderOut(nil)
+                oldWindow?.contentView = nil
+                oldWindow?.close()
+            }
         }
         
         isShowing = true
@@ -144,16 +148,26 @@ class FloatingOverlay {
         
         onMainThread {
             guard let windowToDismiss = windowToDismiss else { return }
-            
+
+            // close(), not just orderOut(): show() builds a NEW NSWindow every
+            // time, and AppKit keeps its own retain on an ordered-in window.
+            // orderOut alone left every window ever shown alive (with its
+            // backing store and SwiftUI view graph) — the main source of the
+            // 43 MB → 123 MB growth, since SecureInputOverlay shows on every
+            // app switch.
             if animated {
                 NSAnimationContext.runAnimationGroup({ context in
                     context.duration = 0.25
                     windowToDismiss.animator().alphaValue = 0
                 }, completionHandler: {
                     windowToDismiss.orderOut(nil)
+                    windowToDismiss.contentView = nil
+                    windowToDismiss.close()
                 })
             } else {
                 windowToDismiss.orderOut(nil)
+                windowToDismiss.contentView = nil
+                windowToDismiss.close()
             }
         }
     }

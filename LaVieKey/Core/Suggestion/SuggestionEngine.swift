@@ -36,7 +36,10 @@ struct SuggestionSet: Equatable {
 
 final class SuggestionEngine {
 
-    private let wordList: EnglishWordList
+    /// Loaded on first use: the word list costs a few MB and most users never
+    /// switch the suggestion feature on.
+    private lazy var wordList: EnglishWordList = wordListProvider()
+    private let wordListProvider: () -> EnglishWordList
 
     /// Raw ASCII letters typed since the last word break (lowercased)
     private var rawWord: String = ""
@@ -63,8 +66,8 @@ final class SuggestionEngine {
     /// How many candidates to offer
     private let maxCandidates = 3
 
-    init(wordList: EnglishWordList = .loadBundled()) {
-        self.wordList = wordList
+    init(wordList: @autoclosure @escaping () -> EnglishWordList = .loadBundled()) {
+        self.wordListProvider = wordList
     }
 
     // MARK: - Feeding keystrokes (called from KeyboardEventHandler, VN mode)

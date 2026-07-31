@@ -108,6 +108,10 @@ enum AccentTheme: String, Codable, CaseIterable {
     case green
     case teal
     case graphite
+    case custom        // free colour picked by the user (accentCustomHex)
+
+    /// Presets shown as swatches; `custom` gets its own picker control
+    static var presets: [AccentTheme] { allCases.filter { $0 != .custom } }
 
     /// Raw Vietnamese label (UI wraps with LocalizedStringKey)
     var displayName: String {
@@ -121,6 +125,7 @@ enum AccentTheme: String, Codable, CaseIterable {
         case .green: return "Xanh lá"
         case .teal: return "Xanh ngọc"
         case .graphite: return "Xám"
+        case .custom: return "Tuỳ chỉnh"
         }
     }
 }
@@ -230,6 +235,7 @@ struct Preferences: Codable {
     var appLanguage: AppLanguage = .vi
     var appearanceMode: AppAppearanceMode = .system  // Light/dark override
     var accentTheme: AccentTheme = .blue             // App accent color
+    var accentCustomHex: String = "#2563EB"          // Used when accentTheme == .custom
     var autoCheckForUpdates: Bool = true
 
     // Japanese input (phase 1: romaji → kana)

@@ -80,6 +80,7 @@ enum SharedSettingsKey: String {
     case menuBarIconStyle = "LaVieKey.menuBarIconStyle"
     case appearanceMode = "LaVieKey.appearanceMode"
     case accentTheme = "LaVieKey.accentTheme"
+    case accentCustomHex = "LaVieKey.accentCustomHex"
     case kanaScript = "LaVieKey.kanaScript"
     case japanesePunctuation = "LaVieKey.japanesePunctuation"
     case appLanguage = "LaVieKey.appLanguage"
@@ -755,6 +756,11 @@ class SharedSettings {
         set { writeString(newValue, forKey: SharedSettingsKey.accentTheme.rawValue) }
     }
 
+    var accentCustomHex: String {
+        get { readString(forKey: SharedSettingsKey.accentCustomHex.rawValue) ?? "#2563EB" }
+        set { writeString(newValue, forKey: SharedSettingsKey.accentCustomHex.rawValue) }
+    }
+
     var kanaScript: String {
         get { readString(forKey: SharedSettingsKey.kanaScript.rawValue) ?? "hiragana" }
         set { writeString(newValue, forKey: SharedSettingsKey.kanaScript.rawValue) }
@@ -1396,6 +1402,7 @@ class SharedSettings {
         if let accent = AccentTheme(rawValue: accentTheme) {
             prefs.accentTheme = accent
         }
+        prefs.accentCustomHex = accentCustomHex
         if let kana = KanaScript(rawValue: kanaScript) {
             prefs.kanaScript = kana
         }
@@ -1565,6 +1572,7 @@ class SharedSettings {
         appLanguage = prefs.appLanguage.rawValue
         appearanceMode = prefs.appearanceMode.rawValue
         accentTheme = prefs.accentTheme.rawValue
+        accentCustomHex = prefs.accentCustomHex
         kanaScript = prefs.kanaScript.rawValue
         japanesePunctuation = prefs.japanesePunctuation
         autoCheckForUpdates = prefs.autoCheckForUpdates

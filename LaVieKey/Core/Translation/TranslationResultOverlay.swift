@@ -90,7 +90,11 @@ class TranslationResultOverlay {
                 context.duration = 0.15
                 p.animator().alphaValue = 0
             }, completionHandler: { [weak self] in
+                // close(), not just orderOut: createAndShowWindow builds a new
+                // NSPanel each time and AppKit retains ordered-in windows.
                 p.orderOut(nil)
+                p.contentView = nil
+                p.close()
                 self?.panel = nil
             })
         }
@@ -99,7 +103,11 @@ class TranslationResultOverlay {
     private func createAndShowWindow(text: String, autoHideSeconds: Int) {
         // Dismiss any existing window immediately
         removeMonitors()
-        panel?.orderOut(nil)
+        if let old = panel {
+            old.orderOut(nil)
+            old.contentView = nil
+            old.close()
+        }
         panel = nil
         
         let mouseLocation = NSEvent.mouseLocation

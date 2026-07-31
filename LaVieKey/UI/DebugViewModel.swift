@@ -12,6 +12,9 @@ import Combine
 class DebugViewModel: ObservableObject {
     @Published var statusText = "Status: Initializing..."
     @Published var logLines: [String] = []  // Changed from logText to array for better performance
+
+    /// Token for the block-based distributed observer (see setupIMKitDebugListener)
+    private var imkitObserverToken: NSObjectProtocol?
     @Published var isLoggingEnabled = true {
         didSet {
             loggingEnabledCallback?(isLoggingEnabled)
@@ -154,6 +157,10 @@ class DebugViewModel: ObservableObject {
     }
     
     deinit {
+        if let token = imkitObserverToken {
+            DistributedNotificationCenter.default().removeObserver(token)
+            imkitObserverToken = nil
+        }
         readTimer?.invalidate()
         DistributedNotificationCenter.default().removeObserver(self)
     }
@@ -284,7 +291,9 @@ class DebugViewModel: ObservableObject {
     // MARK: - IMKit Debug Listener
     
     private func setupIMKitDebugListener() {
-        DistributedNotificationCenter.default().addObserver(
+        // Block-based observers are NOT removed by removeObserver(self); keep
+        // the token so each debug-window cycle does not leave one behind.
+        imkitObserverToken = DistributedNotificationCenter.default().addObserver(
             forName: Notification.Name("LaVieKey.debugLog"),
             object: nil,
             queue: nil // Use caller's queue, we handle threading ourselves
