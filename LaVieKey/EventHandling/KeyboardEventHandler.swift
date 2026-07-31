@@ -22,6 +22,11 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     let japaneseEngine = JapaneseEngine()
     private var isJapaneseEnabled = false
 
+    /// Phase 2: kana → kanji conversion (Space looks the kana up, the user
+    /// walks the candidate window). Off unless the dictionary is present.
+    let kanaKanjiSession = KanaKanjiSession()
+    var kanjiConversionEnabled = false
+
     // English inline suggestion (VS Code-style rescue: raw "origi" displayed
     // as "ỏigi" → suggest "origin" → Tab accepts). VN mode only.
     let suggestionEngine = SuggestionEngine()
@@ -848,9 +853,31 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
     /// through the converter and are injected as display diffs; word-break keys
     /// first resolve the pending tail (trailing "n" → ん) then pass through.
     private func processJapaneseKey(character: Character, keyCode: CGKeyCode, event: CGEvent, proxy: CGEventTapProxy) -> CGEvent? {
+        // --- Conversion session active: the keyboard belongs to it ---
+        if kanaKanjiSession.isActive {
+            return handleConversionKey(character: character, keyCode: keyCode, event: event, proxy: proxy)
+        }
+
+        // Space starts a conversion when there is kana to convert.
+        if character == " ", kanjiConversionEnabled {
+            injector.waitForInjectionComplete()
+            let flush = japaneseEngine.endSegment()      // resolve trailing "n" first
+            if !flush.isNoOp {
+                inject(flush.backspaceCount, flush.insert, proxy: proxy)
+            }
+            let reading = japaneseEngine.lastCommittedSegment
+            if !reading.isEmpty, kanaKanjiSession.start(reading: reading) {
+                if let state = kanaKanjiSession.state {
+                    CandidateWindowController.shared.show(state)
+                }
+                return nil          // consume the space; it opened the window
+            }
+            return event            // nothing to convert → ordinary space
+        }
+
         // Characters the romaji converter understands (letters + mapped punctuation)
         let isConvertible = (character.isLetter && character.isASCII)
-            || "',.?!-[]".contains(character)
+            || "\',.?!-[]".contains(character)
 
         guard isConvertible else {
             // Anything else (space, enter, digits, symbols) ends the segment:
@@ -858,12 +885,7 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
             injector.waitForInjectionComplete()
             let flush = japaneseEngine.endSegment()
             if !flush.isNoOp {
-                injector.injectSync(
-                    backspaceCount: flush.backspaceCount,
-                    characters: flush.insert.map { VNCharacter(character: $0) },
-                    codeTable: .unicode,
-                    proxy: proxy
-                )
+                inject(flush.backspaceCount, flush.insert, proxy: proxy)
             }
             return event
         }
@@ -873,13 +895,82 @@ class KeyboardEventHandler: EventTapManager.EventTapDelegate {
         guard !result.isNoOp else {
             return nil  // consumed, nothing visible changed
         }
+        inject(result.backspaceCount, result.insert, proxy: proxy)
+        return nil  // consume the original key
+    }
+
+    /// Keys while the candidate window is open.
+    private func handleConversionKey(character: Character, keyCode: CGKeyCode, event: CGEvent, proxy: CGEventTapProxy) -> CGEvent? {
+        injector.waitForInjectionComplete()
+
+        func refreshPreview() {
+            // Show the highlighted candidate in the document as we move
+            if let replacement = kanaKanjiSession.pendingReplacement() {
+                inject(replacement.backspaces, replacement.insert, proxy: proxy)
+            }
+            if let state = kanaKanjiSession.state {
+                CandidateWindowController.shared.show(state)
+            }
+        }
+
+        switch keyCode {
+        case VietnameseData.KEY_SPACE, VietnameseData.KEY_DOWN:
+            kanaKanjiSession.moveSelection(by: 1)
+            refreshPreview()
+            return nil
+
+        case VietnameseData.KEY_UP:
+            kanaKanjiSession.moveSelection(by: -1)
+            refreshPreview()
+            return nil
+
+        case VietnameseData.KEY_RETURN, VietnameseData.KEY_ENTER:
+            // The preview is already on screen; just close the session.
+            _ = kanaKanjiSession.commit()
+            CandidateWindowController.shared.hide()
+            japaneseEngine.reset()
+            return nil
+
+        case VietnameseData.KEY_ESC:
+            if let restore = kanaKanjiSession.cancel() {
+                inject(restore.backspaces, restore.insert, proxy: proxy)
+            } else {
+                kanaKanjiSession.end()
+            }
+            CandidateWindowController.shared.hide()
+            japaneseEngine.reset()
+            return nil
+
+        default:
+            // 1…9 pick a candidate directly
+            if let digit = character.wholeNumberValue, (1...9).contains(digit),
+               kanaKanjiSession.select(number: digit) {
+                if let replacement = kanaKanjiSession.pendingReplacement() {
+                    inject(replacement.backspaces, replacement.insert, proxy: proxy)
+                }
+                _ = kanaKanjiSession.commit()
+                CandidateWindowController.shared.hide()
+                japaneseEngine.reset()
+                return nil
+            }
+
+            // Any other key commits the current candidate, then is handled
+            // normally (so typing simply continues).
+            _ = kanaKanjiSession.commit()
+            CandidateWindowController.shared.hide()
+            japaneseEngine.reset()
+            return processJapaneseKey(character: character, keyCode: keyCode, event: event, proxy: proxy)
+        }
+    }
+
+    /// Inject a (backspaces, text) diff as plain characters
+    private func inject(_ backspaces: Int, _ text: String, proxy: CGEventTapProxy) {
         injector.injectSync(
-            backspaceCount: result.backspaceCount,
-            characters: result.insert.map { VNCharacter(character: $0) },
+            backspaceCount: backspaces,
+            characters: text.map { VNCharacter(character: $0) },
             codeTable: .unicode,
             proxy: proxy
         )
-        return nil  // consume the original key
     }
 
     private func handleBackspace(event: CGEvent, proxy: CGEventTapProxy) -> CGEvent? {

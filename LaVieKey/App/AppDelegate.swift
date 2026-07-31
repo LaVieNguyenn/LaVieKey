@@ -586,6 +586,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         debugWindowController?.logEvent("🛠️ Debug window opened via menu")
     }
     
+    /// Keep the macOS login-item registration in step with the preference,
+    /// and report back when the system refuses (e.g. the user switched it off
+    /// in System Settings → General → Login Items).
+    private func applyLaunchAtLogin(_ enabled: Bool) {
+        LaunchAtLogin.logCallback = { [weak self] message in
+            self?.debugWindowController?.logEvent(message)
+        }
+        guard LaunchAtLogin.isEnabled() != enabled else { return }   // already in the right state
+        let ok = LaunchAtLogin.setEnabled(enabled)
+        if !ok && enabled {
+            debugWindowController?.logEvent("Bật khởi động cùng hệ thống thất bại — \(LaunchAtLogin.statusDescription)")
+        }
+    }
+
     private func applyPreferences(_ preferences: Preferences) {
         // Apply theme (accent color + light/dark) — runs at launch and on every save
         ThemeManager.shared.apply(preferences)
@@ -596,6 +610,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Japanese engine options
         keyboardHandler?.japaneseEngine.script = preferences.kanaScript
         keyboardHandler?.japaneseEngine.japanesePunctuation = preferences.japanesePunctuation
+
+        // Kana → kanji conversion needs the SKK dictionary in memory; load it
+        // lazily the first time the feature is switched on (it costs ~30 MB).
+        keyboardHandler?.kanjiConversionEnabled = preferences.kanjiConversionEnabled
+        if preferences.kanjiConversionEnabled {
+            SKKDictionary.shared.logCallback = { [weak self] message in
+                self?.debugWindowController?.logEvent(message)
+            }
+            SKKDictionary.shared.loadIfNeeded { [weak self] ok in
+                if !ok {
+                    self?.debugWindowController?.logEvent("Chưa có từ điển tiếng Nhật — hãy tải trong Cài đặt → Tiếng Nhật")
+                    self?.keyboardHandler?.kanjiConversionEnabled = false
+                }
+            }
+        } else if SKKDictionary.shared.isLoaded {
+            SKKDictionary.shared.unload()   // free the table when switched off
+        }
 
         // Apply all engine settings at once (batch update - only 1 log message instead of 16+)
         keyboardHandler?.applyAllSettings(
@@ -641,6 +672,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // Update Dock icon visibility
         updateDockIconVisibility(show: preferences.showDockIcon)
+
+        // Register/unregister the login item. This was never wired up: the
+        // preference was stored but macOS was never told, so the toggle did
+        // nothing at all.
+        applyLaunchAtLogin(preferences.startAtLogin)
         
         // Update hotkey
         setupGlobalHotkey(with: preferences.toggleHotkey)

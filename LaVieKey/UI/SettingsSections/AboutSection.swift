@@ -134,7 +134,7 @@ struct AboutSection: View {
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
 
-                    Text("Sau khi cập nhật cần bật lại quyền Trợ năng (Accessibility) — bản build ký ad-hoc nên macOS coi mỗi bản là ứng dụng mới.")
+                    Text("Sau khi cập nhật, cần bật lại quyền Trợ năng trong System Settings.")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)

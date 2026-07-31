@@ -19,6 +19,10 @@ final class JapaneseEngine {
 
     private var converter = RomajiKanaConverter()
 
+    /// Kana of the segment that endSegment() just finished — the reading the
+    /// kana→kanji lookup needs, since reset() clears the converter.
+    private(set) var lastCommittedSegment: String = ""
+
     /// Keep segments bounded: once the visible segment grows past this, the
     /// engine forgets its history (the text on screen is final anyway).
     private let segmentCap = 60
@@ -66,6 +70,7 @@ final class JapaneseEngine {
     func endSegment() -> Result {
         let old = converter.displayText
         converter.flushPending()
+        lastCommittedSegment = converter.displayText
         let result = diff(from: old, to: converter.displayText)
         converter.reset()
         return result
@@ -75,6 +80,7 @@ final class JapaneseEngine {
     /// app switch, click…).
     func reset() {
         converter.reset()
+        lastCommittedSegment = ""
     }
 
     // MARK: - Diff

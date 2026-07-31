@@ -78,6 +78,11 @@
 		564995EF131811377C4F3FF6 /* VNEngineAdvanced.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F6BDFF6F99DC1B577BA425 /* VNEngineAdvanced.swift */; };
 		5A61FAA58A29AD3225DD649C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803B94EF161FE79A022FF806 /* SettingsView.swift */; };
 		1A7EA11E2F0100010000AB01 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA11E2F0100020000AB02 /* ThemeManager.swift */; };
+		1A7EA55E2F0500010000EF01 /* JapaneseLearning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA55E2F0500020000EF02 /* JapaneseLearning.swift */; };
+		1A7EA44E2F0400070000DE07 /* CaretAnchor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA44E2F0400080000DE08 /* CaretAnchor.swift */; };
+		1A7EA44E2F0400050000DE05 /* CandidateWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA44E2F0400060000DE06 /* CandidateWindowController.swift */; };
+		1A7EA44E2F0400030000DE03 /* KanaKanjiSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA44E2F0400040000DE04 /* KanaKanjiSession.swift */; };
+		1A7EA44E2F0400010000DE01 /* SKKDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA44E2F0400020000DE02 /* SKKDictionary.swift */; };
 		1A7EA33E2F0300010000CD01 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA33E2F0300020000CD02 /* UpdateChecker.swift */; };
 		1A7EA22E2F0200030000AB13 /* RomajiKanaConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA22E2F0200020000AB12 /* RomajiKanaConverter.swift */; };
 		1A7EA33E2F0300030000AC03 /* EnglishWordList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7EA33E2F0300020000AC02 /* EnglishWordList.swift */; };
@@ -221,6 +226,11 @@
 		69901F64AACBE0FBAC7C0E0F /* BackupRestoreSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackupRestoreSection.swift; sourceTree = "<group>"; };
 		803B94EF161FE79A022FF806 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		1A7EA11E2F0100020000AB02 /* ThemeManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
+		1A7EA55E2F0500020000EF02 /* JapaneseLearning.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = JapaneseLearning.swift; sourceTree = "<group>"; };
+		1A7EA44E2F0400080000DE08 /* CaretAnchor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CaretAnchor.swift; sourceTree = "<group>"; };
+		1A7EA44E2F0400060000DE06 /* CandidateWindowController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CandidateWindowController.swift; sourceTree = "<group>"; };
+		1A7EA44E2F0400040000DE04 /* KanaKanjiSession.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KanaKanjiSession.swift; sourceTree = "<group>"; };
+		1A7EA44E2F0400020000DE02 /* SKKDictionary.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SKKDictionary.swift; sourceTree = "<group>"; };
 		1A7EA33E2F0300020000CD02 /* UpdateChecker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		1A7EA22E2F0200020000AB12 /* RomajiKanaConverter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RomajiKanaConverter.swift; sourceTree = "<group>"; };
 		1A7EA33E2F0300020000AC02 /* EnglishWordList.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EnglishWordList.swift; sourceTree = "<group>"; };
@@ -490,6 +500,9 @@
 			children = (
 				1A7EA22E2F0200020000AB12 /* RomajiKanaConverter.swift */,
 				1A7EA22E2F0200040000AB14 /* JapaneseEngine.swift */,
+				1A7EA44E2F0400040000DE04 /* KanaKanjiSession.swift */,
+				1A7EA55E2F0500020000EF02 /* JapaneseLearning.swift */,
+				1A7EA44E2F0400020000DE02 /* SKKDictionary.swift */,
 			);
 			path = Japanese;
 			sourceTree = "<group>";
@@ -522,6 +535,8 @@
 				1084A5442ED41EB200EA2D2A /* PreferencesViewModel.swift */,
 				803B94EF161FE79A022FF806 /* SettingsView.swift */,
 				1A7EA11E2F0100020000AB02 /* ThemeManager.swift */,
+				1A7EA44E2F0400080000DE08 /* CaretAnchor.swift */,
+				1A7EA44E2F0400060000DE06 /* CandidateWindowController.swift */,
 				1A7EA33E2F0300060000AC06 /* SuggestionPanelController.swift */,
 				8EAA0ED7079ABD1980FBFFAE /* SettingsWindowController.swift */,
 				STATUSBARVM002 /* StatusBarViewModel.swift */,
@@ -818,6 +833,11 @@
 				1045F4282EF91CBA00F735BE /* VNEngineEnglishDetection.swift in Sources */,
 				5A61FAA58A29AD3225DD649C /* SettingsView.swift in Sources */,
 				1A7EA11E2F0100010000AB01 /* ThemeManager.swift in Sources */,
+				1A7EA55E2F0500010000EF01 /* JapaneseLearning.swift in Sources */,
+				1A7EA44E2F0400070000DE07 /* CaretAnchor.swift in Sources */,
+				1A7EA44E2F0400050000DE05 /* CandidateWindowController.swift in Sources */,
+				1A7EA44E2F0400030000DE03 /* KanaKanjiSession.swift in Sources */,
+				1A7EA44E2F0400010000DE01 /* SKKDictionary.swift in Sources */,
 				1A7EA33E2F0300010000CD01 /* UpdateChecker.swift in Sources */,
 				1A7EA22E2F0200030000AB13 /* RomajiKanaConverter.swift in Sources */,
 				1A7EA33E2F0300030000AC03 /* EnglishWordList.swift in Sources */,

@@ -240,6 +240,7 @@ struct Preferences: Codable {
 
     // Japanese input (phase 1: romaji → kana)
     var kanaScript: KanaScript = .hiragana
+    var kanjiConversionEnabled: Bool = false        // Space converts kana → kanji
     var japanesePunctuation: Bool = true             // . , ? ! → 。、？！
     
     // Excluded apps - apps where Vietnamese input is disabled

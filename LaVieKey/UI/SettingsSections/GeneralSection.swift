@@ -127,7 +127,7 @@ struct GeneralSection: View {
                         Divider()
 
                         Toggle("Cho phép gõ kiểu GenZ (zậy, zị, zui…)", isOn: $viewModel.preferences.genZMode)
-                        Text("Mở khoá chữ \"z\" làm phụ âm đầu, để bộ gõ không bỏ dấu hoặc tự sửa ngược các từ như zậy, zị, zui, zô.")
+                        Text("Giữ nguyên dấu cho các từ bắt đầu bằng \"z\": zậy, zị, zui, zô.")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -135,7 +135,7 @@ struct GeneralSection: View {
                         Divider()
 
                         Toggle("Gợi ý từ tiếng Anh (Tab để chấp nhận)", isOn: $viewModel.preferences.englishSuggestionEnabled)
-                        Text("Khi gõ tiếng Việt mà chữ hiện ra sai vì Telex (vd \"origi\" → \"ỏigi\"), một ô gợi ý nhỏ hiện dưới con trỏ đề xuất từ tiếng Anh đúng — bấm Tab để thay.")
+                        Text("Gõ \"origi\" (hiện \"ỏigi\") → gợi ý origin. ↑↓ chọn · Tab chấp nhận.")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)

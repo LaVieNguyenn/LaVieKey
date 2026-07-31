@@ -71,9 +71,7 @@ struct AppearanceSection: View {
                             }
                         }
 
-                        Text("Màu nhấn áp dụng cho cửa sổ cài đặt, menu và các thanh công cụ của LaVieKey.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+
                     }
                 }
 
