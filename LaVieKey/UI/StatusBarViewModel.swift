@@ -243,7 +243,12 @@ class StatusBarViewModel: ObservableObject {
     }
     
     func quit() {
-        NSApplication.shared.terminate(nil)
+        // Deliberate: skip the ⌘Q confirmation in applicationShouldTerminate.
+        if let delegate = AppDelegate.shared {
+            delegate.requestQuit(reason: "người dùng chọn Thoát trên menu")
+        } else {
+            NSApplication.shared.terminate(nil)
+        }
     }
     
     func updateHotkeyDisplay(_ hotkey: Hotkey? = nil) {

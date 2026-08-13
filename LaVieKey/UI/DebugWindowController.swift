@@ -36,7 +36,7 @@ class DebugWindowController: NSWindowController, DebugWindowControllerProtocol, 
         window.isReleasedWhenClosed = true
         window.setContentSize(NSSize(width: 900, height: 700))
         window.minSize = NSSize(width: 700, height: 500)
-        window.level = .floating  // Always on top by default
+        window.level = viewModel.isAlwaysOnTop ? .floating : .normal  // follows the pin button
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden
         window.center()
@@ -83,7 +83,19 @@ class DebugWindowController: NSWindowController, DebugWindowControllerProtocol, 
     }
     
     // MARK: - Public Methods
-    
+
+    /// Show the window at launch without making LaVieKey the active app.
+    ///
+    /// `showWindow(_:)` makes the window key, which activates a Dock-less app:
+    /// the console then lands on top of whatever the user is doing after login
+    /// and LaVieKey silently owns the keyboard shortcuts — a ⌘Q meant for
+    /// another app quits the input method. Unpinned and unfocused instead.
+    func showWithoutStealingFocus() {
+        viewModel.isAlwaysOnTop = false
+        window?.level = .normal
+        window?.orderFrontRegardless()
+    }
+
     var isLoggingEnabled: Bool {
         return viewModel.isLoggingEnabled
     }

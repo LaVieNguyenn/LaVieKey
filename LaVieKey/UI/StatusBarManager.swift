@@ -12,7 +12,10 @@ import Combine
 class StatusBarManager: ObservableObject {
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
-    private var eventMonitor: Any?
+    private var popoverCloseObserver: NSObjectProtocol?
+    /// When the popover last closed — used to tell "click the icon to close it"
+    /// apart from "click the icon to open it" (see togglePopover).
+    private var lastPopoverCloseAt: Date = .distantPast
     let viewModel: StatusBarViewModel
     private var menuBarIconStyle: MenuBarIconStyle = .x
     weak var debugWindowController: DebugWindowController?
@@ -27,6 +30,12 @@ class StatusBarManager: ObservableObject {
         self.menuBarIconStyle = SharedSettings.shared.loadPreferences().menuBarIconStyle
     }
     
+    deinit {
+        if let observer = popoverCloseObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
+
     private func log(_ message: String) {
         debugWindowController?.logEvent(message)
     }
@@ -119,7 +128,16 @@ class StatusBarManager: ObservableObject {
         // Apply glass/vibrancy effect to the popover's content view
         // This creates the frosted glass appearance like macOS system menus
         popover.contentViewController?.view.wantsLayer = true
-        
+
+        // .transient already dismisses on any interaction outside the popover, so
+        // this only records *when* that happened.
+        popoverCloseObserver = NotificationCenter.default.addObserver(
+            forName: NSPopover.didCloseNotification, object: popover, queue: .main
+        ) { [weak self] _ in
+            self?.lastPopoverCloseAt = Date()
+            self?.log("Popover closed")
+        }
+
         self.popover = popover
     }
     
@@ -131,6 +149,11 @@ class StatusBarManager: ObservableObject {
         if popover.isShown {
             closePopover()
         } else {
+            // The click that dismissed a .transient popover must not reopen it:
+            // AppKit closes on mouse-down, this action runs on mouse-up, so
+            // isShown is already false by the time we get here.
+            guard Date().timeIntervalSince(lastPopoverCloseAt) > 0.25 else { return }
+
             // Recreate content view to ensure fresh state
             let contentView = StatusBarPopoverView(
                 viewModel: viewModel,
@@ -152,33 +175,22 @@ class StatusBarManager: ObservableObject {
             // Ensure popover window becomes key window for focus
             popover.contentViewController?.view.window?.makeKey()
             log("Popover shown")
-            
-            // Start monitoring for clicks outside popover
-            startEventMonitor()
         }
     }
-    
+
+    /// Dismissal is handled by the popover's own `.transient` behavior.
+    ///
+    /// There used to be an `NSEvent.addGlobalMonitorForEvents` here that closed
+    /// the popover on any mouse-down. A global monitor sees every click that is
+    /// *not* delivered to the active app — so the moment LaVieKey was not the
+    /// active app, the click on the status item (hosted by ControlCenter) and the
+    /// clicks inside the popover itself both reached the monitor and shut the
+    /// popover before any button could fire. Nothing in the dropdown could be
+    /// clicked. `.transient` does the same job from inside AppKit, correctly.
     private func closePopover() {
         popover?.performClose(nil)
-        stopEventMonitor()
-        log("Popover closed")
     }
-    
-    // MARK: - Event Monitor (click outside to close)
-    
-    private func startEventMonitor() {
-        eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
-            self?.closePopover()
-        }
-    }
-    
-    private func stopEventMonitor() {
-        if let monitor = eventMonitor {
-            NSEvent.removeMonitor(monitor)
-            eventMonitor = nil
-        }
-    }
-    
+
     // MARK: - Status Icon
     
     private func updateStatusIcon() {

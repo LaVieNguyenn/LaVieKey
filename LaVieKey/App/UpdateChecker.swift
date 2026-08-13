@@ -196,7 +196,13 @@ final class UpdateChecker {
         try swap.run()
 
         DispatchQueue.main.async {
-            NSApp.terminate(nil)
+            // Deliberate: the swap script is already waiting on this PID, so the
+            // quit must not be held up by the ⌘Q confirmation.
+            if let delegate = AppDelegate.shared {
+                delegate.requestQuit(reason: "cài đặt bản cập nhật rồi khởi động lại")
+            } else {
+                NSApp.terminate(nil)
+            }
         }
     }
 }

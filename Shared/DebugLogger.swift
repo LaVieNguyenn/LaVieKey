@@ -64,24 +64,36 @@ class DebugLogger {
     /// Write to file asynchronously (fire-and-forget)
     private func writeToFile(_ text: String) {
         logQueue.async { [weak self] in
-            guard let self = self else { return }
-            
-            self.writeLock.lock()
-            defer { self.writeLock.unlock() }
-            
-            let timestamp = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
-            let line = "[\(timestamp)] \(text)\n"
-            
-            guard let data = line.data(using: .utf8) else { return }
-            
-            do {
-                let handle = try FileHandle(forWritingTo: self.logFileURL)
-                handle.seekToEndOfFile()
-                handle.write(data)
-                try handle.close()
-            } catch {
-                // Ignore write errors - fire and forget
-            }
+            self?.writeLineNow(text)
+        }
+    }
+
+    /// Append one line on the calling thread.
+    private func writeLineNow(_ text: String) {
+        writeLock.lock()
+        defer { writeLock.unlock() }
+
+        let timestamp = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
+        let line = "[\(timestamp)] \(text)\n"
+
+        guard let data = line.data(using: .utf8) else { return }
+
+        // FileHandle(forWritingTo:) throws when the file does not exist, so
+        // without this every line was dropped until the debug window had
+        // created the file once — including the quit reason of a session that
+        // ran with debugging off.
+        let fm = FileManager.default
+        if !fm.fileExists(atPath: logFileURL.path) {
+            fm.createFile(atPath: logFileURL.path, contents: nil)
+        }
+
+        do {
+            let handle = try FileHandle(forWritingTo: logFileURL)
+            handle.seekToEndOfFile()
+            handle.write(data)
+            try handle.close()
+        } catch {
+            // Ignore write errors - fire and forget
         }
     }
 
@@ -117,6 +129,20 @@ class DebugLogger {
                 writeToFile(fullMessage)
             }
         }
+    }
+
+    /// Write to the log file regardless of whether logging is switched on.
+    ///
+    /// Reserved for lifecycle facts — why the app is quitting above all. Those
+    /// lines are the only record left once the process is gone, and
+    /// `isLoggingEnabled` is false whenever the debug window is closed, which is
+    /// exactly when a disappearing app is hardest to explain.
+    ///
+    /// Written synchronously: the background queue is not guaranteed to run
+    /// before the process exits, and a quit reason that loses the race is worth
+    /// nothing. Lifecycle events are rare, so the blocking write costs nothing.
+    func logAlways(_ message: String) {
+        writeLineNow(message)
     }
 
     /// Log an info message

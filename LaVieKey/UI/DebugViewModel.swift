@@ -185,8 +185,30 @@ class DebugViewModel: ObservableObject {
         writeLock.lock()
         try? logFileHandle?.close()
         logFileHandle = nil
+        rotatePreviousLog()
         try? header.write(to: logFileURL, atomically: true, encoding: .utf8)
         writeLock.unlock()
+    }
+
+    /// Keep the finished session's log as `LaVieKey_Debug.previous.log`.
+    ///
+    /// Overwriting in place destroyed the only record of how the last run ended
+    /// — the exact evidence needed when the app is gone and the user asks why.
+    /// Caller holds `writeLock`.
+    private func rotatePreviousLog() {
+        let fm = FileManager.default
+        guard fm.fileExists(atPath: logFileURL.path) else { return }
+
+        let previousURL = logFileURL
+            .deletingLastPathComponent()
+            .appendingPathComponent("LaVieKey_Debug.previous.log")
+
+        try? fm.removeItem(at: previousURL)
+        do {
+            try fm.moveItem(at: logFileURL, to: previousURL)
+        } catch {
+            // Rotation is best-effort: a failure here must not cost us the new log.
+        }
     }
     
     private func loadExistingLogs() {

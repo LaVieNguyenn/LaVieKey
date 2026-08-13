@@ -81,6 +81,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     /// Daily background update check (UpdateChecker, not Sparkle)
     private var updateCheckTimer: Timer?
     private var sparkleUpdateDelegate: SparkleUpdateDelegate?
+
+    /// Set by every deliberate quit path (menu Quit, updater restart, the
+    /// permission alert) so the confirmation in applicationShouldTerminate does
+    /// not second-guess a quit the user already asked for.
+    private var quitIsIntentional = false
+
+    /// What ended this run — written to the log file on the way out, so the
+    /// next session can say why the previous one is gone.
+    private var quitReason = "không rõ"
+
+    /// Logout / restart / shutdown must never be held up by the confirmation.
+    private var powerOffObserver: NSObjectProtocol?
     
     /// Store the input source ID BEFORE a Window Title Rule switched it
     /// Used to restore when leaving the rule-controlled context
@@ -192,7 +204,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // focused app must degrade them to their synthetic fallbacks instead
         // of stalling input until macOS disables the event tap.
         AXHelper.setGlobalMessagingTimeout(0.25)
-        
+
+        // Logout / restart / shutdown quits the app through the same path a ⌘Q
+        // does. Remember which one it was so the confirmation only ever appears
+        // for a keystroke the user may not have meant.
+        powerOffObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.willPowerOffNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            self?.quitIsIntentional = true
+            self?.quitReason = "hệ thống tắt máy / đăng xuất"
+        }
+
         // Create debug window first
         setupDebugWindow()
         
@@ -294,8 +316,54 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         debugWindowController?.logEvent("LaVieKey started successfully")
     }
 
+    /// Quit on purpose, skipping the confirmation below.
+    /// Every in-app quit path goes through here instead of calling terminate directly.
+    func requestQuit(reason: String) {
+        quitIsIntentional = true
+        quitReason = reason
+        NSApplication.shared.terminate(nil)
+    }
+
+    /// A stray ⌘Q used to kill Vietnamese typing everywhere, silently: the app
+    /// has no Dock icon and often no window, so the user could not tell LaVieKey
+    /// was the active app receiving the shortcut. Confirm that case; leave every
+    /// other quit path untouched.
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        if isRunningTests || quitIsIntentional { return .terminateNow }
+
+        // A quit driven by an Apple event is never a stray keystroke: logout and
+        // restart, the Dock's Quit, an AppleScript, and the newer instance
+        // taking over in the single-instance guard all arrive this way.
+        if NSAppleEventManager.shared().currentAppleEvent != nil {
+            quitReason = "yêu cầu từ hệ thống (Apple event)"
+            return .terminateNow
+        }
+
+        NSApp.activate(ignoringOtherApps: true)
+
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Thoát LaVieKey?")
+        alert.informativeText = String(localized: "Thoát sẽ tắt luôn bộ gõ tiếng Việt cho mọi ứng dụng.")
+        // Default button = keep running, so Return or Esc on a shortcut the user
+        // did not mean to press does the harmless thing.
+        alert.addButton(withTitle: String(localized: "Tiếp tục chạy"))
+        alert.addButton(withTitle: String(localized: "Thoát"))
+
+        guard alert.runModal() == .alertSecondButtonReturn else {
+            DebugLogger.shared.logAlways("⌘Q — người dùng chọn tiếp tục chạy")
+            return .terminateCancel
+        }
+
+        quitReason = "người dùng xác nhận thoát (⌘Q)"
+        return .terminateNow
+    }
+
     func applicationWillTerminate(_ notification: Notification) {
         debugWindowController?.logEvent("👋 LaVieKey terminating...")
+        // Written unconditionally: the next session reads this to explain why
+        // the previous one ended, which is exactly what was missing while
+        // hunting an apparent crash that was really a quit.
+        DebugLogger.shared.logAlways("👋 LaVieKey thoát — lý do: \(quitReason)")
         eventTapManager?.stop()
 
         // Remove read word hotkey monitors
@@ -329,7 +397,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let observer = appSwitchObserver {
             NSWorkspace.shared.notificationCenter.removeObserver(observer)
         }
-        
+
+        if let observer = powerOffObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(observer)
+            powerOffObserver = nil
+        }
+
         // Stop permission check timer
         permissionCheckTimer?.invalidate()
         permissionCheckTimer = nil
@@ -363,8 +436,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setupDebugWindow() {
         // Check if debug mode is enabled in preferences
-        let preferences = SharedSettings.shared.loadPreferences()
-        
+        var preferences = SharedSettings.shared.loadPreferences()
+
         // Show debug window if:
         // 1. debugModeEnabled is true (user explicitly enabled debug mode), OR
         // 2. openDebugOnLaunch is true (user wants to open debug on every launch)
@@ -372,8 +445,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Show debug window only if enabled in settings
         if shouldShowDebug {
+            // From here on debugModeEnabled is the single source of truth for
+            // "the window is on screen". Without this, applyPreferences() —
+            // which runs moments later — would read debugModeEnabled == false
+            // and close the window openDebugOnLaunch had just opened.
+            if !preferences.debugModeEnabled {
+                preferences.debugModeEnabled = true
+                SharedSettings.shared.savePreferences(preferences)
+            }
+
             debugWindowController = DebugWindowController()
-            debugWindowController?.showWindow(nil)
+            // showWindow(nil) makes this window key, which makes LaVieKey the
+            // frontmost app right after login — and then the next ⌘Q the user
+            // presses for some *other* app quits the input method instead.
+            // Show it without taking focus and at the normal window level.
+            debugWindowController?.showWithoutStealingFocus()
 
             // Connect DebugLogger to debug window
             DebugLogger.shared.debugWindowController = debugWindowController
@@ -652,10 +738,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             undoTypingEnabled: preferences.undoTypingEnabled
         )
         
-        // Apply debug mode (toggle debug window)
-        // Keep debug window open if either debugModeEnabled OR openDebugOnLaunch is true
-        let shouldShowDebug = preferences.debugModeEnabled || preferences.openDebugOnLaunch
-        toggleDebugWindow(enabled: shouldShowDebug)
+        // Apply debug mode (toggle debug window). openDebugOnLaunch is a launch
+        // option only — it is consumed once in setupDebugWindow(). Reading it
+        // here reopened the window on every settings save, seconds after the
+        // user had closed it, which made the window feel impossible to turn off.
+        // bringToFront: false — this runs at launch too, and pulling the console
+        // forward there is exactly the focus theft setupDebugWindow() avoids.
+        toggleDebugWindow(enabled: preferences.debugModeEnabled, bringToFront: false)
         
         // Update status bar manager
         statusBarManager?.viewModel.currentInputMethod = preferences.inputMethod
@@ -697,7 +786,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             debugWindowController?.logEvent("Undo typing disabled")
         }
 
-
         // Apply toggle states
         keyboardHandler?.exclusionRulesEnabled = preferences.exclusionRulesEnabled
         AppBehaviorDetector.shared.windowTitleRulesEnabled = preferences.windowTitleRulesEnabled
@@ -731,6 +819,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let newEnabled = !prefs.debugModeEnabled
 
         prefs.debugModeEnabled = newEnabled
+        // Turning it off from the menu means off — including at the next launch.
+        // Leaving openDebugOnLaunch set would bring the window straight back.
+        if !newEnabled {
+            prefs.openDebugOnLaunch = false
+        }
         SharedSettings.shared.savePreferences(prefs)
 
         // Update viewModel
@@ -746,7 +839,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    private func toggleDebugWindow(enabled: Bool) {
+    /// - Parameter bringToFront: pass false when the caller is not a direct
+    ///   "show me the console" request, so an already-open window is left where
+    ///   it is instead of being made key.
+    private func toggleDebugWindow(enabled: Bool, bringToFront: Bool = true) {
         // Respect the debug mode setting
         if enabled {
             // Enable debug window
@@ -788,7 +884,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
                 debugWindowController?.logEvent("Debug window enabled via settings")
             }
-            debugWindowController?.showWindow(nil)
+            let alreadyOnScreen = debugWindowController?.window?.isVisible == true
+            if bringToFront || !alreadyOnScreen {
+                debugWindowController?.showWindow(nil)
+            }
         } else {
             // Disable debug window - also disable verbose logging
             keyboardHandler?.verboseEngineLogging = false
@@ -803,9 +902,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     /// Handle when debug window is closed via Close button on title bar
     private func handleDebugWindowClosed() {
-        // Disable debug mode in preferences
+        // Disable debug mode in preferences. Closing the window is the most
+        // direct way a user says "I don't want this", so it also clears the
+        // auto-open-at-launch option — otherwise the window reappears at the
+        // next login and the close button looks broken.
         var prefs = SharedSettings.shared.loadPreferences()
         prefs.debugModeEnabled = false
+        prefs.openDebugOnLaunch = false
         SharedSettings.shared.savePreferences(prefs)
 
         // Update viewModel to sync menu
@@ -820,9 +923,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         DebugLogger.shared.debugWindowController = nil
 
         // Log to file (window is closing, but file logging still works)
-        DebugLogger.shared.log("🛠️ Debug window closed - Debug mode disabled")
+        DebugLogger.shared.logAlways("🛠️ Debug window closed — Debug mode + auto-open at launch disabled")
+
     }
-    
+
+    // NOTE: there was an attempt here to hand focus back (NSApp.deactivate())
+    // once none of our windows were on screen, so a Dock-less app would stop
+    // silently owning ⌘Q. It broke the menu bar dropdown: after an explicit
+    // deactivate, the NSApp.activate(ignoringOtherApps:) that StatusBarManager
+    // does before showing the popover no longer reliably takes effect on
+    // macOS 26, so the popover opened in an inactive app and closed on the first
+    // click. The ⌘Q hazard is covered by applicationShouldTerminate instead,
+    // which is the protection that actually matters.
+
     // MARK: - Permissions
     
     private func checkAndRequestPermissions() {
@@ -859,7 +972,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             openAccessibilityPreferences()
             // Don't show alert again after opening settings
         } else {
-            NSApplication.shared.terminate(nil)
+            requestQuit(reason: "người dùng chọn Quit ở hộp thoại cấp quyền Accessibility")
         }
     }
     
@@ -1999,7 +2112,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         )
     }
-
 
     private func setupSparkleUpdater() {
         // Create the update delegate first
